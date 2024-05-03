@@ -36,37 +36,98 @@ class Alunos {
     // Callback para exibir o conteúdo do meta box
     function exibir_meta_box_alunos($post) {
 
-        // Recupere os valores dos campos personalizados, se existirem
         $nome = get_post_meta($post->ID, 'nome', true);
         $ultimo_nome = get_post_meta($post->ID, 'ultimo_nome', true);
-
+        // ESCOLAS
+        $args = array(
+            'post_type' => 'escolas',
+            'posts_per_page' => -1, 
+        );
+        $escolas_query = new \WP_Query($args);
+        // ESCOLAS
         ?>
+        <style>
+            .post-type-alunos span.select2.select2-container {
+                width: 100% !important;
+                margin-bottom: 13px;
+            }
+            .post-type-alunos .select2-container--default .select2-selection--multiple .select2-selection__rendered li{
+                font-size: 13px !important;
+                line-height: 1.5em !important;
+                padding: 0px 8px 4px !important;
+                font-weight: 500 !important;
+                text-transform: uppercase !important;
+                color: #5a5a5a !important;
+            }
+            .post-type-alunos input.select2-search__field {
+                min-height: 26px !important;
+            }
+            .post-type-alunos .select2-container--default .select2-selection--multiple {
+                padding-bottom: 0 !important;
+            }
+            .post-type-alunos .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+                color: #b61111 !important;
+            }
+            .post-type-alunos .select2-container--default .select2-selection--multiple .select2-selection__choice__remove{
+                border-right: none;
+                padding: 0;
+                padding-right: 3px;
+                background: none;
+            } 
+            .post-type-alunos .select2-container--default.select2-container--focus .select2-selection--multiple {
+                border: solid #5897fb 1px !important;
+                outline: 0;
+            }
+            .post-type-alunos span.select2-results ul li { 
+                font-size: 14px !important; text-transform: uppercase !important; 
+            }
+
+        </style>
+        <script>
+            jQuery(document).ready(function($) {
+                $('.select2').select2();
+            });
+        </script>
         <div class="row mt-4 mb-4">
             <div class="col">
                 <div class="form-group">
-                    <label for="nome" class="mb-1 fw-bold">Nome</label>
+                    <label for="nome" class="mb-2 fw-bold">Nome</label>
                     <input type="text" id="nome" name="nome" class="form-control" value="<?php echo esc_attr($nome); ?>" />
                 </div>
             </div>
             <div class="col">
                 <div class="form-group">
-                    <label for="ultimo_nome" class="mb-1 fw-bold">Último Nome</label>
+                    <label for="ultimo_nome" class="mb-2 fw-bold">Último Nome</label>
                     <input type="text" id="ultimo_nome" name="ultimo_nome" class="form-control" value="<?php echo esc_attr($ultimo_nome); ?>" />
                 </div>
             </div>
             <div class="col">
                 <div class="form-group">
-                    <label for="senha_nome" class="mb-1 fw-bold">Senha Nome</label>
+                    <label for="senha_nome" class="mb-2 fw-bold">Senha Nome</label>
                     <input type="text" id="senha_nome" name="senha_nome" class="form-control" value="<?php ?>" />
                 </div>
             </div>
             <div class="col">
                 <div class="form-group">
-                    <label for="data_nascimento" class="mb-1 fw-bold">Data de Nascimento</label>
+                    <label for="data_nascimento" class="mb-2 fw-bold">Data de Nascimento</label>
                     <input type="text" id="data_nascimento" name="data_nascimento" class="form-control" value="<?php ?>" />
                 </div>
             </div>
         </div>
+        <!-- ESCOLAS -->
+        <div class="row mt-4 mb-4">
+            <div class="col">
+                <div class="form-group">
+                    <label for="escola" class="mb-2 fw-bold">Escola</label>
+                    <select id="escola" name="escola[]" class="form-control select2" multiple="multiple">
+                        <?php while ($escolas_query->have_posts()) : $escolas_query->the_post(); ?>
+                            <option value="<?php echo esc_attr(get_the_ID()); ?>"><?php the_title(); ?></option>
+                        <?php endwhile; ?>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <!-- ESCOLAS -->
         <?php
     }
 
