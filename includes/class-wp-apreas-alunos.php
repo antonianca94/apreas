@@ -85,7 +85,9 @@ class Alunos {
         </style>
         <script>
             jQuery(document).ready(function($) {
-                $('.select2').select2();
+                $('.select2').select2({
+                maximumSelectionLength: 1
+            });
             });
         </script>
         <div class="row mt-4 mb-4">
