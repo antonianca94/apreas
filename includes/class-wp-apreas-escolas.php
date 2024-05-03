@@ -97,6 +97,29 @@ class Escolas {
     function exibir_meta_box_escolas($post) {
         $nome = get_post_meta($post->ID, 'nome', true);
         ?>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var titleInput = document.getElementById('title');
+                var nomeInput = document.getElementById('nome');
+                var titleLabel = document.getElementById('title-prompt-text');
+                titleInput.addEventListener('input', function() {
+                    nomeInput.value = titleInput.value;
+                    if (titleInput.value === '') {
+                        titleLabel.style.display = 'block';
+                    } else {
+                        titleLabel.style.display = 'none';
+                    }
+                });
+                nomeInput.addEventListener('input', function() {
+                    titleInput.value = nomeInput.value;
+                    if (nomeInput.value === '') {
+                        titleLabel.style.display = 'block';
+                    } else {
+                        titleLabel.style.display = 'none';
+                    }
+                });
+            });
+        </script>
         <div class="row mt-4 mb-4">
             <div class="col">
                 <div class="form-group">
