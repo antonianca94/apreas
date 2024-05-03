@@ -38,6 +38,10 @@ class Alunos {
 
         $nome = get_post_meta($post->ID, 'nome', true);
         $ultimo_nome = get_post_meta($post->ID, 'ultimo_nome', true);
+        $senha_nome = get_post_meta($post->ID, 'senha_nome', true);
+        $data_nascimento = get_post_meta($post->ID, 'data_nascimento', true);
+        $escola = get_post_meta($post->ID, 'escola', true);
+
         // ESCOLAS
         $args = array(
             'post_type' => 'escolas',
@@ -106,13 +110,13 @@ class Alunos {
             <div class="col">
                 <div class="form-group">
                     <label for="senha_nome" class="mb-2 fw-bold">Senha Nome</label>
-                    <input type="text" id="senha_nome" name="senha_nome" class="form-control" value="<?php ?>" />
+                    <input type="text" id="senha_nome" name="senha_nome" class="form-control" value="<?php echo esc_attr($senha_nome); ?>" />
                 </div>
             </div>
             <div class="col">
                 <div class="form-group">
                     <label for="data_nascimento" class="mb-2 fw-bold">Data de Nascimento</label>
-                    <input type="text" id="data_nascimento" name="data_nascimento" class="form-control" value="<?php ?>" />
+                    <input type="date" id="data_nascimento" name="data_nascimento" class="form-control" value="<?php echo esc_attr($data_nascimento); ?>" />
                 </div>
             </div>
         </div>
@@ -123,7 +127,11 @@ class Alunos {
                     <label for="escola" class="mb-2 fw-bold">Escola</label>
                     <select id="escola" name="escola[]" class="form-control select2" multiple="multiple">
                         <?php while ($escolas_query->have_posts()) : $escolas_query->the_post(); ?>
-                            <option value="<?php echo esc_attr(get_the_ID()); ?>"><?php the_title(); ?></option>
+                            <?php
+                            // Verifique se o ID da escola está presente na variável $escola
+                            $selected = in_array(get_the_ID(), $escola) ? 'selected' : '';
+                            ?>
+                            <option value="<?php echo esc_attr(get_the_ID()); ?>" <?php echo $selected; ?>><?php the_title(); ?></option>
                         <?php endwhile; ?>
                     </select>
                 </div>
@@ -138,8 +146,17 @@ class Alunos {
         if (isset($_POST['nome'])) {
             update_post_meta($post_id, 'nome', sanitize_text_field($_POST['nome']));
         }
-        if (isset($_POST['idade'])) {
-            update_post_meta($post_id, 'idade', sanitize_text_field($_POST['idade']));
+        if (isset($_POST['ultimo_nome'])) {
+            update_post_meta($post_id, 'ultimo_nome', sanitize_text_field($_POST['ultimo_nome']));
+        }
+        if (isset($_POST['senha_nome'])) {
+            update_post_meta($post_id, 'senha_nome', sanitize_text_field($_POST['senha_nome']));
+        }
+        if (isset($_POST['data_nascimento'])) {
+            update_post_meta($post_id, 'data_nascimento', sanitize_text_field($_POST['data_nascimento']));
+        }
+        if (isset($_POST['escola'])) {
+            update_post_meta($post_id, 'escola', $_POST['escola'] );
         }
     }
 
