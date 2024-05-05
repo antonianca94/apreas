@@ -131,8 +131,7 @@ class Alunos {
                     <select id="escola" name="escola[]" class="form-control select2" multiple="multiple">
                         <?php while ($escolas_query->have_posts()) : $escolas_query->the_post(); ?>
                             <?php
-                            // Verifique se o ID da escola está presente na variável $escola
-                            $selected = in_array(get_the_ID(), $escola) ? 'selected' : '';
+                            $selected = is_array($escola) && in_array(get_the_ID(), $escola) ? 'selected' : '';
                             ?>
                             <option value="<?php echo esc_attr(get_the_ID()); ?>" <?php echo $selected; ?>><?php the_title(); ?></option>
                         <?php endwhile; ?>
