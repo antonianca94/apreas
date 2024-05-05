@@ -121,7 +121,7 @@ class Alunos {
             </div>
         </div>
         <!-- ESCOLAS -->
-        <div class="row mt-4 mb-4">
+        <div class="row mt-4">
             <div class="col">
                 <div class="form-group">
                     <label for="escola" class="mb-2 fw-bold">Escola</label>
@@ -138,6 +138,34 @@ class Alunos {
             </div>
         </div>
         <!-- ESCOLAS -->
+        <!-- IMAGEM -->
+        <div class="row">
+            <div class="col-xxl-6 mt-3">
+                <label for="ultimo_nome" class="mb-2 fw-bold">Imagem Individual</label>
+                <div class="corpo-upload" style="width:100%; margin-bottom:10px;"><a href="#" id="imagem_upload" name="imagem_upload" class="imagem_upload aw_upload_image_button button button-secondary"><span class="dashicons dashicons-cloud-upload"></span> Carregar Imagem</a></div>
+                <div style="width:100%;">
+                    <input type="text" id="aw_custom_image" name="aw_custom_image" class="aw_custom_image" value="<?php  ?>" />
+                </div>
+                <div class="preview-aluno">
+                    <div class="preview-aluno-item">
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-xxl-6 mt-3">
+            <label for="ultimo_nome" class="mb-2 fw-bold">Imagem Turma</label>
+                <div class="corpo-upload" style="width:100%; margin-bottom:10px;"><a href="#" id="imagem_upload" name="imagem_upload" class="imagem_upload aw_upload_image_button button button-secondary"><span class="dashicons dashicons-cloud-upload"></span> Carregar Imagem</a></div>
+                <div style="width:100%;">
+                    <input type="text" id="aw_custom_image" name="aw_custom_image" class="aw_custom_image" value="<?php  ?>" />
+                </div>
+                <div class="preview-aluno">
+                    <div class="preview-aluno-item">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- IMAGEM --> 
         <?php
     }
 
