@@ -45,6 +45,7 @@ class APREAS_Plugin {
     private function init() {
         add_action( 'plugins_loaded', array( $this, 'plugin_loaded' ) );
         add_action( 'admin_enqueue_scripts', array( $this, 'load_admin_assets' ) );
+        add_action( 'wp_enqueue_scripts', array( $this, 'load_frontend_assets' ) ); 
     }
 
     public function plugin_loaded() {
@@ -55,11 +56,26 @@ class APREAS_Plugin {
             $Escolas = \Apreas\Escolas::getInstance();
             // INSTANCIAS
         }
+        $Login = \Apreas\Login::getInstance();
+
+    }
+
+    public function load_frontend_assets() {
+        $this->enqueue_frontend_styles();
+        $this->enqueue_frontend_scripts();        
     }
 
     public function load_admin_assets() {
         $this->enqueue_admin_styles();
         $this->enqueue_admin_scripts();        
+    }
+
+    private function enqueue_frontend_styles() {
+        wp_enqueue_style('bootstrap', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css', array(), '5.3.0');
+    }
+
+    private function enqueue_frontend_scripts() {
+        wp_enqueue_script('bootstrap', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js', array('jquery'), '5.3.0', true);
     }
 
     private function enqueue_admin_styles() {
