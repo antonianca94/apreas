@@ -46,17 +46,19 @@ class APREAS_Plugin {
         add_action( 'plugins_loaded', array( $this, 'plugin_loaded' ) );
         add_action( 'admin_enqueue_scripts', array( $this, 'load_admin_assets' ) );
         add_action( 'wp_enqueue_scripts', array( $this, 'load_frontend_assets' ) ); 
+
     }
 
     public function plugin_loaded() {
+        $Login = \Apreas\Login::getInstance();
 
         if (is_admin()) {
             // INSTANCIAS
             $Alunos = \Apreas\Alunos::getInstance();
             $Escolas = \Apreas\Escolas::getInstance();
+
             // INSTANCIAS
-        }
-        $Login = \Apreas\Login::getInstance();
+        } 
 
     }
 
@@ -76,6 +78,7 @@ class APREAS_Plugin {
 
     private function enqueue_frontend_scripts() {
         wp_enqueue_script('bootstrap', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js', array('jquery'), '5.3.0', true);
+        wp_enqueue_script('Login_JS', plugins_url('/admin/js/login.js', __FILE__), array(), '1.0.2', true);
     }
 
     private function enqueue_admin_styles() {
@@ -87,10 +90,9 @@ class APREAS_Plugin {
         if ( ! did_action( 'wp_enqueue_media' ) ) {
             wp_enqueue_media();
         }
-
+        wp_enqueue_script('Login_JS', plugins_url('/admin/js/login.js', __FILE__), array(), '1.0.2', true);
         wp_enqueue_script('Upload_JS', plugins_url('/admin/js/upload.js', __FILE__), array(), '1.0.0', true);
         wp_enqueue_script('Preview_JS', plugins_url('/admin/js/preview.js', __FILE__), array(), '1.0.0', true);
-
         wp_enqueue_script('select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-beta.1/js/select2.min.js', array('jquery'), '4.1.0', true);
         wp_enqueue_style('select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-beta.1/css/select2.min.css', array(), '4.1.0');
         wp_enqueue_script('pt-BR', plugins_url('/admin/js/pt-BR.js', __FILE__), array('select2'), '1.0.0', true);
