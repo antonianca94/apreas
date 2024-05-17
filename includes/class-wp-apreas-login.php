@@ -98,20 +98,45 @@ class Login {
     }
     
     public function process_login_form() {
-        $nome = $_POST['formData']['senha_nome'];
-        $data_nascimento = $_POST['formData']['data_nascimento'];
-        $escola = $_POST['formData']['escola'];
-        if (empty($nome)) {
-            wp_send_json_error('Digite o nome do Aluno');
-        }
-        elseif (empty($data_nascimento)) {
-            wp_send_json_error('Digite a Data de Nascimento');
-        }
-        elseif (empty($escola)) {
-            wp_send_json_error('Digite a Escola');
-        }
-        else {
-            wp_send_json_success('Acesso Permitido');
+        $senha_nome = sanitize_text_field($_POST['formData']['senha_nome']);
+        $data_nascimento = sanitize_text_field($_POST['formData']['data_nascimento']);
+        $escola = sanitize_text_field($_POST['formData']['escola']);
+    
+        $args = array(
+            'post_type' => 'alunos',
+            'meta_query' => array(
+                'relation' => 'OR',
+                array(
+                    'key' => 'senha_nome',
+                    'value' => $senha_nome,
+                    'compare' => '='
+                ),
+                array(
+                    'key' => 'data_nascimento',
+                    'value' => $data_nascimento,
+                    'compare' => '='
+                ),
+                array(
+                    'key' => 'escola',
+                    'value' => $escola,
+                    'compare' => '='
+                )
+            )
+        );
+    
+        $query = new \WP_Query($args);
+    
+        $dados = [
+            'senha_nome' => $senha_nome,
+            'data_nascimento' => $data_nascimento,
+            'escola' => $escola
+        ];
+
+        if ($query->have_posts()) {
+            wp_send_json_success('Aluno encontrado');
+            wp_send_json_success($dados);
+        } else {
+            wp_send_json_error('Aluno não encontrado');
         }
     }
     

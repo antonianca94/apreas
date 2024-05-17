@@ -16,16 +16,17 @@ jQuery(document).ready(function($) {
             },
             dataType: 'json',
             success: function(response) {
-                console.log(response);
                 if (response.success == true) {                    
                     console.log(response.data);
                 } 
                 if (response.success == false) {    
                     console.log(response.data);                
                 } 
+                
             },
             error: function(response) {
-                console.log(response.data);
+                console.log(response.data);                
+
             }
         });
     });
