@@ -52,6 +52,7 @@ class Login {
                     <div class="col-12">
                         <button type="submit" class="btn btn-primary">Login</button>
                     </div>
+                    <div class="error"> </div>
                 </form>
             </div>
         </div>
@@ -95,9 +96,23 @@ class Login {
     }
     
     public function process_login_form() {
-        $data = $_POST;
-        wp_send_json_success($data);
+        $nome = $_POST['formData']['senha_nome'];
+        $data_nascimento = $_POST['formData']['data_nascimento'];
+        $escola = $_POST['formData']['escola'];
+        if (empty($nome)) {
+            wp_send_json_error('Digite o nome do Aluno.');
+        }
+        elseif (empty($data_nascimento)) {
+            wp_send_json_error('Digite a Data de Nascimento.');
+        }
+        elseif (empty($escola)) {
+            wp_send_json_error('Digite a Escola.');
+        }
+        else {
+            wp_send_json_success('Acesso Permitido');
+        }
     }
+    
  
 }
 
