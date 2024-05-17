@@ -18,24 +18,14 @@ jQuery(document).ready(function($) {
             success: function(response) {
                 console.log(response);
                 if (response.success == true) {                    
-                    Swal.fire({
-                        title: response.data,
-                        text: '',
-                        icon: 'success',
-                    });
+                    console.log(response.data);
                 } 
-                if (response.success == false) {                    
-                    Swal.fire({
-                        title: response.data,
-                        text: '',
-                        icon: 'error',
-                    });
+                if (response.success == false) {    
+                    console.log(response.data);                
                 } 
-                
             },
             error: function(response) {
-                console.log(response);
-                alert('Ocorreu um erro.');
+                console.log(response.data);
             }
         });
     });

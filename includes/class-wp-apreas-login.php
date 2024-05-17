@@ -29,14 +29,16 @@ class Login {
                     <div class="col-md-6">
                         <label for="senha_nome" class="form-label"> Nome</label>
                         <input type="text" class="form-control senha_nome" name="senha_nome" id="senha_nome" placeholder="Nome">
+                        <div class="invalid-feedback" id="nameError"></div>
                     </div>
                     <div class="col-md-6">
                         <label for="data_nascimento" class="form-label">Data de Nascimento</label>
                         <input type="date" class="form-control data_nascimento" name="data_nascimento" id="data_nascimento" placeholder="Data de Nascimento">
+                        <div class="invalid-feedback" id="dataError"></div>
                     </div>
                     <div class="col-12">
                         <label for="escola" class="form-label">Escola</label>
-                        <select class="form-select" name="escola" aria-label="Escola">
+                        <select class="form-select" name="escola" id="escola" aria-label="Escola">
                         <option value=""> </option>
                         <?php
                             $escolas = get_posts( array(
@@ -47,12 +49,12 @@ class Login {
                                 echo '<option value="' . esc_attr( $escola->ID ) . '">' . esc_html( $escola->post_title ) . '</option>';
                             }
                         ?>
-                        </select>            
+                        </select>       
+                        <div class="invalid-feedback" id="escolaError"></div>     
                     </div>
                     <div class="col-12">
                         <button type="submit" class="btn btn-primary">Login</button>
                     </div>
-                    <div class="error"> </div>
                 </form>
             </div>
         </div>
@@ -100,13 +102,13 @@ class Login {
         $data_nascimento = $_POST['formData']['data_nascimento'];
         $escola = $_POST['formData']['escola'];
         if (empty($nome)) {
-            wp_send_json_error('Digite o nome do Aluno.');
+            wp_send_json_error('Digite o nome do Aluno');
         }
         elseif (empty($data_nascimento)) {
-            wp_send_json_error('Digite a Data de Nascimento.');
+            wp_send_json_error('Digite a Data de Nascimento');
         }
         elseif (empty($escola)) {
-            wp_send_json_error('Digite a Escola.');
+            wp_send_json_error('Digite a Escola');
         }
         else {
             wp_send_json_success('Acesso Permitido');
