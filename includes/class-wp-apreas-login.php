@@ -112,14 +112,14 @@ class Login {
     }
     
     public function process_login_form() {
-        $senha_nome = sanitize_text_field($_POST['formData']['senha_nome']);
-        $data_nascimento = sanitize_text_field($_POST['formData']['data_nascimento']);
-        $escola = sanitize_text_field($_POST['formData']['escola']);
+        $senha_nome = $_POST['formData']['senha_nome'];
+        $data_nascimento = $_POST['formData']['data_nascimento'];
+        $escola = $_POST['formData']['escola'];
     
         $args = array(
             'post_type' => 'alunos',
             'meta_query' => array(
-                'relation' => 'OR',
+                'relation' => 'AND',
                 array(
                     'key' => 'senha_nome',
                     'value' => $senha_nome,
@@ -147,10 +147,9 @@ class Login {
         ];
 
         if ($query->have_posts()) {
-            wp_send_json_success('Aluno encontrado');
             wp_send_json_success($dados);
         } else {
-            wp_send_json_error('Aluno não encontrado');
+            wp_send_json_error($dados);
         }
     }
     

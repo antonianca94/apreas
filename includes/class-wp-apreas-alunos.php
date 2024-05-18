@@ -42,9 +42,9 @@ class Alunos {
         $data_nascimento = get_post_meta($post->ID, 'data_nascimento', true);
         $escola = get_post_meta($post->ID, 'escola', true);
 
-        var_dump('SENHA_NOME: '.$senha_nome);
-        var_dump('DATA_NASCIMENTO: '.$data_nascimento);
-        var_dump($escola);
+        // var_dump('SENHA_NOME: '.$senha_nome);
+        // var_dump('DATA_NASCIMENTO: '.$data_nascimento);
+        // var_dump($escola);
 
         $imagem_upload_individual = get_post_meta($post->ID, 'imagem_upload_individual', true);
         $imagem_upload_turma = get_post_meta($post->ID, 'imagem_upload_turma', true);
@@ -156,7 +156,7 @@ class Alunos {
             <div class="col">
                 <div class="form-group">
                     <label for="escola" class="mb-2 fw-bold">Escola</label>
-                    <select id="escola" name="escola[]" class="form-control select2" multiple="multiple">
+                    <select id="escola" name="escola" class="form-control select2" multiple="multiple">
                         <?php while ($escolas_query->have_posts()) : $escolas_query->the_post(); ?>
                             <?php
                             $selected = is_array($escola) && in_array(get_the_ID(), $escola) ? 'selected' : '';

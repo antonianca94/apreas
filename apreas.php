@@ -80,7 +80,7 @@ class APREAS_Plugin {
 
     private function enqueue_frontend_scripts() {
         wp_enqueue_script('bootstrap', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js', array('jquery'), '5.3.0', true);
-        wp_enqueue_script('Login_JS', plugins_url('/admin/js/login.js', __FILE__), array(), '1.0.2', true);
+        wp_enqueue_script('Login_JS', plugins_url('/admin/js/login.js', __FILE__), array(), '1.0.4', true);
         wp_enqueue_script('sweetalert2-js', 'https://cdn.jsdelivr.net/npm/sweetalert2@11', [], null, true);
         wp_enqueue_script('Validation_JS', plugins_url('/admin/js/validation.js', __FILE__), array(), '1.0.2', true);
 
@@ -95,7 +95,7 @@ class APREAS_Plugin {
         if ( ! did_action( 'wp_enqueue_media' ) ) {
             wp_enqueue_media();
         }
-        wp_enqueue_script('Login_JS', plugins_url('/admin/js/login.js', __FILE__), array(), '1.0.2', true);
+        // wp_enqueue_script('Login_JS', plugins_url('/admin/js/login.js', __FILE__), array(), '1.0.4', true);
         wp_enqueue_script('Upload_JS', plugins_url('/admin/js/upload.js', __FILE__), array(), '1.0.0', true);
         wp_enqueue_script('Preview_JS', plugins_url('/admin/js/preview.js', __FILE__), array(), '1.0.0', true);
         wp_enqueue_script('select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-beta.1/js/select2.min.js', array('jquery'), '4.1.0', true);

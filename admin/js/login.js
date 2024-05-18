@@ -18,15 +18,36 @@ jQuery(document).ready(function($) {
             success: function(response) {
                 if (response.success == true) {                    
                     console.log(response.data);
+                    Swal.fire({
+                        title: 'Acesso Liberado com Sucesso!',
+                        text: '',
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    });
+                    var loginContainer = document.getElementById('loginContainer');
+                    if (loginContainer) {
+                        loginContainer.classList.add('d-none');
+                    }
                 } 
                 if (response.success == false) {    
-                    console.log(response.data);                
+                    console.log(response.data);   
+                    Swal.fire({
+                        title: 'Aluno não encontrado.',
+                        text: '',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });             
                 } 
                 
             },
             error: function(response) {
                 console.log(response.data);                
-
+                Swal.fire({
+                    title: 'Aluno não encontrado.',
+                    text: '',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });   
             }
         });
     });
