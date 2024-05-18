@@ -9,7 +9,7 @@ jQuery(document).ready(function($) {
         });
         $.ajax({
             type: 'POST',
-            url: `${'http://127.0.0.1/apreas'}/wp-admin/admin-ajax.php`,
+            url: `${'https://apreas.com.br'}/wp-admin/admin-ajax.php`,
             data: {
                 action: 'process_login_form', 
                 formData: formData

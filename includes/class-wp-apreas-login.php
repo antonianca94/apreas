@@ -52,7 +52,7 @@ class Login {
                         </select>       
                         <div class="invalid-feedback" id="escolaError"></div>     
                     </div>
-                    <div class="col-12">
+                    <div class="col-12 mt-4 pt-3 pb-3">
                         <button type="submit" class="btn btn-primary btn_form_login">Acessar</button>
                     </div>
                 </form>
@@ -70,6 +70,7 @@ class Login {
                 display: flex;
                 justify-content: center;
                 align-items: center;
+                z-index: 10;
             }
     
             #loginOverlay {
@@ -78,7 +79,7 @@ class Login {
                 left: 0;
                 width: 100%;
                 height: 100%;
-                background-color: rgba(0, 0, 0, 0.7); 
+                background-color: rgb(0 0 0 / 88%);
                 z-index: 1;
             }
     
@@ -91,11 +92,18 @@ class Login {
                 box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); 
             }
             form#form_login input:not(.is-invalid, .is-valid) {
-                border: 1px solid #c2c2c2;
+                border: 1px solid #c2c2c2 !important;
+                border-radius: 5px !important;
             }
             form#form_login select:not(.is-invalid, .is-valid) {
-                border: 1px solid #c2c2c2;
+                font-size: 15px !important;
+                line-height: 1rem !important;
             }
+            .woocommerce-js form#form_login input, .woocommerce-js form#form_login select {
+                font-family: "Roboto", Sans-serif !important;
+                padding-left: 1rem !important;
+            }
+ 
             .btn_form_login {
                 background: #C0FF2D !important;
                 color: #000 !important;
@@ -103,7 +111,62 @@ class Login {
                 border: none !important;
                 text-transform: uppercase !important;
                 margin-top: 8px;
+                padding: 8px 17px !important;
+                font-family: "Roboto", Sans-serif !important;
+
             }
+
+            .woocommerce-js form#form_login input.is-invalid {
+                border: 1px solid rgb(220, 53, 69);
+                border-radius: 5px !important;
+            }
+            .woocommerce-js form#form_login input.is-invalid:active {
+                border: 1px solid rgb(220, 53, 69);
+                border-radius: 5px !important;
+            }
+            .woocommerce-js form#form_login input.is-invalid:focus {
+                border: 1px solid rgb(220, 53, 69);
+                border-radius: 5px !important;
+            }
+            .woocommerce-js form#form_login input.is-valid {
+                border: 1px solid rgb(25, 135, 84);
+                border-radius: 5px !important;
+            }
+            .woocommerce-js form#form_login input.is-valid:active {
+                border: 1px solid rgb(25, 135, 84);
+                border-radius: 5px !important;
+            }
+            .woocommerce-js form#form_login input.is-valid:focus {
+                border: 1px solid rgb(25, 135, 84);
+                border-radius: 5px !important;
+            }
+
+
+            .woocommerce-js form#form_login select.is-invalid {
+                border: 1px solid rgb(220, 53, 69);
+                border-radius: 5px !important;
+            }
+            .woocommerce-js form#form_login select.is-invalid:active {
+                border: 1px solid rgb(220, 53, 69);
+                border-radius: 5px !important;
+            }
+            .woocommerce-js form#form_login select.is-invalid:focus {
+                border: 1px solid rgb(220, 53, 69);
+                border-radius: 5px !important;
+            }
+            .woocommerce-js form#form_login select.is-valid {
+                border: 1px solid rgb(25, 135, 84);
+                border-radius: 5px !important;
+            }
+            .woocommerce-js form#form_login select.is-valid:active {
+                border: 1px solid rgb(25, 135, 84);
+                border-radius: 5px !important;
+            }
+            .woocommerce-js form#form_login select.is-valid:focus {
+                border: 1px solid rgb(25, 135, 84);
+                border-radius: 5px !important;
+            }
+
         </style>
         <!-- CSS -->
         
