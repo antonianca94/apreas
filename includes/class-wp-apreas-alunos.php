@@ -124,6 +124,17 @@ class Alunos {
                     maximumSelectionLength: 1
                 });
                 
+                function updateSenhaNome() {
+                    var nome = $('#nome').val().toLowerCase();
+                    var ultimoNome = $('#ultimo_nome').val().toLowerCase().replace(/ç/g, 'c').normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+                    var senhaNome = nome + '_' + ultimoNome;
+                    $('#senha_nome').val(senhaNome);
+                }
+
+                $('#nome, #ultimo_nome').on('input', updateSenhaNome);
+
+                updateSenhaNome();
+
             });
         </script>
         <div class="row mt-4 mb-4">
