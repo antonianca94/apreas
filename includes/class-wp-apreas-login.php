@@ -139,21 +139,21 @@ class Login {
         );
     
         $query = new \WP_Query($args);
-    
-        $dados = [
-            'senha_nome' => $senha_nome,
-            'data_nascimento' => $data_nascimento,
-            'escola' => $escola
-        ];
-
+        foreach ($query->posts as $post) {
+            $post_id = $post->ID;
+            $imagem_upload_individual = get_post_meta($post_id, 'imagem_upload_individual', true);
+            $imagem_upload_turma = get_post_meta($post_id, 'imagem_upload_turma', true);
+            $dados = [
+                'imagem_upload_individual' => $imagem_upload_individual,
+                'imagem_upload_turma' => $imagem_upload_turma,
+            ];
+        }
         if ($query->have_posts()) {
             wp_send_json_success($dados);
         } else {
             wp_send_json_error($dados);
         }
     }
-    
- 
 }
 
 Login::getInstance();
