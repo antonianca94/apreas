@@ -113,6 +113,7 @@ class Login {
     
     public function process_login_form() {
         $senha_nome = $_POST['formData']['senha_nome'];
+        $senha_nome_transformada = strtolower(str_replace(' ', '_', $senha_nome));
         $data_nascimento = $_POST['formData']['data_nascimento'];
         $escola = $_POST['formData']['escola'];
     
@@ -122,7 +123,7 @@ class Login {
                 'relation' => 'AND',
                 array(
                     'key' => 'senha_nome',
-                    'value' => $senha_nome,
+                    'value' => $senha_nome_transformada,
                     'compare' => '='
                 ),
                 array(
