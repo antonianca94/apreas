@@ -124,20 +124,24 @@ class Alunos {
                     maximumSelectionLength: 1
                 });
                 
+
+                function removeDiacritics(str) {
+                    return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+                }
+
                 function updateSenhaNome() {
-                    var nome = $('#nome').val().toLowerCase();
-                    var ultimoNome = $('#ultimo_nome').val().toLowerCase().replace(/ç/g, 'c').normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+                    var nome = removeDiacritics($('#nome').val().toLowerCase());
+                    var ultimoNome = removeDiacritics($('#ultimo_nome').val().toLowerCase()).replace(/ç/g, 'c');
                     var senhaNome = nome + '_' + ultimoNome;
                     $('#senha_nome').val(senhaNome);
                 }
 
                 // Verificar se os campos estão preenchidos no carregamento da página
                 if ($('#nome').val() && $('#ultimo_nome').val()) {
-                updateSenhaNome();
+                    updateSenhaNome();
                 }
 
                 $('#nome, #ultimo_nome').on('input', updateSenhaNome);
-
             });
         </script>
         <div class="row mt-4 mb-4">
