@@ -24,6 +24,22 @@ jQuery(document).ready(function($) {
                         icon: 'success',
                         confirmButtonText: 'OK'
                     });
+
+                    // IMAGEM
+                    if (response.data.imagem_upload_individual) {
+                        $('.imagem_upload_individual').attr('src', response.data.imagem_upload_individual);
+                    }
+                    if (response.data.imagem_upload_individual) {
+                        $('.imagem_upload_individual').attr('srcset', response.data.imagem_upload_individual);
+                    }
+                    if (response.data.imagem_upload_turma) {
+                        $('.imagem_upload_turma').attr('src', response.data.imagem_upload_turma);
+                    }
+                    if (response.data.imagem_upload_turma) {
+                        $('.imagem_upload_turma').attr('srcset', response.data.imagem_upload_turma);
+                    }
+                    // IMAGEM
+
                     var loginContainer = document.getElementById('loginContainer');
                     if (loginContainer) {
                         loginContainer.classList.add('d-none');
