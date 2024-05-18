@@ -53,7 +53,7 @@ class Login {
                         <div class="invalid-feedback" id="escolaError"></div>     
                     </div>
                     <div class="col-12">
-                        <button type="submit" class="btn btn-primary">Login</button>
+                        <button type="submit" class="btn btn-primary btn_form_login">Acessar</button>
                     </div>
                 </form>
             </div>
@@ -89,6 +89,20 @@ class Login {
                 padding: 20px;
                 border-radius: 10px;
                 box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); 
+            }
+            form#form_login input:not(.is-invalid, .is-valid) {
+                border: 1px solid #c2c2c2;
+            }
+            form#form_login select:not(.is-invalid, .is-valid) {
+                border: 1px solid #c2c2c2;
+            }
+            .btn_form_login {
+                background: #C0FF2D !important;
+                color: #000 !important;
+                font-weight: 500 !important;
+                border: none !important;
+                text-transform: uppercase !important;
+                margin-top: 8px;
             }
         </style>
         <!-- CSS -->
