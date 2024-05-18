@@ -41,6 +41,7 @@ class Alunos {
         $senha_nome = get_post_meta($post->ID, 'senha_nome', true);
         $data_nascimento = get_post_meta($post->ID, 'data_nascimento', true);
         $escola = get_post_meta($post->ID, 'escola', true);
+        $escola = !empty($escola) ? explode(',', $escola) : [];
 
         // var_dump('SENHA_NOME: '.$senha_nome);
         // var_dump('DATA_NASCIMENTO: '.$data_nascimento);
