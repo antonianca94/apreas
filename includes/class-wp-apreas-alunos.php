@@ -131,9 +131,12 @@ class Alunos {
                     $('#senha_nome').val(senhaNome);
                 }
 
-                $('#nome, #ultimo_nome').on('input', updateSenhaNome);
-
+                // Verificar se os campos estão preenchidos no carregamento da página
+                if ($('#nome').val() && $('#ultimo_nome').val()) {
                 updateSenhaNome();
+                }
+
+                $('#nome, #ultimo_nome').on('input', updateSenhaNome);
 
             });
         </script>
