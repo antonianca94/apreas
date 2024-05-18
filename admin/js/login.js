@@ -27,16 +27,16 @@ jQuery(document).ready(function($) {
 
                     // IMAGEM
                     if (response.data.imagem_upload_individual) {
-                        $('.imagem_upload_individual').attr('src', response.data.imagem_upload_individual);
+                        $('.imagem_upload_individual img').attr('src', response.data.imagem_upload_individual);
                     }
                     if (response.data.imagem_upload_individual) {
-                        $('.imagem_upload_individual').attr('srcset', response.data.imagem_upload_individual);
+                        $('.imagem_upload_individual img').attr('srcset', response.data.imagem_upload_individual);
                     }
                     if (response.data.imagem_upload_turma) {
-                        $('.imagem_upload_turma').attr('src', response.data.imagem_upload_turma);
+                        $('.imagem_upload_turma img').attr('src', response.data.imagem_upload_turma);
                     }
                     if (response.data.imagem_upload_turma) {
-                        $('.imagem_upload_turma').attr('srcset', response.data.imagem_upload_turma);
+                        $('.imagem_upload_turma img').attr('srcset', response.data.imagem_upload_turma);
                     }
                     // IMAGEM
 
