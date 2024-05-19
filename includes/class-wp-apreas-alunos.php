@@ -97,28 +97,6 @@ class Alunos {
         </style>
         <script>
 
-            document.addEventListener('DOMContentLoaded', function() {
-                var titleInput = document.getElementById('title');
-                var nomeInput = document.getElementById('nome');
-                var titleLabel = document.getElementById('title-prompt-text');
-                titleInput.addEventListener('input', function() {
-                    nomeInput.value = titleInput.value;
-                    if (titleInput.value === '') {
-                        titleLabel.style.display = 'block';
-                    } else {
-                        titleLabel.style.display = 'none';
-                    }
-                });
-                nomeInput.addEventListener('input', function() {
-                    titleInput.value = nomeInput.value;
-                    if (nomeInput.value === '') {
-                        titleLabel.style.display = 'block';
-                    } else {
-                        titleLabel.style.display = 'none';
-                    }
-                });
-            });
-
             jQuery(document).ready(function($) {
                 $('.select2').select2({
                     maximumSelectionLength: 1

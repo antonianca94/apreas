@@ -27,8 +27,8 @@ class Login {
             <div id="loginContent">
                 <form class="row g-3" id="form_login" name="form_login" enctype="multipart/form-data">
                     <div class="col-md-6">
-                        <label for="senha_nome" class="form-label"> Nome</label>
-                        <input type="text" class="form-control senha_nome" name="senha_nome" id="senha_nome" placeholder="Nome">
+                        <label for="senha_nome" class="form-label"> Nome e Último Nome </label>
+                        <input type="text" class="form-control senha_nome" name="senha_nome" id="senha_nome" placeholder="Nome e Último Nome">
                         <div class="invalid-feedback" id="nameError"></div>
                     </div>
                     <div class="col-md-6">
