@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (name.value === '' || name.value == null) {
             name.classList.add("is-invalid");
             nameError.classList.add("d-block");
-            nameError.innerText = 'Insira algo no Nome';
+            nameError.innerText = 'Insira algo no Nome e Último Nome';
             e.preventDefault();
         } else {
             name.classList.remove("is-invalid");
