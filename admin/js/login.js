@@ -44,6 +44,7 @@ jQuery(document).ready(function($) {
                     if (loginContainer) {
                         loginContainer.classList.add('d-none');
                     }
+                    window.scrollTo(0, 0);
                 } 
                 if (response.success == false) {    
                     console.log(response.data);   
