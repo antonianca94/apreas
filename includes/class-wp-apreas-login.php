@@ -26,7 +26,7 @@ class Login {
             <div id="loginOverlay"></div>
             <div id="loginContent">
                 <a type="button" class="btn btn-secondary back" style="" onclick="window.history.back()">
-                    <i class="bi bi-arrow-left pe-1"></i> Voltar
+                    <i class="bi bi-arrow-left pe-1" style="font-size: 1.5rem !important; padding-right: 0.7rem !important;"></i> Voltar
                 </a>
                 <form class="row g-3" id="form_login" name="form_login" enctype="multipart/form-data">
                     <div class="col-md-6">
@@ -64,20 +64,22 @@ class Login {
     
         <!-- CSS -->
         <style>
-            .back{
+            .back {
                 font-family: "Roboto", Sans-serif !important; 
                 padding: 25px 0px !important; 
                 padding-top: 0 !important;
                 border: 0 !important; 
                 box-shadow: none !important; 
                 background: none !important;
-                font-weight: 500;
-                text-transform: uppercase;
+                font-weight: 500 !important;
+                text-transform: uppercase !important;
+                font-size: 1.2rem !important;
+                display: flex;
+                align-items: center;
             }
-            .back i {
-                font-size: 1.1rem;
+            .back:hover {
+                color: black !important;
             }
-
             #loginContainer {
                 position: fixed;
                 top: 0;
