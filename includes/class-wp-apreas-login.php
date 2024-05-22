@@ -25,6 +25,9 @@ class Login {
         <div id="loginContainer">
             <div id="loginOverlay"></div>
             <div id="loginContent">
+                <a type="button" class="btn btn-secondary back" style="" onclick="window.history.back()">
+                    <i class="bi bi-arrow-left pe-1"></i> Voltar
+                </a>
                 <form class="row g-3" id="form_login" name="form_login" enctype="multipart/form-data">
                     <div class="col-md-6">
                         <label for="senha_nome" class="form-label"> Nome e Último Nome </label>
@@ -61,6 +64,20 @@ class Login {
     
         <!-- CSS -->
         <style>
+            .back{
+                font-family: "Roboto", Sans-serif !important; 
+                padding: 25px 0px !important; 
+                padding-top: 0 !important;
+                border: 0 !important; 
+                box-shadow: none !important; 
+                background: none !important;
+                font-weight: 500;
+                text-transform: uppercase;
+            }
+            .back i {
+                font-size: 1.1rem;
+            }
+
             #loginContainer {
                 position: fixed;
                 top: 0;
