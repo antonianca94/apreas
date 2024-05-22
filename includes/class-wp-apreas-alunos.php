@@ -101,25 +101,35 @@ class Alunos {
                 $('.select2').select2({
                     maximumSelectionLength: 1
                 });
-                
-
                 function removeDiacritics(str) {
                     return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
                 }
-
                 function updateSenhaNome() {
                     var nome = removeDiacritics($('#nome').val().toLowerCase());
                     var ultimoNome = removeDiacritics($('#ultimo_nome').val().toLowerCase()).replace(/ç/g, 'c');
                     var senhaNome = nome + '_' + ultimoNome;
                     $('#senha_nome').val(senhaNome);
                 }
-
-                // Verificar se os campos estão preenchidos no carregamento da página
+                function splitName(title) {
+                    var nameParts = title.trim().split(' ');
+                    if (nameParts.length > 1) {
+                        var nome = nameParts[0];
+                        var ultimoNome = nameParts[nameParts.length - 1];
+                        $('#nome').val(nome);
+                        $('#ultimo_nome').val(ultimoNome);
+                        updateSenhaNome();
+                    }
+                }
                 if ($('#nome').val() && $('#ultimo_nome').val()) {
                     updateSenhaNome();
                 }
-
                 $('#nome, #ultimo_nome').on('input', updateSenhaNome);
+                $('#title').on('input', function() {
+                    splitName($(this).val());
+                });
+                if ($('#title').val()) {
+                    splitName($('#title').val());
+                }
             });
         </script>
         <div class="row mt-4 mb-4">
