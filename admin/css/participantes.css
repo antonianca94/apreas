@@ -21,3 +21,16 @@
     cursor: pointer;
     z-index: 2;
 }
+
+.fotos-para-selecionar  {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+ .fotos-para-selecionar  img {
+    width: 200px !important;
+    height: 200px !important;
+    object-fit: cover !important;
+    border-radius: 8px !important;
+    box-shadow: rgb(67 71 85 / 27%) 0px 0px 0.25em, rgb(90 125 188 / 5%) 0px 0.25em 1em !important;
+}

@@ -123,18 +123,19 @@ jQuery(document).ready(function($) {
                         $.each(response.data[0].fotos_participante, function(index, foto) {
                             fotosHtml += `
                             <div class="col-md-4 mb-4">
-                                <div class="mb-3" style="position: relative; text-align: center;">
-                                    <label class="foto-item">
-                                        <input type="checkbox" name="selected_photos[]" value="${foto.codigo}" class="checkbox-photo">
-                                        <img src="${foto.caminho}" alt="${foto.nome}" class="img-fluid">
-                                    </label>
+                                <div class="mb-3 fotos-para-selecionar" style="position: relative; text-align: center;">
+                                    <img src="${foto.caminho}" alt="${foto.nome}" class="img-fluid mb-4">
+                                    <button type="button" class="btn btn-primary select-photo text-white" data-codigo="${foto.codigo}">
+                                        Selecionar
+                                    </button>
                                 </div>
                             </div>
-                            `;            
+                            `;
                         });
                         fotosHtml += '</div>';
                         $('#fotos-container').html(fotosHtml);
-                        updateCheckboxListener();
+
+                        updateCheckboxListener(); // Adiciona os listeners aos botões
                     }
                     // FOTOS PARTICIPANTE
         
@@ -169,27 +170,62 @@ jQuery(document).ready(function($) {
 
     // FUNÇÃO QUE COLOCA OS VALORES DAS FOTOS NO INPUT DO FORMULÁRIO
     function updateCheckboxListener() {
-        function getSelectedCheckboxes() {
+        function getSelectedValues() {
+            // Captura todos os inputs de fotos selecionadas
             let selectedValues = [];
-            const checkboxes = document.querySelectorAll('input[name="selected_photos[]"]:checked');
-            checkboxes.forEach(function(checkbox) {
-                selectedValues.push(checkbox.value);
+            const selectedInputs = document.querySelectorAll('input[name="selected_photos[]"]');
+            selectedInputs.forEach(function(input) {
+                selectedValues.push(input.value);
             });
             return selectedValues.join(','); 
         }
-        document.querySelectorAll('input[name="selected_photos[]"]').forEach(function(checkbox) {
-            checkbox.addEventListener('change', function() {
-                const selected = getSelectedCheckboxes();
-                console.log(selected); 
-                const inputEscolha = document.querySelector('.escolha input');
-                    if (inputEscolha) {
-                        inputEscolha.value = selected; 
-                    } else {
-                        console.log('Nenhum input foi encontrado dentro do div .escolha.');
-                    }
-                });
+
+        // Atualiza o input com os valores selecionados
+        function updateInputEscolha() {
+            const selected = getSelectedValues();
+            console.log(selected);
+            const inputEscolha = document.querySelector('.escolha input');
+            if (inputEscolha) {
+                inputEscolha.value = selected;
+            } else {
+                console.log('Nenhum input foi encontrado dentro do div .escolha.');
+            }
+        }
+
+        // Adiciona ou remove o valor ao clicar no botão "Selecionar"/"Remover"
+        document.querySelectorAll('.select-photo').forEach(function(button) {
+            button.addEventListener('click', function() {
+                const codigo = this.dataset.codigo;
+                const existingInput = document.querySelector(`input[name="selected_photos[]"][value="${codigo}"]`);
+                
+                if (existingInput) {
+                    // Se já estiver selecionado, remove
+                    existingInput.remove();
+                    this.textContent = 'Selecionar';
+                    this.classList.remove('btn-danger');
+                    this.classList.add('btn-primary');
+                    this.style.backgroundColor = '#007bff';  // Cor da classe "btn-primary"
+                    this.style.color = '#ffffff';  
+                    this.style.borderColor = '#007bff';       // Cor da borda para "Selecionar"
+                } else {
+                    // Se não estiver, adiciona
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'selected_photos[]';
+                    input.value = codigo;
+                    document.getElementById('fotos-container').appendChild(input);
+                    this.textContent = 'Remover';
+                    this.classList.remove('btn-primary');
+                    this.classList.add('btn-danger');
+                    this.style.backgroundColor = '#dc3545';  // Cor da classe "btn-danger"
+                    this.style.color = '#ffffff';             // Cor do texto para "Desselecionar"
+                    this.style.borderColor = '#dc3545';       // Cor da borda para "Desselecionar"
+                }                
+                updateInputEscolha(); // Atualiza o input com os valores selecionados
+            });
         });
     }
+
     updateCheckboxListener();
     // FUNÇÃO QUE COLOCA OS VALORES DAS FOTOS NO INPUT DO FORMULÁRIO
 
