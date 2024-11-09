@@ -48,6 +48,7 @@ class Alunos {
         // var_dump($escola);
 
         $imagem_upload_individual = get_post_meta($post->ID, 'imagem_upload_individual', true);
+        $imagem_upload_individual2 = get_post_meta($post->ID, 'imagem_upload_individual2', true);
         $imagem_upload_turma = get_post_meta($post->ID, 'imagem_upload_turma', true);
 
         // ESCOLAS
@@ -178,7 +179,7 @@ class Alunos {
         <!-- IMAGEM -->
         <div class="row mb-4">
             <div class="col-xxl-6 mt-3">
-                <label for="ultimo_nome" class="mb-2 fw-bold">Imagem Individual</label>
+                <label class="mb-2 fw-bold">Imagem Individual</label>
                 <div class="corpo-upload" style="width:100%; margin-bottom:10px;"><a href="#" id="imagem_upload" name="imagem_upload" class="imagem_upload_individual_btn button button-secondary"><span class="dashicons dashicons-cloud-upload"></span> Carregar Imagem</a></div>
                 <div style="width:100%;">
                     <input type="text" id="imagem_upload_individual" name="imagem_upload_individual" class="imagem_upload_individual" value="<?php  echo $imagem_upload_individual; ?>" />
@@ -190,7 +191,19 @@ class Alunos {
                 </div>
             </div>
             <div class="col-xxl-6 mt-3">
-            <label for="ultimo_nome" class="mb-2 fw-bold">Imagem Turma</label>
+                <label class="mb-2 fw-bold">Imagem Individual 2</label>
+                <div class="corpo-upload" style="width:100%; margin-bottom:10px;"><a href="#" id="imagem_upload" name="imagem_upload" class="imagem_upload_individual_btn2 button button-secondary"><span class="dashicons dashicons-cloud-upload"></span> Carregar Imagem</a></div>
+                <div style="width:100%;">
+                    <input type="text" id="imagem_upload_individual2" name="imagem_upload_individual2" class="imagem_upload_individual2" value="<?php  echo $imagem_upload_individual2; ?>" />
+                </div>
+                <div class="preview-aluno">
+                    <div class="preview-aluno-individual2">
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-xxl-6 mt-3">
+            <label class="mb-2 fw-bold">Imagem Turma</label>
                 <div class="corpo-upload" style="width:100%; margin-bottom:10px;"><a href="#" id="imagem_upload" name="imagem_upload" class="imagem_upload_turma_btn button button-secondary"><span class="dashicons dashicons-cloud-upload"></span> Carregar Imagem</a></div>
                 <div style="width:100%;">
                     <input type="text" id="imagem_upload_turma" name="imagem_upload_turma" class="imagem_upload_turma" value="<?php echo $imagem_upload_turma; ?>" />
@@ -225,6 +238,9 @@ class Alunos {
         }
         if (isset($_POST['imagem_upload_individual'])) {
             update_post_meta($post_id, 'imagem_upload_individual', $_POST['imagem_upload_individual'] );
+        }
+        if (isset($_POST['imagem_upload_individual2'])) {
+            update_post_meta($post_id, 'imagem_upload_individual2', $_POST['imagem_upload_individual2'] );
         }
         if (isset($_POST['imagem_upload_turma'])) {
             update_post_meta($post_id, 'imagem_upload_turma', $_POST['imagem_upload_turma'] );

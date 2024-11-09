@@ -1,0 +1,23 @@
+.foto-item {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.foto-item img {
+    width: 200px !important;
+    height: 200px !important;
+    object-fit: cover !important;
+    border-radius: 8px !important;
+    box-shadow: rgb(67 71 85 / 27%) 0px 0px 0.25em, rgb(90 125 188 / 5%) 0px 0.25em 1em !important;
+}
+
+.foto-item input[type="checkbox"] {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    z-index: 2;
+}

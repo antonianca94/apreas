@@ -3,7 +3,7 @@
 Plugin Name: Apreas WP Plugin
 Plugin URI: https://apreas.com.br/
 Description: Recursos extras para os Alunos.
-Version: 1.0
+Version: 2.1
 Author: Apreas Development Team
 Author URI: https://apreas.com.br/
 Text Domain: apreas
@@ -57,6 +57,8 @@ class APREAS_Plugin {
             $Alunos = \Apreas\Alunos::getInstance();
             $Escolas = \Apreas\Escolas::getInstance();
 
+            $Participantes = \Apreas\Participantes::getInstance();
+            $Eventos = \Apreas\Eventos::getInstance();
             // INSTANCIAS
         } 
 
@@ -73,6 +75,7 @@ class APREAS_Plugin {
     }
 
     private function enqueue_frontend_styles() {
+        wp_enqueue_style('Participantes_CSS', plugins_url('/admin/css/participantes.css', __FILE__), array(), '1.0.9');
         wp_enqueue_style('bootstrap', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css', array(), '5.3.0');
         wp_enqueue_style('sweetalert2-css', 'https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css', [], null);
         wp_enqueue_style('bootstrap-icons', 'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css', array(), '1.5.0');
@@ -80,10 +83,12 @@ class APREAS_Plugin {
     }
 
     private function enqueue_frontend_scripts() {
+        wp_enqueue_script('jquery');
+
         wp_enqueue_script('bootstrap', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js', array('jquery'), '5.3.0', true);
-        wp_enqueue_script('Login_JS', plugins_url('/admin/js/login.js', __FILE__), array(), '1.0.6', true);
+        wp_enqueue_script('Login_JS', plugins_url('/admin/js/login.js', __FILE__), array(), '1.0.26', true);
         wp_enqueue_script('sweetalert2-js', 'https://cdn.jsdelivr.net/npm/sweetalert2@11', [], null, true);
-        wp_enqueue_script('Validation_JS', plugins_url('/admin/js/validation.js', __FILE__), array(), '1.0.3', true);
+        wp_enqueue_script('Validation_JS', plugins_url('/admin/js/validation.js', __FILE__), array(), '1.0.4', true);
 
     }
 

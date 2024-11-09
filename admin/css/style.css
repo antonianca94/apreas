@@ -102,13 +102,13 @@ a#imagem_upload {
     margin-top: 4px;
     margin-right: 2px;
 }
-input#imagem_upload_individual, input#imagem_upload_turma { 
+input#imagem_upload_individual, input#imagem_upload_individual2, input#imagem_upload_turma { 
     width: 100%; 
     margin: 10px 0px 10px 0px; 
 }
 /*** PREVIEW ALUNO ***/
 
-.preview-aluno-individual, .preview-aluno-turma {
+.preview-aluno-individual, .preview-aluno-individual2, .preview-aluno-turma {
     margin-top:20px;
     background-color: #cccccc;
     height: 200px;
