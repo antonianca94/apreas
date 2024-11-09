@@ -134,8 +134,7 @@ jQuery(document).ready(function($) {
                         });
                         fotosHtml += '</div>';
                         $('#fotos-container').html(fotosHtml);
-
-                        updateCheckboxListener(); // Adiciona os listeners aos botões
+                        updateCheckboxListener(); 
                     }
                     // FOTOS PARTICIPANTE
         
@@ -192,23 +191,19 @@ jQuery(document).ready(function($) {
             }
         }
 
-        // Adiciona ou remove o valor ao clicar no botão "Selecionar"/"Remover"
         document.querySelectorAll('.select-photo').forEach(function(button) {
             button.addEventListener('click', function() {
                 const codigo = this.dataset.codigo;
                 const existingInput = document.querySelector(`input[name="selected_photos[]"][value="${codigo}"]`);
-                
                 if (existingInput) {
-                    // Se já estiver selecionado, remove
                     existingInput.remove();
                     this.textContent = 'Selecionar';
                     this.classList.remove('btn-danger');
                     this.classList.add('btn-primary');
-                    this.style.backgroundColor = '#007bff';  // Cor da classe "btn-primary"
+                    this.style.backgroundColor = '#007bff'; 
                     this.style.color = '#ffffff';  
-                    this.style.borderColor = '#007bff';       // Cor da borda para "Selecionar"
+                    this.style.borderColor = '#007bff';      
                 } else {
-                    // Se não estiver, adiciona
                     const input = document.createElement('input');
                     input.type = 'hidden';
                     input.name = 'selected_photos[]';
@@ -217,15 +212,14 @@ jQuery(document).ready(function($) {
                     this.textContent = 'Remover';
                     this.classList.remove('btn-primary');
                     this.classList.add('btn-danger');
-                    this.style.backgroundColor = '#dc3545';  // Cor da classe "btn-danger"
-                    this.style.color = '#ffffff';             // Cor do texto para "Desselecionar"
-                    this.style.borderColor = '#dc3545';       // Cor da borda para "Desselecionar"
+                    this.style.backgroundColor = '#dc3545';  
+                    this.style.color = '#ffffff';             
+                    this.style.borderColor = '#dc3545';      
                 }                
-                updateInputEscolha(); // Atualiza o input com os valores selecionados
+                updateInputEscolha();
             });
         });
     }
-
     updateCheckboxListener();
     // FUNÇÃO QUE COLOCA OS VALORES DAS FOTOS NO INPUT DO FORMULÁRIO
 
