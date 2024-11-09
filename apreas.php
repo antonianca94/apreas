@@ -56,6 +56,7 @@ class APREAS_Plugin {
             // INSTANCIAS
             $Alunos = \Apreas\Alunos::getInstance();
             $Escolas = \Apreas\Escolas::getInstance();
+            $Unidades = \Apreas\Unidades::getInstance();
 
             $Participantes = \Apreas\Participantes::getInstance();
             $Eventos = \Apreas\Eventos::getInstance();
