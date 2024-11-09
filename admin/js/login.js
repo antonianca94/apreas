@@ -1,5 +1,16 @@
 jQuery(document).ready(function($) {
 
+    // MODAL FOTO HMTL
+    document.body.insertAdjacentHTML('beforeend', `
+        <div id="customModal" class="custom-modal" style="display: none;">
+            <div class="custom-modal-content">
+                <span id="closeCustomModal" class="custom-close">&times;</span>
+                <img id="modalImage" src="" alt="Imagem do Participante" class="custom-modal-image">
+            </div>
+        </div>
+    `);
+    // MODAL FOTO HMTL
+
     $('#form_login').submit(function (e) { 
         e.preventDefault(); 
         var formDataArray = $(this).serializeArray();
@@ -117,6 +128,7 @@ jQuery(document).ready(function($) {
                     }       
                     // LINK ALBUM
 
+                    
                     // FOTOS PARTICIPANTE
                     if (response.data.length > 0 && response.data[0].fotos_participante) {
                         var fotosHtml = '<div class="row">';
@@ -219,6 +231,25 @@ jQuery(document).ready(function($) {
                 updateInputEscolha();
             });
         });
+
+        // MODAL FOTO
+            $('.img-fluid').click(function() {
+                const imgSrc = $(this).attr('src');
+                $('#modalImage').attr('src', imgSrc);
+                $('#customModal').fadeIn();
+            });
+
+            $('#closeCustomModal').click(function() {
+                $('#customModal').fadeOut();
+            });
+
+            $(window).click(function(event) {
+                if (event.target === document.getElementById('customModal')) {
+                    $('#customModal').fadeOut();
+                }
+            });
+        // MODAL FOTO
+
     }
     updateCheckboxListener();
     // FUNÇÃO QUE COLOCA OS VALORES DAS FOTOS NO INPUT DO FORMULÁRIO
