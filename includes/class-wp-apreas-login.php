@@ -234,10 +234,32 @@ class Login {
             $imagem_upload_individual = get_post_meta($post_id, 'imagem_upload_individual', true);
             $imagem_upload_individual2 = get_post_meta($post_id, 'imagem_upload_individual2', true);
             $imagem_upload_turma = get_post_meta($post_id, 'imagem_upload_turma', true);
+
+            // [ESCOLA - UNIDADE - TURMA] 
+                $escola_id = get_post_meta($post_id, 'escola', true);    
+                $unidade_id = get_post_meta($post_id, 'unidade', true);
+                $turma_id = get_post_meta($post_id, 'turma', true);
+                $escola_post = get_post($escola_id);
+                $unidade_post = get_post($unidade_id);
+                $turma_post = get_post($turma_id);
+            // [ESCOLA - UNIDADE - TURMA] 
+
             $dados = [
                 'imagem_upload_individual' => $imagem_upload_individual,
                 'imagem_upload_individual2' => $imagem_upload_individual2,
                 'imagem_upload_turma' => $imagem_upload_turma,
+                'escola' => [
+                    'id' => intval($escola_id),
+                    'nome' => $escola_post ? $escola_post->post_title : null
+                ],
+                'unidade' => [
+                    'id' => intval($unidade_id),
+                    'nome' => $unidade_post ? $unidade_post->post_title : null
+                ],
+                'turma' => [
+                    'id' => intval($turma_id),
+                    'nome' => $turma_post ? $turma_post->post_title : null
+                ]
             ];
         }
         if ($query->have_posts()) {
@@ -524,6 +546,15 @@ class Login {
                 $imagem_upload_turma = get_post_meta($post_id, 'imagem_upload_turma', true);
                 $link_album = get_post_meta($post_id, 'link_album', true);
 
+                // [ESCOLA - UNIDADE - TURMA] 
+                    $escola_id = get_post_meta($post_id, 'escola', true);    
+                    $unidade_id = get_post_meta($post_id, 'unidade', true);
+                    $turma_id = get_post_meta($post_id, 'turma', true);
+                    $escola_post = get_post($escola_id);
+                    $unidade_post = get_post($unidade_id);
+                    $turma_post = get_post($turma_id);
+                // [ESCOLA - UNIDADE - TURMA] 
+
                 // Montar as fotos com nome, caminho e código
                 $fotos_formatadas = array();
                 foreach ($fotos as $foto) {
@@ -539,7 +570,19 @@ class Login {
                     'imagem_upload_individual' => $imagem_upload_individual,
                     'imagem_upload_individual2' => $imagem_upload_individual2,
                     'imagem_upload_turma' => $imagem_upload_turma,
-                    'link_album' => $link_album
+                    'link_album' => $link_album,
+                    'escola' => [
+                        'id' => intval($escola_id),
+                        'nome' => $escola_post ? $escola_post->post_title : null
+                    ],
+                    'unidade' => [
+                        'id' => intval($unidade_id),
+                        'nome' => $unidade_post ? $unidade_post->post_title : null
+                    ],
+                    'turma' => [
+                        'id' => intval($turma_id),
+                        'nome' => $turma_post ? $turma_post->post_title : null
+                    ]
                 ];
             }
             wp_send_json_success($dados);
