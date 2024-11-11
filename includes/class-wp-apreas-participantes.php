@@ -166,6 +166,15 @@ class Participantes {
         $imagem_upload_individual2 = get_post_meta($post->ID, 'imagem_upload_individual2', true);
         $imagem_upload_turma = get_post_meta($post->ID, 'imagem_upload_turma', true);
 
+        $escola = get_post_meta($post->ID, 'escola', true);
+        $escola = !empty($escola) ? explode(',', $escola) : [];
+
+        $unidade = get_post_meta($post->ID, 'unidade', true);
+        $unidade = !empty($unidade) ? explode(',', $unidade) : [];
+
+        $turma = get_post_meta($post->ID, 'turma', true);
+        $turma = !empty($turma) ? explode(',', $turma) : [];
+
         // EVENTOS
         $args = array(
             'post_type' => 'eventos',
@@ -173,6 +182,31 @@ class Participantes {
         );
         $eventos_query = new \WP_Query($args);
         // EVENTOS
+
+        // ESCOLAS
+        $args = array(
+            'post_type' => 'escolas',
+            'posts_per_page' => -1, 
+        );
+        $escolas_query = new \WP_Query($args);
+        // ESCOLAS
+
+        // UNIDADES
+        $args_unidades = array(
+            'post_type' => 'unidades',
+            'posts_per_page' => -1, 
+        );
+        $unidades_query = new \WP_Query($args_unidades);
+        // UNIDADES
+
+        // TURMAS
+        $args_turmas = array(
+            'post_type' => 'turmas',
+            'posts_per_page' => -1, 
+        );
+        $turmas_query = new \WP_Query($args_turmas);
+        // TURMAS
+
         ?>
 
         <style>
@@ -293,6 +327,57 @@ class Participantes {
             </div>
         </div>
         <!-- EVENTO -->
+        <!-- ESCOLAS -->
+        <div class="row mt-3">
+            <div class="col">
+                <div class="form-group">
+                    <label for="escola" class="mb-2 fw-bold">Escola</label>
+                    <select id="escola" name="escola" class="form-control select2" multiple="multiple">
+                        <?php while ($escolas_query->have_posts()) : $escolas_query->the_post(); ?>
+                            <?php
+                            $selected = is_array($escola) && in_array(get_the_ID(), $escola) ? 'selected' : '';
+                            ?>
+                            <option value="<?php echo esc_attr(get_the_ID()); ?>" <?php echo $selected; ?>><?php the_title(); ?></option>
+                        <?php endwhile; ?>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <!-- ESCOLAS -->
+        <!-- UNIDADES -->
+        <div class="row mt-3">
+            <div class="col">
+                <div class="form-group">
+                    <label for="unidade" class="mb-2 fw-bold">Unidade</label>
+                    <select id="unidade" name="unidade" class="form-control select2" multiple="multiple">
+                        <?php while ($unidades_query->have_posts()) : $unidades_query->the_post(); ?>
+                            <?php
+                            $selected = is_array($unidade) && in_array(get_the_ID(), $unidade) ? 'selected' : '';
+                            ?>
+                            <option value="<?php echo esc_attr(get_the_ID()); ?>" <?php echo $selected; ?>><?php the_title(); ?></option>
+                        <?php endwhile; ?>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <!-- UNIDADES -->
+        <!-- TURMAS -->
+        <div class="row mt-3">
+            <div class="col">
+                <div class="form-group">
+                    <label for="turma" class="mb-2 fw-bold">Turma</label>
+                    <select id="turma" name="turma" class="form-control select2" multiple="multiple">
+                        <?php while ($turmas_query->have_posts()) : $turmas_query->the_post(); ?>
+                            <?php
+                            $selected = is_array($turma) && in_array(get_the_ID(), $turma) ? 'selected' : '';
+                            ?>
+                            <option value="<?php echo esc_attr(get_the_ID()); ?>" <?php echo $selected; ?>><?php the_title(); ?></option>
+                        <?php endwhile; ?>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <!-- TURMAS -->
 
         <!-- LINK -->
         <div class="row mt-4">
@@ -382,6 +467,15 @@ class Participantes {
         }
         if (isset($_POST['evento'])) {
             update_post_meta($post_id, 'evento', $_POST['evento'] );
+        }
+        if (isset($_POST['escola'])) {
+            update_post_meta($post_id, 'escola', $_POST['escola'] );
+        }
+        if (isset($_POST['unidade'])) {
+            update_post_meta($post_id, 'unidade', $_POST['unidade'] );
+        }
+        if (isset($_POST['turma'])) {
+            update_post_meta($post_id, 'turma', $_POST['turma'] );
         }
         if (isset($_POST['link_album'])) {
             update_post_meta($post_id, 'link_album', $_POST['link_album'] );
