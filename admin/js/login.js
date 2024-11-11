@@ -75,6 +75,25 @@ jQuery(document).ready(function($) {
                     });             
                 } 
                 
+                // ENVIAR VALORES PARA O FORMULÁRIO
+                const escolaInput = document.querySelector('.escola input');
+                const unidadeInput = document.querySelector('.unidade input');
+                const turmaInput = document.querySelector('.turma input');
+                
+                if (escolaInput && response.data[0].escola) {
+                    escolaInput.value = response.data[0].escola.nome || '';
+                    console.log(escolaInput.value);
+                }
+                if (unidadeInput && response.data[0].unidade) {
+                    unidadeInput.value = response.data[0].unidade.nome || '';
+                    console.log(unidadeInput.value);
+                }
+                if (turmaInput && response.data[0].turma) {
+                    turmaInput.value = response.data[0].turma.nome || '';
+                    console.log(turmaInput.value);
+                }
+                // ENVIAR VALORES PARA O FORMULÁRIO
+
             },
             error: function(response) {
                 console.log(response.data);                
@@ -147,6 +166,26 @@ jQuery(document).ready(function($) {
                         fotosHtml += '</div>';
                         $('#fotos-container').html(fotosHtml);
                         updateCheckboxListener(); 
+
+                        // ENVIAR VALORES PARA O FORMULÁRIO
+                        const escolaInput = document.querySelector('.escola input');
+                        const unidadeInput = document.querySelector('.unidade input');
+                        const turmaInput = document.querySelector('.turma input');
+                        
+                        if (escolaInput && response.data[0].escola) {
+                            escolaInput.value = response.data[0].escola.nome || '';
+                            console.log(escolaInput.value);
+                        }
+                        if (unidadeInput && response.data[0].unidade) {
+                            unidadeInput.value = response.data[0].unidade.nome || '';
+                            console.log(unidadeInput.value);
+                        }
+                        if (turmaInput && response.data[0].turma) {
+                            turmaInput.value = response.data[0].turma.nome || '';
+                            console.log(turmaInput.value);
+                        }
+                        // ENVIAR VALORES PARA O FORMULÁRIO
+
                     }
                     // FOTOS PARTICIPANTE
         
