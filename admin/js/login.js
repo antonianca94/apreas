@@ -150,7 +150,7 @@ jQuery(document).ready(function($) {
                     
                     // FOTOS PARTICIPANTE
                     if (response.data.length > 0 && response.data[0].fotos_participante) {
-                        var fotosHtml = '<div class="row">';
+                        var fotosHtml = '<div class="row"><div id="selected-count-container" class="text-center" style="font-size: 1.5rem; margin-bottom: 26px; font-weight: 400; font-family: \'Roboto\', Sans-serif !important; color: grey;">Fotos selecionadas: <span id="selected-count">0</span></div>';
                         $.each(response.data[0].fotos_participante, function(index, foto) {
                             fotosHtml += `
                             <div class="col-6 col-md-3 col-lg-2 mb-4">
@@ -224,26 +224,36 @@ jQuery(document).ready(function($) {
             // Captura todos os inputs de fotos selecionadas
             let selectedValues = [];
             const selectedInputs = document.querySelectorAll('input[name="selected_photos[]"]');
-            selectedInputs.forEach(function(input) {
+            selectedInputs.forEach(function (input) {
                 selectedValues.push(input.value);
             });
-            return selectedValues.join(','); 
+            return selectedValues.join(',');
         }
-
+    
+        // Atualiza o contador de fotos selecionadas
+        function updateSelectedCount() {
+            const selectedInputs = document.querySelectorAll('input[name="selected_photos[]"]');
+            const count = selectedInputs.length; // Conta os inputs de fotos selecionadas
+            const countElement = document.getElementById('selected-count');
+            if (countElement) {
+                countElement.textContent = count; // Atualiza o texto do contador
+            }
+        }
+    
         // Atualiza o input com os valores selecionados
         function updateInputEscolha() {
             const selected = getSelectedValues();
-            console.log(selected);
             const inputEscolha = document.querySelector('.escolha input');
             if (inputEscolha) {
                 inputEscolha.value = selected;
             } else {
                 console.log('Nenhum input foi encontrado dentro do div .escolha.');
             }
+            updateSelectedCount(); // Atualiza o contador sempre que o input for alterado
         }
-
-        document.querySelectorAll('.select-photo').forEach(function(button) {
-            button.addEventListener('click', function() {
+    
+        document.querySelectorAll('.select-photo').forEach(function (button) {
+            button.addEventListener('click', function () {
                 const codigo = this.dataset.codigo;
                 const existingInput = document.querySelector(`input[name="selected_photos[]"][value="${codigo}"]`);
                 if (existingInput) {
@@ -251,9 +261,9 @@ jQuery(document).ready(function($) {
                     this.textContent = 'Selecionar';
                     this.classList.remove('btn-danger');
                     this.classList.add('btn-primary');
-                    this.style.backgroundColor = '#C0FF2D'; 
-                    this.style.color = '#000000';  
-                    this.style.borderColor = '#C0FF2D';      
+                    this.style.backgroundColor = '#C0FF2D';
+                    this.style.color = '#000000';
+                    this.style.borderColor = '#C0FF2D';
                 } else {
                     const input = document.createElement('input');
                     input.type = 'hidden';
@@ -263,33 +273,34 @@ jQuery(document).ready(function($) {
                     this.textContent = 'Remover';
                     this.classList.remove('btn-primary');
                     this.classList.add('btn-danger');
-                    this.style.backgroundColor = '#dc3545';  
-                    this.style.color = '#ffffff';             
-                    this.style.borderColor = '#dc3545';      
-                }                
-                updateInputEscolha();
+                    this.style.backgroundColor = '#dc3545';
+                    this.style.color = '#ffffff';
+                    this.style.borderColor = '#dc3545';
+                }
+                updateInputEscolha(); // Atualiza o input e o contador
             });
         });
-
-        // MODAL FOTO
-            $('.img-fluid').click(function() {
-                const imgSrc = $(this).attr('src');
-                $('#modalImage').attr('src', imgSrc);
-                $('#customModal').fadeIn();
-            });
-
-            $('#closeCustomModal').click(function() {
+    
+        // Modal Foto
+        $('.img-fluid').click(function () {
+            const imgSrc = $(this).attr('src');
+            $('#modalImage').attr('src', imgSrc);
+            $('#customModal').fadeIn();
+        });
+    
+        $('#closeCustomModal').click(function () {
+            $('#customModal').fadeOut();
+        });
+    
+        $(window).click(function (event) {
+            if (event.target === document.getElementById('customModal')) {
                 $('#customModal').fadeOut();
-            });
-
-            $(window).click(function(event) {
-                if (event.target === document.getElementById('customModal')) {
-                    $('#customModal').fadeOut();
-                }
-            });
-        // MODAL FOTO
-
+            }
+        });
+    
+        updateSelectedCount(); // Inicializa o contador
     }
+        
     updateCheckboxListener();
     // FUNÇÃO QUE COLOCA OS VALORES DAS FOTOS NO INPUT DO FORMULÁRIO
 
