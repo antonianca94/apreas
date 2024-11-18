@@ -77,7 +77,7 @@ class APREAS_Plugin {
     }
 
     private function enqueue_frontend_styles() {
-        wp_enqueue_style('Participantes_CSS', plugins_url('/admin/css/participantes.css', __FILE__), array(), '1.0.24');
+        wp_enqueue_style('Participantes_CSS', plugins_url('/admin/css/participantes.css', __FILE__), array(), '1.0.29');
         wp_enqueue_style('bootstrap', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css', array(), '5.3.0');
         wp_enqueue_style('sweetalert2-css', 'https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css', [], null);
         wp_enqueue_style('bootstrap-icons', 'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css', array(), '1.5.0');
@@ -88,7 +88,7 @@ class APREAS_Plugin {
         wp_enqueue_script('jquery');
 
         wp_enqueue_script('bootstrap', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js', array('jquery'), '5.3.0', true);
-        wp_enqueue_script('Login_JS', plugins_url('/admin/js/login.js', __FILE__), array(), '1.0.48', true);
+        wp_enqueue_script('Login_JS', plugins_url('/admin/js/login.js', __FILE__), array(), '1.0.51', true);
         wp_enqueue_script('sweetalert2-js', 'https://cdn.jsdelivr.net/npm/sweetalert2@11', [], null, true);
         wp_enqueue_script('Validation_JS', plugins_url('/admin/js/validation.js', __FILE__), array(), '1.0.4', true);
 

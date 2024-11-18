@@ -153,7 +153,7 @@ jQuery(document).ready(function($) {
                         var fotosHtml = '<div class="row">';
                         $.each(response.data[0].fotos_participante, function(index, foto) {
                             fotosHtml += `
-                            <div class="col-md-4 mb-4">
+                            <div class="col-6 col-md-3 col-lg-2 mb-4">
                                 <div class="mb-3 fotos-para-selecionar" style="position: relative; text-align: center;">
                                     <img src="${foto.caminho}" alt="${foto.nome}" class="img-fluid mb-4">
                                     <button type="button" class="btn btn-primary select-photo text-white" data-codigo="${foto.codigo}">
@@ -251,9 +251,9 @@ jQuery(document).ready(function($) {
                     this.textContent = 'Selecionar';
                     this.classList.remove('btn-danger');
                     this.classList.add('btn-primary');
-                    this.style.backgroundColor = '#007bff'; 
-                    this.style.color = '#ffffff';  
-                    this.style.borderColor = '#007bff';      
+                    this.style.backgroundColor = '#C0FF2D'; 
+                    this.style.color = '#000000';  
+                    this.style.borderColor = '#C0FF2D';      
                 } else {
                     const input = document.createElement('input');
                     input.type = 'hidden';

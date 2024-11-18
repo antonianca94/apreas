@@ -86,3 +86,8 @@
 
 }
 
+.fotos-para-selecionar button.btn-primary {
+    background-color:  #C0FF2D !important; 
+    border-color:  #C0FF2D !important; 
+    color: black !important;
+}

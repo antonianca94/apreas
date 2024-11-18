@@ -22,6 +22,17 @@ class Login {
         add_shortcode( 'login_form_eventos', [$this,'render_login_form_eventos'] );
         add_action('wp_ajax_process_login_form_eventos', [$this,'process_login_form_eventos']);
         add_action('wp_ajax_nopriv_process_login_form_eventos', [$this,'process_login_form_eventos']);
+
+        add_shortcode( 'galeria', [$this,'shortcode_fotos_container'] );
+    }
+
+    function shortcode_fotos_container() {
+        ob_start(); 
+        ?>
+        <div id="fotos-container" class="container">
+        </div>
+        <?php
+        return ob_get_clean(); 
     }
 
     function render_login_form() {
@@ -140,7 +151,11 @@ class Login {
                 margin-top: 8px;
                 padding: 8px 17px !important;
                 font-family: "Roboto", Sans-serif !important;
+                font-size: 1.2rem;
+            }
 
+            .btn_form_login:focus, .btn_form_login:hover{
+                background: #006DD4 !important;
             }
 
             .woocommerce-js form#form_login input.is-invalid {
@@ -291,7 +306,7 @@ class Login {
                         <div class="invalid-feedback" id="nameError"></div>
                     </div>
                     <div class="col-md-6">
-                        <label for="data_nascimento" class="form-label">Data de Nascimento</label>
+                        <label for="data_nascimento" class="form-label">Data de Nascimento / Data Evento</label>
                         <input type="date" class="form-control data_nascimento" name="data_nascimento" id="data_nascimento" placeholder="Data de Nascimento">
                         <div class="invalid-feedback" id="dataError"></div>
                     </div>
@@ -401,7 +416,11 @@ class Login {
                 margin-top: 8px;
                 padding: 8px 17px !important;
                 font-family: "Roboto", Sans-serif !important;
+                font-size: 1.2rem;
+            }
 
+            .btn_form_login:focus, .btn_form_login:hover{
+                background: #006DD4 !important;
             }
 
             .woocommerce-js form#form_login input.is-invalid {
