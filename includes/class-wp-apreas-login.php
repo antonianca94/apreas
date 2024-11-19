@@ -273,6 +273,7 @@ class Login {
             // [ESCOLA - UNIDADE - TURMA] 
 
             $dados = [
+                'nome' => $post->post_title,
                 'imagem_upload_individual' => $imagem_upload_individual,
                 'imagem_upload_individual2' => $imagem_upload_individual2,
                 'imagem_upload_turma' => $imagem_upload_turma,
@@ -600,6 +601,7 @@ class Login {
                 }
     
                 $dados[] = [
+                    'nome' => $post->post_title,
                     'fotos_participante' => $fotos_formatadas,
                     'imagem_upload_individual' => $imagem_upload_individual,
                     'imagem_upload_individual2' => $imagem_upload_individual2,

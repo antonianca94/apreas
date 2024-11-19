@@ -82,11 +82,18 @@ jQuery(document).ready(function($) {
                 } 
                 
                 // ENVIAR VALORES PARA O FORMULÁRIO
+
+                const nomeInput = document.querySelector('.nome input');
                 const eventoInput = document.querySelector('.evento input');
                 const escolaInput = document.querySelector('.escola input');
                 const unidadeInput = document.querySelector('.unidade input');
                 const turmaInput = document.querySelector('.turma input');
                 
+                if (nomeInput && response.data.nome) {
+                    nomeInput.value = response.data.nome || '';
+                    console.log(nomeInput.value);
+                }
+
                 if (eventoInput && response.data.evento) {
                     eventoInput.value = response.data.evento.nome || '';
                     console.log(eventoInput.value);
@@ -180,20 +187,26 @@ jQuery(document).ready(function($) {
                         updateCheckboxListener(); 
 
                         // ENVIAR VALORES PARA O FORMULÁRIO
+                        const nomeInput = document.querySelector('.nomeoculto input');
+                        const escolaeventoInput = document.querySelector('.escolaevento input');
                         const eventoInput = document.querySelector('.evento input');
                         const escolaInput = document.querySelector('.escola input');
                         const unidadeInput = document.querySelector('.unidade input');
                         const turmaInput = document.querySelector('.turma input');
                         
-                        if (response.data[0].escola && response.data[0].evento) {
-                            escolaInput.value = `${response.data[0].escola.nome || ''} / ${response.data[0].evento.nome || ''}`;
+                        if (nomeInput && response.data[0].nome) {
+                            nomeInput.value = response.data[0].nome || '';
                         }
 
-                        if (!response.data[0].escola && response.data[0].evento) {
+                        if (escolaeventoInput && response.data[0].escola && response.data[0].evento) {
+                            escolaeventoInput.value = `${response.data[0].escola.nome || ''} / ${response.data[0].evento.nome || ''}`;
+                        }
+
+                        if (eventoInput&& response.data[0].evento) {
                             eventoInput.value = response.data[0].evento.nome || '';
                             console.log(eventoInput.value);
                         }
-                        if (escolaInput && response.data[0].escola && !response.data[0].evento) {
+                        if (escolaInput && response.data[0].escola) {
                             escolaInput.value = response.data[0].escola.nome || '';
                             console.log(escolaInput.value);
                         }
