@@ -33,7 +33,10 @@ jQuery(document).ready(function($) {
                         title: 'Acesso Liberado com Sucesso!',
                         text: '',
                         icon: 'success',
-                        confirmButtonText: 'OK'
+                        confirmButtonText: 'OK',
+                        customClass: {
+                            confirmButton: 'custom-confirm-button'
+                        }
                     });
 
                     // IMAGEM
@@ -71,25 +74,33 @@ jQuery(document).ready(function($) {
                         title: 'Aluno não encontrado.',
                         text: '',
                         icon: 'error',
-                        confirmButtonText: 'OK'
+                        confirmButtonText: 'OK',
+                        customClass: {
+                            confirmButton: 'custom-confirm-button'
+                        }
                     });             
                 } 
                 
                 // ENVIAR VALORES PARA O FORMULÁRIO
+                const eventoInput = document.querySelector('.evento input');
                 const escolaInput = document.querySelector('.escola input');
                 const unidadeInput = document.querySelector('.unidade input');
                 const turmaInput = document.querySelector('.turma input');
                 
-                if (escolaInput && response.data[0].escola) {
-                    escolaInput.value = response.data[0].escola.nome || '';
+                if (eventoInput && response.data.evento) {
+                    eventoInput.value = response.data.evento.nome || '';
+                    console.log(eventoInput.value);
+                }
+                if (escolaInput && response.data.escola) {
+                    escolaInput.value = response.data.escola.nome || '';
                     console.log(escolaInput.value);
                 }
-                if (unidadeInput && response.data[0].unidade) {
-                    unidadeInput.value = response.data[0].unidade.nome || '';
+                if (unidadeInput && response.data.unidade) {
+                    unidadeInput.value = response.data.unidade.nome || '';
                     console.log(unidadeInput.value);
                 }
-                if (turmaInput && response.data[0].turma) {
-                    turmaInput.value = response.data[0].turma.nome || '';
+                if (turmaInput && response.data.turma) {
+                    turmaInput.value = response.data.turma.nome || '';
                     console.log(turmaInput.value);
                 }
                 // ENVIAR VALORES PARA O FORMULÁRIO
@@ -124,6 +135,7 @@ jQuery(document).ready(function($) {
             },
             dataType: 'json',
             success: function(response) {
+                console.log(response)
                 if (response.success == true) {
                     // IMAGEM
                     if (response.data[0].imagem_upload_individual) {
@@ -168,11 +180,20 @@ jQuery(document).ready(function($) {
                         updateCheckboxListener(); 
 
                         // ENVIAR VALORES PARA O FORMULÁRIO
+                        const eventoInput = document.querySelector('.evento input');
                         const escolaInput = document.querySelector('.escola input');
                         const unidadeInput = document.querySelector('.unidade input');
                         const turmaInput = document.querySelector('.turma input');
                         
-                        if (escolaInput && response.data[0].escola) {
+                        if (response.data[0].escola && response.data[0].evento) {
+                            escolaInput.value = `${response.data[0].escola.nome || ''} / ${response.data[0].evento.nome || ''}`;
+                        }
+
+                        if (!response.data[0].escola && response.data[0].evento) {
+                            eventoInput.value = response.data[0].evento.nome || '';
+                            console.log(eventoInput.value);
+                        }
+                        if (escolaInput && response.data[0].escola && !response.data[0].evento) {
                             escolaInput.value = response.data[0].escola.nome || '';
                             console.log(escolaInput.value);
                         }

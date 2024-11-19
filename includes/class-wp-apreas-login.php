@@ -566,9 +566,11 @@ class Login {
                 $link_album = get_post_meta($post_id, 'link_album', true);
 
                 // [ESCOLA - UNIDADE - TURMA] 
+                    $evento_id = get_post_meta($post_id, 'evento', true);    
                     $escola_id = get_post_meta($post_id, 'escola', true);    
                     $unidade_id = get_post_meta($post_id, 'unidade', true);
                     $turma_id = get_post_meta($post_id, 'turma', true);
+                    $evento_post = get_post($evento_id);
                     $escola_post = get_post($escola_id);
                     $unidade_post = get_post($unidade_id);
                     $turma_post = get_post($turma_id);
@@ -590,6 +592,10 @@ class Login {
                     'imagem_upload_individual2' => $imagem_upload_individual2,
                     'imagem_upload_turma' => $imagem_upload_turma,
                     'link_album' => $link_album,
+                    'evento' => [
+                        'id' => intval($evento_id),
+                        'nome' => $evento_post ? $evento_post->post_title : null
+                    ],
                     'escola' => [
                         'id' => intval($escola_id),
                         'nome' => $escola_post ? $escola_post->post_title : null

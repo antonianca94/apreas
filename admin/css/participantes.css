@@ -91,3 +91,20 @@
     border-color:  #C0FF2D !important; 
     color: black !important;
 }
+
+button.swal2-confirm.swal2-styled {
+    background-color: #C0FF2D !important;
+    border-color:  #C0FF2D !important;
+    color: black !important;
+}
+button.swal2-confirm.swal2-styled:hover {
+    background-color: #006DD4 !important;
+    border-color:  #006DD4 !important;
+    color: black !important;
+}
+
+.fotos-para-selecionar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;    
+}
