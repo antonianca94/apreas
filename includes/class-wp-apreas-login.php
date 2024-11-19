@@ -24,6 +24,19 @@ class Login {
         add_action('wp_ajax_nopriv_process_login_form_eventos', [$this,'process_login_form_eventos']);
 
         add_shortcode( 'galeria', [$this,'shortcode_fotos_container'] );
+        add_shortcode( 'fotos_selecionadas', [$this,'fotos_counter'] );
+
+    }
+    
+    function fotos_counter() {
+        ob_start(); 
+        ?>
+        <div id="selected-count-container" class="text-center" style="font-size: 2rem;margin-bottom: 26px;font-weight: 400;font-family: 'Roboto', Sans-serif !important;color: grey;">
+            Fotos selecionadas: 
+            <span id="selected-count" style="font-weight:600;">0</span>
+        </div>
+        <?php
+        return ob_get_clean(); 
     }
 
     function shortcode_fotos_container() {

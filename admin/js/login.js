@@ -162,7 +162,7 @@ jQuery(document).ready(function($) {
                     
                     // FOTOS PARTICIPANTE
                     if (response.data.length > 0 && response.data[0].fotos_participante) {
-                        var fotosHtml = '<div class="row"><div id="selected-count-container" class="text-center" style="font-size: 1.5rem; margin-bottom: 26px; font-weight: 400; font-family: \'Roboto\', Sans-serif !important; color: grey;">Fotos selecionadas: <span id="selected-count">0</span></div>';
+                        var fotosHtml = '<div class="row">';
                         $.each(response.data[0].fotos_participante, function(index, foto) {
                             fotosHtml += `
                             <div class="col-6 col-md-3 col-lg-2 mb-4">
