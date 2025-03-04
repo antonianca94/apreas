@@ -96,6 +96,7 @@ class Escolas {
     // Callback para exibir o conteúdo do meta box
     function exibir_meta_box_escolas($post) {
         $nome = get_post_meta($post->ID, 'nome', true);
+        $imagem_logo_escola = get_post_meta($post->ID, 'imagem_logo_escola', true);
         ?>
         <script>
             document.addEventListener('DOMContentLoaded', function() {
@@ -128,6 +129,23 @@ class Escolas {
                 </div>
             </div>
         </div>
+
+        <!-- LOGO ESCOLA -->
+        <div class="row mb-4">
+            <div class="col-xxl mt-2">
+                <label class="mb-2 fw-bold">Logo Escola</label>
+                <div class="corpo-upload" style="width:100%; margin-bottom:10px;"><a href="#" id="imagem_logo_escola_upload" name="imagem_logo_escola_upload" class="imagem_logo_escola_btn button button-secondary"><span class="dashicons dashicons-cloud-upload"></span> Carregar Imagem</a></div>
+                <div style="width:100%;">
+                    <input type="text" id="imagem_logo_escola" name="imagem_logo_escola" class="imagem_logo_escola" value="<?php  echo $imagem_logo_escola; ?>" />
+                </div>
+                <div class="preview-logo">
+                    <div class="preview-logo-escola">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- LOGO ESCOLA -->
+
         <?php
     }
 
@@ -135,6 +153,9 @@ class Escolas {
     function salvar_meta_box_escolas($post_id) {
         if (isset($_POST['nome'])) {
             update_post_meta($post_id, 'nome', sanitize_text_field($_POST['nome']));
+        }
+        if (isset($_POST['imagem_logo_escola'])) {
+            update_post_meta($post_id, 'imagem_logo_escola', $_POST['imagem_logo_escola'] );
         }
     }
 
