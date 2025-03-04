@@ -26,8 +26,40 @@ class Login {
         add_shortcode( 'galeria', [$this,'shortcode_fotos_container'] );
         add_shortcode( 'fotos_selecionadas', [$this,'fotos_counter'] );
 
+        // LOGOS
+        add_shortcode('imagem_logo_evento', [$this,'mostrar_imagem_logo_evento']);
+        add_shortcode('imagem_logo_escola', [$this,'mostrar_imagem_logo_escola']);
+        // LOGOS
     }
     
+    function mostrar_imagem_logo_evento($atts) {
+        $atts = shortcode_atts(array(
+            'id' => null,
+        ), $atts, 'imagem_logo_evento');
+        if ($atts['id'] === null) {
+            return 'ID do evento não fornecido.';
+        }
+        $imagem_logo_evento = get_post_meta($atts['id'], 'imagem_logo_evento', true);
+        if (empty($imagem_logo_evento)) {
+            return 'Nenhuma imagem encontrada para este evento.';
+        }
+        return '<img src="' . esc_url($imagem_logo_evento) . '" alt="Logo do Evento" style="max-width: 100%; height: auto;">';
+    }
+
+    function mostrar_imagem_logo_escola($atts) {
+        $atts = shortcode_atts(array(
+            'id' => null,
+        ), $atts, 'imagem_logo_escola');
+        if ($atts['id'] === null) {
+            return 'ID da escola não fornecido.';
+        }
+        $imagem_logo_escola = get_post_meta($atts['id'], 'imagem_logo_escola', true);
+        if (empty($imagem_logo_escola)) {
+            return 'Nenhuma imagem encontrada para esta escola.';
+        }
+        return '<img src="' . esc_url($imagem_logo_escola) . '" alt="Logo da Escola" style="max-width: 100%; height: auto;">';
+    }
+
     function fotos_counter() {
         ob_start(); 
         ?>
