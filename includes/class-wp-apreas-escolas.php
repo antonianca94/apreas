@@ -107,20 +107,28 @@ class Escolas {
             'normal', 
             'high' 
         );
+        add_meta_box(
+            'meta-box-lote-two',
+            'LOTE 2', 
+            [$this,'exibir_lote_two'], 
+            'escolas', 
+            'normal', 
+            'high' 
+        );
     }
 
     function exibir_lote_one($post) {
         // ESCOLHA
-        $escolha_data_inicio = get_post_meta($post->ID, 'escolha_data_inicio', true);
-        $escolha_data_fim = get_post_meta($post->ID, 'escolha_data_fim', true);
+        $l1_escolha_data_inicio = get_post_meta($post->ID, 'l1_escolha_data_inicio', true);
+        $l1_escolha_data_fim = get_post_meta($post->ID, 'l1_escolha_data_fim', true);
         ?>
         <div class="row mt-4 mb-4">
             <label for="nome" class="mb-4 fw-bold" style="font-size: 1rem; color:#7A7A7A;">ESCOLHA</label>
             <div class="col">
                 <div class="form-group">
-                    <label for="escolha_data_inicio" class="mb-2 fw-bold">Data de Início</label>
+                    <label for="l1_escolha_data_inicio" class="mb-2 fw-bold">Data de Início</label>
                     <div class="input-group">
-                        <input type="text" id="escolha_data_inicio" name="escolha_data_inicio" class="form-control" value="<?php echo esc_attr($escolha_data_inicio); ?>" />
+                        <input type="text" id="l1_escolha_data_inicio" name="l1_escolha_data_inicio" class="form-control" value="<?php echo esc_attr($l1_escolha_data_inicio); ?>" />
                         <div class="input-group-append">
                             <span class="input-group-text"><i class="dashicons dashicons-calendar-alt"></i></span>
                         </div>
@@ -129,9 +137,9 @@ class Escolas {
             </div>
             <div class="col">
                 <div class="form-group">
-                    <label for="escolha_data_fim" class="mb-2 fw-bold">Data de Fim</label>
+                    <label for="l1_escolha_data_fim" class="mb-2 fw-bold">Data de Fim</label>
                     <div class="input-group">
-                        <input type="text" id="escolha_data_fim" name="escolha_data_fim" class="form-control" value="<?php echo esc_attr($escolha_data_fim); ?>" />
+                        <input type="text" id="l1_escolha_data_fim" name="l1_escolha_data_fim" class="form-control" value="<?php echo esc_attr($l1_escolha_data_fim); ?>" />
                         <div class="input-group-append">
                             <span class="input-group-text"><i class="dashicons dashicons-calendar-alt"></i></span>
                         </div>
@@ -141,13 +149,13 @@ class Escolas {
         </div>
         <script>
             jQuery(document).ready(function($) {
-                $('#escolha_data_inicio').flatpickr({
+                $('#l1_escolha_data_inicio').flatpickr({
                     enableTime: true,
                     dateFormat: "d/m/Y H:i",
                     time_24hr: true,
                     locale: 'pt'
                 });
-                $('#escolha_data_fim').flatpickr({
+                $('#l1_escolha_data_fim').flatpickr({
                     enableTime: true,
                     dateFormat: "d/m/Y H:i",
                     time_24hr: true,
@@ -160,8 +168,8 @@ class Escolas {
         // ESCOLHA 
 
         // ENTREGA
-        $entrega_data_inicio = get_post_meta($post->ID, 'entrega_data_inicio', true);
-        $entrega_data_fim = get_post_meta($post->ID, 'entrega_data_fim', true);
+        $l1_entrega_data_inicio = get_post_meta($post->ID, 'l1_entrega_data_inicio', true);
+        $l1_entrega_data_fim = get_post_meta($post->ID, 'l1_entrega_data_fim', true);
         ?>
         
         <hr class="my-1"/>
@@ -170,9 +178,9 @@ class Escolas {
             <label for="nome" class="mb-4 fw-bold" style="font-size: 1rem; color:#7A7A7A;">ENTREGA</label>
             <div class="col">
                 <div class="form-group">
-                    <label for="entrega_data_inicio" class="mb-2 fw-bold">Data de Início</label>
+                    <label for="l1_entrega_data_inicio" class="mb-2 fw-bold">Data de Início</label>
                     <div class="input-group">
-                        <input type="text" id="entrega_data_inicio" name="entrega_data_inicio" class="form-control" value="<?php echo esc_attr($entrega_data_inicio); ?>" />
+                        <input type="text" id="l1_entrega_data_inicio" name="l1_entrega_data_inicio" class="form-control" value="<?php echo esc_attr($l1_entrega_data_inicio); ?>" />
                         <div class="input-group-append">
                             <span class="input-group-text"><i class="dashicons dashicons-calendar-alt"></i></span>
                         </div>
@@ -181,9 +189,9 @@ class Escolas {
             </div>
             <div class="col">
                 <div class="form-group">
-                    <label for="entrega_data_fim" class="mb-2 fw-bold">Data de Fim</label>
+                    <label for="l1_entrega_data_fim" class="mb-2 fw-bold">Data de Fim</label>
                     <div class="input-group">
-                        <input type="text" id="entrega_data_fim" name="entrega_data_fim" class="form-control" value="<?php echo esc_attr($entrega_data_fim); ?>" />
+                        <input type="text" id="l1_entrega_data_fim" name="l1_entrega_data_fim" class="form-control" value="<?php echo esc_attr($l1_entrega_data_fim); ?>" />
                         <div class="input-group-append">
                             <span class="input-group-text"><i class="dashicons dashicons-calendar-alt"></i></span>
                         </div>
@@ -193,13 +201,115 @@ class Escolas {
         </div>
         <script>
             jQuery(document).ready(function($) {
-                $('#entrega_data_inicio').flatpickr({
+                $('#l1_entrega_data_inicio').flatpickr({
                     enableTime: true,
                     dateFormat: "d/m/Y H:i",
                     time_24hr: true,
                     locale: 'pt'
                 });
-                $('#entrega_data_fim').flatpickr({
+                $('#l1_entrega_data_fim').flatpickr({
+                    enableTime: true,
+                    dateFormat: "d/m/Y H:i",
+                    time_24hr: true,
+                    locale: 'pt'
+                });
+            });
+        </script>
+        <?php
+        // ENTREGA
+    }
+
+    function exibir_lote_two($post) {
+        // ESCOLHA
+        $l2_escolha_data_inicio = get_post_meta($post->ID, 'l2_escolha_data_inicio', true);
+        $l2_escolha_data_fim = get_post_meta($post->ID, 'l2_escolha_data_fim', true);
+        ?>
+        <div class="row mt-4 mb-4">
+            <label for="nome" class="mb-4 fw-bold" style="font-size: 1rem; color:#7A7A7A;">ESCOLHA</label>
+            <div class="col">
+                <div class="form-group">
+                    <label for="l2_escolha_data_inicio" class="mb-2 fw-bold">Data de Início</label>
+                    <div class="input-group">
+                        <input type="text" id="l2_escolha_data_inicio" name="l2_escolha_data_inicio" class="form-control" value="<?php echo esc_attr($l2_escolha_data_inicio); ?>" />
+                        <div class="input-group-append">
+                            <span class="input-group-text"><i class="dashicons dashicons-calendar-alt"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="l2_escolha_data_fim" class="mb-2 fw-bold">Data de Fim</label>
+                    <div class="input-group">
+                        <input type="text" id="l2_escolha_data_fim" name="l2_escolha_data_fim" class="form-control" value="<?php echo esc_attr($l2_escolha_data_fim); ?>" />
+                        <div class="input-group-append">
+                            <span class="input-group-text"><i class="dashicons dashicons-calendar-alt"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            jQuery(document).ready(function($) {
+                $('#l2_escolha_data_inicio').flatpickr({
+                    enableTime: true,
+                    dateFormat: "d/m/Y H:i",
+                    time_24hr: true,
+                    locale: 'pt'
+                });
+                $('#l2_escolha_data_fim').flatpickr({
+                    enableTime: true,
+                    dateFormat: "d/m/Y H:i",
+                    time_24hr: true,
+                    locale: 'pt'
+                });
+            });
+        </script>
+        
+        <?php
+        // ESCOLHA 
+
+        // ENTREGA
+        $l2_entrega_data_inicio = get_post_meta($post->ID, 'l2_entrega_data_inicio', true);
+        $l2_entrega_data_fim = get_post_meta($post->ID, 'l2_entrega_data_fim', true);
+        ?>
+        
+        <hr class="my-1"/>
+
+        <div class="row mt-4 mb-4">
+            <label for="nome" class="mb-4 fw-bold" style="font-size: 1rem; color:#7A7A7A;">ENTREGA</label>
+            <div class="col">
+                <div class="form-group">
+                    <label for="l2_entrega_data_inicio" class="mb-2 fw-bold">Data de Início</label>
+                    <div class="input-group">
+                        <input type="text" id="l2_entrega_data_inicio" name="l2_entrega_data_inicio" class="form-control" value="<?php echo esc_attr($l2_entrega_data_inicio); ?>" />
+                        <div class="input-group-append">
+                            <span class="input-group-text"><i class="dashicons dashicons-calendar-alt"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="l2_entrega_data_fim" class="mb-2 fw-bold">Data de Fim</label>
+                    <div class="input-group">
+                        <input type="text" id="l2_entrega_data_fim" name="l2_entrega_data_fim" class="form-control" value="<?php echo esc_attr($l2_entrega_data_fim); ?>" />
+                        <div class="input-group-append">
+                            <span class="input-group-text"><i class="dashicons dashicons-calendar-alt"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            jQuery(document).ready(function($) {
+                $('#l2_entrega_data_inicio').flatpickr({
+                    enableTime: true,
+                    dateFormat: "d/m/Y H:i",
+                    time_24hr: true,
+                    locale: 'pt'
+                });
+                $('#l2_entrega_data_fim').flatpickr({
                     enableTime: true,
                     dateFormat: "d/m/Y H:i",
                     time_24hr: true,
@@ -276,18 +386,35 @@ class Escolas {
             update_post_meta($post_id, 'imagem_logo_escola', $_POST['imagem_logo_escola'] );
         }
 
-        if (isset($_POST['escolha_data_inicio'])) {
-            update_post_meta($post_id, 'escolha_data_inicio', sanitize_text_field($_POST['escolha_data_inicio']));
+        // LOTE 1 
+        if (isset($_POST['l1_escolha_data_inicio'])) {
+            update_post_meta($post_id, 'l1_escolha_data_inicio', sanitize_text_field($_POST['l1_escolha_data_inicio']));
         }
-        if (isset($_POST['escolha_data_fim'])) {
-            update_post_meta($post_id, 'escolha_data_fim', sanitize_text_field($_POST['escolha_data_fim']));
+        if (isset($_POST['l1_escolha_data_fim'])) {
+            update_post_meta($post_id, 'l1_escolha_data_fim', sanitize_text_field($_POST['l1_escolha_data_fim']));
         }
-        if (isset($_POST['entrega_data_inicio'])) {
-            update_post_meta($post_id, 'entrega_data_inicio', sanitize_text_field($_POST['entrega_data_inicio']));
+        if (isset($_POST['l1_entrega_data_inicio'])) {
+            update_post_meta($post_id, 'l1_entrega_data_inicio', sanitize_text_field($_POST['l1_entrega_data_inicio']));
         }
-        if (isset($_POST['entrega_data_fim'])) {
-            update_post_meta($post_id, 'entrega_data_fim', sanitize_text_field($_POST['entrega_data_fim']));
+        if (isset($_POST['l1_entrega_data_fim'])) {
+            update_post_meta($post_id, 'l1_entrega_data_fim', sanitize_text_field($_POST['l1_entrega_data_fim']));
         }
+        // LOTE 1
+
+        // LOTE 2 
+        if (isset($_POST['l2_escolha_data_inicio'])) {
+            update_post_meta($post_id, 'l2_escolha_data_inicio', sanitize_text_field($_POST['l2_escolha_data_inicio']));
+        }
+        if (isset($_POST['l2_escolha_data_fim'])) {
+            update_post_meta($post_id, 'l2_escolha_data_fim', sanitize_text_field($_POST['l2_escolha_data_fim']));
+        }
+        if (isset($_POST['l2_entrega_data_inicio'])) {
+            update_post_meta($post_id, 'l2_entrega_data_inicio', sanitize_text_field($_POST['l2_entrega_data_inicio']));
+        }
+        if (isset($_POST['l2_entrega_data_fim'])) {
+            update_post_meta($post_id, 'l2_entrega_data_fim', sanitize_text_field($_POST['l2_entrega_data_fim']));
+        }
+        // LOTE 2
 
     }
 
