@@ -63,9 +63,8 @@ class Login {
     function fotos_counter() {
         ob_start(); 
         ?>
-        <div id="selected-count-container" class="text-center" style="font-size: 2rem;margin-bottom: 26px;font-weight: 400;font-family: 'Roboto', Sans-serif !important;color: grey;">
-            Fotos selecionadas: 
-            <span id="selected-count" style="font-weight:600;">0</span>
+        <div id="selected-count-container" class="text-center" style="font-size: 2rem; font-weight: 400;font-family: 'Roboto', Sans-serif !important;color: grey;">
+            <span id="selected-count">0</span>
         </div>
         <?php
         return ob_get_clean(); 
