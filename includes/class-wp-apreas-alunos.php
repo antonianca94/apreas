@@ -234,7 +234,7 @@ class Alunos {
         <!-- IMAGEM -->
         <div class="row mb-4">
             <div class="col-xxl-6 mt-3">
-                <label class="mb-2 fw-bold">Imagem Individual</label>
+                <label class="mb-2 fw-bold">Foto Individual</label>
                 <div class="corpo-upload" style="width:100%; margin-bottom:10px;"><a href="#" id="imagem_upload" name="imagem_upload" class="imagem_upload_individual_btn button button-secondary"><span class="dashicons dashicons-cloud-upload"></span> Carregar Imagem</a></div>
                 <div style="width:100%;">
                     <input type="text" id="imagem_upload_individual" name="imagem_upload_individual" class="imagem_upload_individual" value="<?php  echo $imagem_upload_individual; ?>" />
@@ -246,7 +246,7 @@ class Alunos {
                 </div>
             </div>
             <div class="col-xxl-6 mt-3">
-                <label class="mb-2 fw-bold">Imagem Individual 2</label>
+                <label class="mb-2 fw-bold">Foto Divertida</label>
                 <div class="corpo-upload" style="width:100%; margin-bottom:10px;"><a href="#" id="imagem_upload" name="imagem_upload" class="imagem_upload_individual_btn2 button button-secondary"><span class="dashicons dashicons-cloud-upload"></span> Carregar Imagem</a></div>
                 <div style="width:100%;">
                     <input type="text" id="imagem_upload_individual2" name="imagem_upload_individual2" class="imagem_upload_individual2" value="<?php  echo $imagem_upload_individual2; ?>" />
@@ -258,7 +258,7 @@ class Alunos {
                 </div>
             </div>
             <div class="col-xxl-6 mt-3">
-            <label class="mb-2 fw-bold">Imagem Turma</label>
+            <label class="mb-2 fw-bold">Foto Coletiva</label>
                 <div class="corpo-upload" style="width:100%; margin-bottom:10px;"><a href="#" id="imagem_upload" name="imagem_upload" class="imagem_upload_turma_btn button button-secondary"><span class="dashicons dashicons-cloud-upload"></span> Carregar Imagem</a></div>
                 <div style="width:100%;">
                     <input type="text" id="imagem_upload_turma" name="imagem_upload_turma" class="imagem_upload_turma" value="<?php echo $imagem_upload_turma; ?>" />
