@@ -18,6 +18,7 @@ class Escolas {
         add_action( 'admin_init', [$this,'escolas_capacidades_administrador']);
         add_action( 'add_meta_boxes', [$this,'adicionar_meta_box_escolas']);
         add_action( 'save_post', [$this,'salvar_meta_box_escolas']);
+        add_action('admin_enqueue_scripts', [$this,'enqueue_flatpickr_assets']);
 
     }
 
@@ -82,6 +83,13 @@ class Escolas {
         
     }
 
+    function enqueue_flatpickr_assets() {
+        wp_enqueue_style('flatpickr-css', 'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css');
+        wp_enqueue_script('flatpickr-js', 'https://cdn.jsdelivr.net/npm/flatpickr', array('jquery'), null, true);
+        wp_enqueue_script('flatpickr-locale-pt', 'https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js', array('flatpickr-js'), null, true);
+        
+    }
+    
     function adicionar_meta_box_escolas() {
         add_meta_box(
             'meta-box-escolas',
@@ -91,6 +99,116 @@ class Escolas {
             'normal', 
             'high' 
         );
+        add_meta_box(
+            'meta-box-lote-one',
+            'LOTE 1', 
+            [$this,'exibir_lote_one'], 
+            'escolas', 
+            'normal', 
+            'high' 
+        );
+    }
+
+    function exibir_lote_one($post) {
+        // ESCOLHA
+        $escolha_data_inicio = get_post_meta($post->ID, 'escolha_data_inicio', true);
+        $escolha_data_fim = get_post_meta($post->ID, 'escolha_data_fim', true);
+        ?>
+        <div class="row mt-4 mb-4">
+            <label for="nome" class="mb-4 fw-bold" style="font-size: 1rem; color:#7A7A7A;">ESCOLHA</label>
+            <div class="col">
+                <div class="form-group">
+                    <label for="escolha_data_inicio" class="mb-2 fw-bold">Data de Início</label>
+                    <div class="input-group">
+                        <input type="text" id="escolha_data_inicio" name="escolha_data_inicio" class="form-control" value="<?php echo esc_attr($escolha_data_inicio); ?>" />
+                        <div class="input-group-append">
+                            <span class="input-group-text"><i class="dashicons dashicons-calendar-alt"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="escolha_data_fim" class="mb-2 fw-bold">Data de Fim</label>
+                    <div class="input-group">
+                        <input type="text" id="escolha_data_fim" name="escolha_data_fim" class="form-control" value="<?php echo esc_attr($escolha_data_fim); ?>" />
+                        <div class="input-group-append">
+                            <span class="input-group-text"><i class="dashicons dashicons-calendar-alt"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            jQuery(document).ready(function($) {
+                $('#escolha_data_inicio').flatpickr({
+                    enableTime: true,
+                    dateFormat: "d/m/Y H:i",
+                    time_24hr: true,
+                    locale: 'pt'
+                });
+                $('#escolha_data_fim').flatpickr({
+                    enableTime: true,
+                    dateFormat: "d/m/Y H:i",
+                    time_24hr: true,
+                    locale: 'pt'
+                });
+            });
+        </script>
+        
+        <?php
+        // ESCOLHA 
+
+        // ENTREGA
+        $entrega_data_inicio = get_post_meta($post->ID, 'entrega_data_inicio', true);
+        $entrega_data_fim = get_post_meta($post->ID, 'entrega_data_fim', true);
+        ?>
+        
+        <hr class="my-1"/>
+
+        <div class="row mt-4 mb-4">
+            <label for="nome" class="mb-4 fw-bold" style="font-size: 1rem; color:#7A7A7A;">ENTREGA</label>
+            <div class="col">
+                <div class="form-group">
+                    <label for="entrega_data_inicio" class="mb-2 fw-bold">Data de Início</label>
+                    <div class="input-group">
+                        <input type="text" id="entrega_data_inicio" name="entrega_data_inicio" class="form-control" value="<?php echo esc_attr($entrega_data_inicio); ?>" />
+                        <div class="input-group-append">
+                            <span class="input-group-text"><i class="dashicons dashicons-calendar-alt"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="entrega_data_fim" class="mb-2 fw-bold">Data de Fim</label>
+                    <div class="input-group">
+                        <input type="text" id="entrega_data_fim" name="entrega_data_fim" class="form-control" value="<?php echo esc_attr($entrega_data_fim); ?>" />
+                        <div class="input-group-append">
+                            <span class="input-group-text"><i class="dashicons dashicons-calendar-alt"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            jQuery(document).ready(function($) {
+                $('#entrega_data_inicio').flatpickr({
+                    enableTime: true,
+                    dateFormat: "d/m/Y H:i",
+                    time_24hr: true,
+                    locale: 'pt'
+                });
+                $('#entrega_data_fim').flatpickr({
+                    enableTime: true,
+                    dateFormat: "d/m/Y H:i",
+                    time_24hr: true,
+                    locale: 'pt'
+                });
+            });
+        </script>
+        <?php
+        // ENTREGA
     }
 
     // Callback para exibir o conteúdo do meta box
@@ -157,6 +275,20 @@ class Escolas {
         if (isset($_POST['imagem_logo_escola'])) {
             update_post_meta($post_id, 'imagem_logo_escola', $_POST['imagem_logo_escola'] );
         }
+
+        if (isset($_POST['escolha_data_inicio'])) {
+            update_post_meta($post_id, 'escolha_data_inicio', sanitize_text_field($_POST['escolha_data_inicio']));
+        }
+        if (isset($_POST['escolha_data_fim'])) {
+            update_post_meta($post_id, 'escolha_data_fim', sanitize_text_field($_POST['escolha_data_fim']));
+        }
+        if (isset($_POST['entrega_data_inicio'])) {
+            update_post_meta($post_id, 'entrega_data_inicio', sanitize_text_field($_POST['entrega_data_inicio']));
+        }
+        if (isset($_POST['entrega_data_fim'])) {
+            update_post_meta($post_id, 'entrega_data_fim', sanitize_text_field($_POST['entrega_data_fim']));
+        }
+
     }
 
     public static function escolas_capacidades_administrador() {
