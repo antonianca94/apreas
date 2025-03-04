@@ -152,3 +152,24 @@ input#imagem_logo_escola {
     margin: 10px 0px 10px 0px; 
 }
 /*** PREVIEW LOGO - ESCOLA ***/
+
+/*** PREVIEW LOGO - EVENTO ***/
+.preview-logo-evento {
+    margin-top: 1rem;
+    background-color: #e1dede;
+    height: 15rem;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    position: relative;
+    border-radius: 9px;
+    margin-left: 4px;
+    margin-right: 4px;
+    /* box-shadow: inset 0 0 0 2000px rgb(0 0 0 / 23%); */
+}
+
+input#imagem_logo_evento { 
+    width: 100%; 
+    margin: 10px 0px 10px 0px; 
+}
+/*** PREVIEW LOGO - EVENTO ***/

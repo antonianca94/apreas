@@ -134,6 +134,7 @@ class Eventos {
     // Callback para exibir o conteúdo do meta box
     function exibir_meta_box_eventos($post) {
         $nome = get_post_meta($post->ID, 'nome', true);
+        $imagem_logo_evento = get_post_meta($post->ID, 'imagem_logo_evento', true);
         ?>
         <script>
             jQuery(document).ready(function($) {
@@ -255,6 +256,22 @@ class Eventos {
                 </div>
             </div>
         </div>
+
+        <!-- LOGO EVENTO -->
+        <div class="row mb-4">
+            <div class="col-xxl mt-2">
+                <span class="" style="width: 150px; display: inline-block; padding-right: 20px; font-weight:600; color:#000;"><label> <h6> LOGO EVENTO </h6> </label> </span> 
+                <div class="corpo-upload" style="width:100%; margin-bottom:10px;"><a href="#" id="imagem_logo_evento_upload" name="imagem_logo_evento_upload" class="imagem_logo_evento_btn button button-secondary"><span class="dashicons dashicons-cloud-upload"></span> Carregar Imagem</a></div>
+                <div style="width:100%;">
+                    <input type="text" id="imagem_logo_evento" name="imagem_logo_evento" class="imagem_logo_evento" value="<?php  echo $imagem_logo_evento; ?>" />
+                </div>
+                <div class="preview-logo">
+                    <div class="preview-logo-evento">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- LOGO EVENTO -->
         <?php
     }
 
@@ -269,6 +286,9 @@ class Eventos {
         // CATEGORIAS
         if (isset($_POST['nome'])) {
             update_post_meta($post_id, 'nome', sanitize_text_field($_POST['nome']));
+        }
+        if (isset($_POST['imagem_logo_evento'])) {
+            update_post_meta($post_id, 'imagem_logo_evento', $_POST['imagem_logo_evento'] );
         }
     }
 
