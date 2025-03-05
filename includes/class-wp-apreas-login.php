@@ -52,15 +52,13 @@ class Login {
         // ESCOLHA  & ENTREGA LOTE 1
         $l1_escolha_data_inicio = get_post_meta($atts['id'], 'l1_escolha_data_inicio', true);
         $l1_escolha_data_fim = get_post_meta($atts['id'], 'l1_escolha_data_fim', true);
-        $l1_entrega_data_inicio = get_post_meta($atts['id'], 'l1_entrega_data_inicio', true);
-        $l1_entrega_data_fim = get_post_meta($atts['id'], 'l1_entrega_data_fim', true);
+        $l1_entrega_data = get_post_meta($atts['id'], 'l1_entrega_data', true);
         // ESCOLHA  & ENTREGA LOTE 1
 
         // ESCOLHA  & ENTREGA LOTE 2
         $l2_escolha_data_inicio = get_post_meta($atts['id'], 'l2_escolha_data_inicio', true);
         $l2_escolha_data_fim = get_post_meta($atts['id'], 'l2_escolha_data_fim', true);
-        $l2_entrega_data_inicio = get_post_meta($atts['id'], 'l2_entrega_data_inicio', true);
-        $l2_entrega_data_fim = get_post_meta($atts['id'], 'l2_entrega_data_fim', true);
+        $l2_entrega_data = get_post_meta($atts['id'], 'l2_entrega_data', true);
         // ESCOLHA  & ENTREGA LOTE 2
 
         return '
@@ -70,18 +68,19 @@ class Login {
                     <h5>Escolha</h5>
                     <p style="font-size: 1.2rem;">'. esc_html($l1_escolha_data_inicio) . ' à ' . esc_html($l1_escolha_data_fim) . '</p>
                     <h5>Entrega</h5>
-                    <p style="font-size: 1.2rem;">'. esc_html($l1_entrega_data_inicio) . ' à ' . esc_html($l1_entrega_data_fim) . '</p>
+                    <p style="font-size: 1.2rem;">'. esc_html($l1_entrega_data) . '</p>
                 </div>
                 <div class="w-100 p-3 m-3" style="border: 1px solid grey; border-radius: 1rem;">
                     <h3 style="padding-bottom: 0.5rem; font-weight: 700;">Lote 2</h3>
                     <h5>Escolha</h5>
                     <p style="font-size: 1.2rem;">'. esc_html($l2_escolha_data_inicio) . ' à ' . esc_html($l2_escolha_data_fim) . '</p>
                     <h5>Entrega</h5>
-                    <p style="font-size: 1.2rem;">'. esc_html($l2_entrega_data_inicio) . ' à ' . esc_html($l2_entrega_data_fim) . '</p>
+                    <p style="font-size: 1.2rem;">'. esc_html($l2_entrega_data) . '</p>
                 </div>
             </div>
         ';
     }
+
     function mostrar_lotes_escolas($atts) {
         $atts = shortcode_atts(array(
             'id' => null,
@@ -93,15 +92,13 @@ class Login {
         // ESCOLHA  & ENTREGA LOTE 1
         $l1_escolha_data_inicio = get_post_meta($atts['id'], 'l1_escolha_data_inicio', true);
         $l1_escolha_data_fim = get_post_meta($atts['id'], 'l1_escolha_data_fim', true);
-        $l1_entrega_data_inicio = get_post_meta($atts['id'], 'l1_entrega_data_inicio', true);
-        $l1_entrega_data_fim = get_post_meta($atts['id'], 'l1_entrega_data_fim', true);
+        $l1_entrega_data = get_post_meta($atts['id'], 'l1_entrega_data', true);
         // ESCOLHA  & ENTREGA LOTE 1
 
         // ESCOLHA  & ENTREGA LOTE 2
         $l2_escolha_data_inicio = get_post_meta($atts['id'], 'l2_escolha_data_inicio', true);
         $l2_escolha_data_fim = get_post_meta($atts['id'], 'l2_escolha_data_fim', true);
-        $l2_entrega_data_inicio = get_post_meta($atts['id'], 'l2_entrega_data_inicio', true);
-        $l2_entrega_data_fim = get_post_meta($atts['id'], 'l2_entrega_data_fim', true);
+        $l2_entrega_data = get_post_meta($atts['id'], 'l2_entrega_data', true);
         // ESCOLHA  & ENTREGA LOTE 2
 
         return '
@@ -111,14 +108,14 @@ class Login {
                     <h5>Escolha</h5>
                     <p style="font-size: 1.2rem;">'. esc_html($l1_escolha_data_inicio) . ' à ' . esc_html($l1_escolha_data_fim) . '</p>
                     <h5>Entrega</h5>
-                    <p style="font-size: 1.2rem;">'. esc_html($l1_entrega_data_inicio) . ' à ' . esc_html($l1_entrega_data_fim) . '</p>
+                    <p style="font-size: 1.2rem;">'. esc_html($l1_entrega_data) . '</p>
                 </div>
                 <div class="w-100 p-3 m-3" style="border: 1px solid grey; border-radius: 1rem;">
                     <h3 style="padding-bottom: 0.5rem; font-weight: 700;">Lote 2</h3>
                     <h5>Escolha</h5>
                     <p style="font-size: 1.2rem;">'. esc_html($l2_escolha_data_inicio) . ' à ' . esc_html($l2_escolha_data_fim) . '</p>
                     <h5>Entrega</h5>
-                    <p style="font-size: 1.2rem;">'. esc_html($l2_entrega_data_inicio) . ' à ' . esc_html($l2_entrega_data_fim) . '</p>
+                    <p style="font-size: 1.2rem;">'. esc_html($l2_entrega_data) . '</p>
                 </div>
             </div>
         ';
