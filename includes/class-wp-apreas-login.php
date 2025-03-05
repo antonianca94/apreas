@@ -41,113 +41,54 @@ class Login {
     }
 
 
-    function mostrar_lotes_eventos($atts) {
-        $atts = shortcode_atts(array(
-            'id' => null,
-        ), $atts, 'lotes_evento');
-        if ($atts['id'] === null) {
-            return 'ID do evento não fornecido.';
-        }
-
-        // ESCOLHA  & ENTREGA LOTE 1
-        $l1_escolha_data_inicio = get_post_meta($atts['id'], 'l1_escolha_data_inicio', true);
-        $l1_escolha_data_fim = get_post_meta($atts['id'], 'l1_escolha_data_fim', true);
-        $l1_entrega_data = get_post_meta($atts['id'], 'l1_entrega_data', true);
-        // ESCOLHA  & ENTREGA LOTE 1
-
-        // ESCOLHA  & ENTREGA LOTE 2
-        $l2_escolha_data_inicio = get_post_meta($atts['id'], 'l2_escolha_data_inicio', true);
-        $l2_escolha_data_fim = get_post_meta($atts['id'], 'l2_escolha_data_fim', true);
-        $l2_entrega_data = get_post_meta($atts['id'], 'l2_entrega_data', true);
-        // ESCOLHA  & ENTREGA LOTE 2
-
+    function mostrar_lotes_eventos() {
         return '
             <div class="d-flex justify-content-start align-items-center">
                 <div class="w-100 p-3 m-3" style="border: 1px solid grey; border-radius: 1rem;">
                     <h3 style="padding-bottom: 0.5rem; font-weight: 700;">Lote 1</h3>
                     <h5>Escolha</h5>
-                    <p style="font-size: 1.2rem;">'. esc_html($l1_escolha_data_inicio) . ' à ' . esc_html($l1_escolha_data_fim) . '</p>
+                    <p style="font-size: 1.2rem;"> <span class="l1_escolha_data_inicio_evento"> </span> à <span class="l1_escolha_data_fim_evento"> </span> </p>
                     <h5>Entrega</h5>
-                    <p style="font-size: 1.2rem;">'. esc_html($l1_entrega_data) . '</p>
+                    <p style="font-size: 1.2rem;"> <span class="l1_entrega_data_evento"> </span> </p>
                 </div>
                 <div class="w-100 p-3 m-3" style="border: 1px solid grey; border-radius: 1rem;">
                     <h3 style="padding-bottom: 0.5rem; font-weight: 700;">Lote 2</h3>
                     <h5>Escolha</h5>
-                    <p style="font-size: 1.2rem;">'. esc_html($l2_escolha_data_inicio) . ' à ' . esc_html($l2_escolha_data_fim) . '</p>
+                    <p style="font-size: 1.2rem;"> <span class="l2_escolha_data_inicio_evento"> </span> à <span class="l2_escolha_data_fim_evento"> </span> </p>
                     <h5>Entrega</h5>
-                    <p style="font-size: 1.2rem;">'. esc_html($l2_entrega_data) . '</p>
+                    <p style="font-size: 1.2rem;"> <span class="l2_entrega_data_evento"> </span> </p>
                 </div>
             </div>
         ';
     }
 
-    function mostrar_lotes_escolas($atts) {
-        $atts = shortcode_atts(array(
-            'id' => null,
-        ), $atts, 'lotes_escola');
-        if ($atts['id'] === null) {
-            return 'ID da escola não fornecida.';
-        }
-
-        // ESCOLHA  & ENTREGA LOTE 1
-        $l1_escolha_data_inicio = get_post_meta($atts['id'], 'l1_escolha_data_inicio', true);
-        $l1_escolha_data_fim = get_post_meta($atts['id'], 'l1_escolha_data_fim', true);
-        $l1_entrega_data = get_post_meta($atts['id'], 'l1_entrega_data', true);
-        // ESCOLHA  & ENTREGA LOTE 1
-
-        // ESCOLHA  & ENTREGA LOTE 2
-        $l2_escolha_data_inicio = get_post_meta($atts['id'], 'l2_escolha_data_inicio', true);
-        $l2_escolha_data_fim = get_post_meta($atts['id'], 'l2_escolha_data_fim', true);
-        $l2_entrega_data = get_post_meta($atts['id'], 'l2_entrega_data', true);
-        // ESCOLHA  & ENTREGA LOTE 2
-
+    function mostrar_lotes_escolas() {
         return '
             <div class="d-flex justify-content-start align-items-center">
                 <div class="w-100 p-3 m-3" style="border: 1px solid grey; border-radius: 1rem;">
                     <h3 style="padding-bottom: 0.5rem; font-weight: 700;">Lote 1</h3>
                     <h5>Escolha</h5>
-                    <p style="font-size: 1.2rem;">'. esc_html($l1_escolha_data_inicio) . ' à ' . esc_html($l1_escolha_data_fim) . '</p>
+                    <p style="font-size: 1.2rem;"> <span class="l1_escolha_data_inicio_escola"> </span> à <span class="l1_escolha_data_fim_escola"> </span> </p>
                     <h5>Entrega</h5>
-                    <p style="font-size: 1.2rem;">'. esc_html($l1_entrega_data) . '</p>
+                    <p style="font-size: 1.2rem;"> <span class="l1_entrega_data_escola"> </span> </p>
                 </div>
                 <div class="w-100 p-3 m-3" style="border: 1px solid grey; border-radius: 1rem;">
                     <h3 style="padding-bottom: 0.5rem; font-weight: 700;">Lote 2</h3>
                     <h5>Escolha</h5>
-                    <p style="font-size: 1.2rem;">'. esc_html($l2_escolha_data_inicio) . ' à ' . esc_html($l2_escolha_data_fim) . '</p>
+                    <p style="font-size: 1.2rem;"> <span class="l2_escolha_data_inicio_escola"> </span> à <span class="l2_escolha_data_fim_escola"> </span> </p>
                     <h5>Entrega</h5>
-                    <p style="font-size: 1.2rem;">'. esc_html($l2_entrega_data) . '</p>
+                    <p style="font-size: 1.2rem;"> <span class="l2_entrega_data_escola"> </span> </p>
                 </div>
             </div>
         ';
-        
     }
     
-    function mostrar_imagem_logo_evento($atts) {
-        $atts = shortcode_atts(array(
-            'id' => null,
-        ), $atts, 'imagem_logo_evento');
-        if ($atts['id'] === null) {
-            return 'ID do evento não fornecido.';
-        }
-        $imagem_logo_evento = get_post_meta($atts['id'], 'imagem_logo_evento', true);
-        if (empty($imagem_logo_evento)) {
-            return 'Nenhuma imagem encontrada para este evento.';
-        }
-        return '<img src="' . esc_url($imagem_logo_evento) . '" alt="Logo do Evento" style="max-width: 100%; height: auto;">';
+    function mostrar_imagem_logo_evento() {
+        return '<img class="imagem_logo_evento" src="https://apreas.com.br/wp-content/plugins/elementor/assets/images/placeholder.png" alt="Logo do Evento" style="max-width: 100%; height: auto;">';
     }
 
-    function mostrar_imagem_logo_escola($atts) {
-        $atts = shortcode_atts(array(
-            'id' => null,
-        ), $atts, 'imagem_logo_escola');
-        if ($atts['id'] === null) {
-            return 'ID da escola não fornecido.';
-        }
-        $imagem_logo_escola = get_post_meta($atts['id'], 'imagem_logo_escola', true);
-        if (empty($imagem_logo_escola)) {
-            return 'Nenhuma imagem encontrada para esta escola.';
-        }
-        return '<img src="' . esc_url($imagem_logo_escola) . '" alt="Logo da Escola" style="max-width: 100%; height: auto;">';
+    function mostrar_imagem_logo_escola() {
+        return '<img class="imagem_logo_escola" src="https://apreas.com.br/wp-content/plugins/elementor/assets/images/placeholder.png" alt="Logo da Escola" style="max-width: 100%; height: auto;">';
     }
 
     function fotos_counter() {
@@ -393,6 +334,16 @@ class Login {
                 $turma_post = get_post($turma_id);
             // [ESCOLA - UNIDADE - TURMA] 
 
+            // ESCOLA | CAMPOS EXTRAS
+            $imagem_logo_escola = get_post_meta(intval($escola_id), 'imagem_logo_escola', true);
+            $l1_escolha_data_inicio_escola = get_post_meta(intval($escola_id), 'l1_escolha_data_inicio', true);
+            $l1_escolha_data_fim_escola = get_post_meta(intval($escola_id), 'l1_escolha_data_fim', true);
+            $l1_entrega_data_escola = get_post_meta(intval($escola_id), 'l1_entrega_data', true);
+            $l2_escolha_data_inicio_escola = get_post_meta(intval($escola_id), 'l2_escolha_data_inicio', true);
+            $l2_escolha_data_fim_escola = get_post_meta(intval($escola_id), 'l2_escolha_data_fim', true);
+            $l2_entrega_data_escola = get_post_meta(intval($escola_id), 'l2_entrega_data', true);
+            // ESCOLA | CAMPOS EXTRAS
+
             $dados = [
                 'nome' => $post->post_title,
                 'imagem_upload_individual' => $imagem_upload_individual,
@@ -400,7 +351,14 @@ class Login {
                 'imagem_upload_turma' => $imagem_upload_turma,
                 'escola' => [
                     'id' => intval($escola_id),
-                    'nome' => $escola_post ? $escola_post->post_title : null
+                    'nome' => $escola_post ? $escola_post->post_title : null,
+                    'imagem_logo_escola' => $imagem_logo_escola,
+                    'l1_escolha_data_inicio' => $l1_escolha_data_inicio_escola,
+                    'l1_escolha_data_fim' => $l1_escolha_data_fim_escola,
+                    'l1_entrega_data' => $l1_entrega_data_escola,
+                    'l2_escolha_data_inicio' => $l2_escolha_data_inicio_escola,
+                    'l2_escolha_data_fim' => $l2_escolha_data_fim_escola,
+                    'l2_entrega_data' => $l2_entrega_data_escola
                 ],
                 'unidade' => [
                     'id' => intval($unidade_id),
@@ -720,6 +678,26 @@ class Login {
                         'codigo' => $foto['codigo']
                     );
                 }
+
+                // ESCOLA | CAMPOS EXTRAS
+                $imagem_logo_escola = get_post_meta(intval($escola_id), 'imagem_logo_escola', true);
+                $l1_escolha_data_inicio_escola = get_post_meta(intval($escola_id), 'l1_escolha_data_inicio', true);
+                $l1_escolha_data_fim_escola = get_post_meta(intval($escola_id), 'l1_escolha_data_fim', true);
+                $l1_entrega_data_escola = get_post_meta(intval($escola_id), 'l1_entrega_data', true);
+                $l2_escolha_data_inicio_escola = get_post_meta(intval($escola_id), 'l2_escolha_data_inicio', true);
+                $l2_escolha_data_fim_escola = get_post_meta(intval($escola_id), 'l2_escolha_data_fim', true);
+                $l2_entrega_data_escola = get_post_meta(intval($escola_id), 'l2_entrega_data', true);
+                // ESCOLA | CAMPOS EXTRAS
+
+                // EVENTO | CAMPOS EXTRAS
+                $imagem_logo_evento = get_post_meta(intval($evento_id), 'imagem_logo_evento', true);
+                $l1_escolha_data_inicio_evento = get_post_meta(intval($evento_id), 'l1_escolha_data_inicio', true);
+                $l1_escolha_data_fim_evento = get_post_meta(intval($evento_id), 'l1_escolha_data_fim', true);
+                $l1_entrega_data_evento = get_post_meta(intval($evento_id), 'l1_entrega_data', true);
+                $l2_escolha_data_inicio_evento = get_post_meta(intval($evento_id), 'l2_escolha_data_inicio', true);
+                $l2_escolha_data_fim_evento = get_post_meta(intval($evento_id), 'l2_escolha_data_fim', true);
+                $l2_entrega_data_evento = get_post_meta(intval($evento_id), 'l2_entrega_data', true);
+                // EVENTO | CAMPOS EXTRAS
     
                 $dados[] = [
                     'nome' => $post->post_title,
@@ -730,11 +708,25 @@ class Login {
                     'link_album' => $link_album,
                     'evento' => [
                         'id' => intval($evento_id),
-                        'nome' => $evento_post ? $evento_post->post_title : null
+                        'nome' => $evento_post ? $evento_post->post_title : null,
+                        'imagem_logo_evento' => $imagem_logo_evento,
+                        'l1_escolha_data_inicio' => $l1_escolha_data_inicio_evento,
+                        'l1_escolha_data_fim' => $l1_escolha_data_fim_evento,
+                        'l1_entrega_data' => $l1_entrega_data_evento,
+                        'l2_escolha_data_inicio' => $l2_escolha_data_inicio_evento,
+                        'l2_escolha_data_fim' => $l2_escolha_data_fim_evento,
+                        'l2_entrega_data' => $l2_entrega_data_evento
                     ],
                     'escola' => [
                         'id' => intval($escola_id),
-                        'nome' => $escola_post ? $escola_post->post_title : null
+                        'nome' => $escola_post ? $escola_post->post_title : null,
+                        'imagem_logo_escola' => $imagem_logo_escola,
+                        'l1_escolha_data_inicio' => $l1_escolha_data_inicio_escola,
+                        'l1_escolha_data_fim' => $l1_escolha_data_fim_escola,
+                        'l1_entrega_data' => $l1_entrega_data_escola,
+                        'l2_escolha_data_inicio' => $l2_escolha_data_inicio_escola,
+                        'l2_escolha_data_fim' => $l2_escolha_data_fim_escola,
+                        'l2_entrega_data' => $l2_entrega_data_escola
                     ],
                     'unidade' => [
                         'id' => intval($unidade_id),
