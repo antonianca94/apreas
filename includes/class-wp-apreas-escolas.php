@@ -169,7 +169,6 @@ class Escolas {
 
         // ENTREGA
         $l1_entrega_data = get_post_meta($post->ID, 'l1_entrega_data', true);
-        $l1_entrega_data_fim = get_post_meta($post->ID, 'l1_entrega_data_fim', true);
         ?>
         
         <hr class="my-1"/>
