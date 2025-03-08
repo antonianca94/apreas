@@ -1,5 +1,15 @@
 jQuery(document).ready(function($) {
 
+    // LIMPAR ESPAÇOS EM BRANCO DO INPUT SENHA_NOME
+    let timeout;
+    document.getElementById("senha_nome").addEventListener("input", function () {
+        clearTimeout(timeout); 
+        timeout = setTimeout(() => {
+            this.value = this.value.trim(); 
+        }, 500); 
+    });
+    // LIMPAR ESPAÇOS EM BRANCO DO INPUT SENHA_NOME
+
     // MODAL FOTO HMTL
     document.body.insertAdjacentHTML('beforeend', `
         <div id="customModal" class="custom-modal" style="display: none;">
