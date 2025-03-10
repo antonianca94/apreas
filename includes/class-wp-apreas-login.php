@@ -47,16 +47,16 @@ class Login {
                 <div class="w-100 p-3 m-3" style="border: 1px solid grey; border-radius: 1rem;">
                     <h3 style="padding-bottom: 0.5rem; font-weight: 700;">Lote 1</h3>
                     <h5>Escolha</h5>
-                    <p style="font-size: 1.2rem;"> <span class="l1_escolha_data_inicio_evento"> </span> à <span class="l1_escolha_data_fim_evento"> </span> </p>
+                    <p style="font-size: 1.35rem;"> <span class="l1_escolha_data_inicio_evento"> </span> à <span class="l1_escolha_data_fim_evento"> </span> </p>
                     <h5>Entrega</h5>
-                    <p style="font-size: 1.2rem;"> <span class="l1_entrega_data_evento"> </span> </p>
+                    <p style="font-size: 1.35rem;"> <span class="l1_entrega_data_evento"> </span> </p>
                 </div>
                 <div class="w-100 p-3 m-3" style="border: 1px solid grey; border-radius: 1rem;">
                     <h3 style="padding-bottom: 0.5rem; font-weight: 700;">Lote 2</h3>
                     <h5>Escolha</h5>
-                    <p style="font-size: 1.2rem;"> <span class="l2_escolha_data_inicio_evento"> </span> à <span class="l2_escolha_data_fim_evento"> </span> </p>
+                    <p style="font-size: 1.35rem;"> <span class="l2_escolha_data_inicio_evento"> </span> à <span class="l2_escolha_data_fim_evento"> </span> </p>
                     <h5>Entrega</h5>
-                    <p style="font-size: 1.2rem;"> <span class="l2_entrega_data_evento"> </span> </p>
+                    <p style="font-size: 1.35rem;"> <span class="l2_entrega_data_evento"> </span> </p>
                 </div>
             </div>
         ';
@@ -68,16 +68,16 @@ class Login {
                 <div class="w-100 p-3 m-3" style="border: 1px solid grey; border-radius: 1rem;">
                     <h3 style="padding-bottom: 0.5rem; font-weight: 700;">Lote 1</h3>
                     <h5>Escolha</h5>
-                    <p style="font-size: 1.2rem;"> <span class="l1_escolha_data_inicio_escola"> </span> à <span class="l1_escolha_data_fim_escola"> </span> </p>
+                    <p style="font-size: 1.35rem;"> <span class="l1_escolha_data_inicio_escola"> </span> à <span class="l1_escolha_data_fim_escola"> </span> </p>
                     <h5>Entrega</h5>
-                    <p style="font-size: 1.2rem;"> <span class="l1_entrega_data_escola"> </span> </p>
+                    <p style="font-size: 1.35rem;"> <span class="l1_entrega_data_escola"> </span> </p>
                 </div>
                 <div class="w-100 p-3 m-3" style="border: 1px solid grey; border-radius: 1rem;">
                     <h3 style="padding-bottom: 0.5rem; font-weight: 700;">Lote 2</h3>
                     <h5>Escolha</h5>
-                    <p style="font-size: 1.2rem;"> <span class="l2_escolha_data_inicio_escola"> </span> à <span class="l2_escolha_data_fim_escola"> </span> </p>
+                    <p style="font-size: 1.35rem;"> <span class="l2_escolha_data_inicio_escola"> </span> à <span class="l2_escolha_data_fim_escola"> </span> </p>
                     <h5>Entrega</h5>
-                    <p style="font-size: 1.2rem;"> <span class="l2_entrega_data_escola"> </span> </p>
+                    <p style="font-size: 1.35rem;"> <span class="l2_entrega_data_escola"> </span> </p>
                 </div>
             </div>
         ';
