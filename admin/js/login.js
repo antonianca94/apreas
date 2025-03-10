@@ -6,7 +6,7 @@ jQuery(document).ready(function($) {
         clearTimeout(timeout); 
         timeout = setTimeout(() => {
             this.value = this.value.trim(); 
-        }, 500); 
+        }, 4000); 
     });
     // LIMPAR ESPAÇOS EM BRANCO DO INPUT SENHA_NOME
 
