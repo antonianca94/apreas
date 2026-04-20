@@ -127,7 +127,7 @@ class Login {
                     </div>
                     <div class="col-md-6">
                         <label for="data_nascimento" class="form-label">Data de Nascimento</label>
-                        <input type="date" class="form-control data_nascimento" name="data_nascimento" id="data_nascimento" placeholder="Data de Nascimento">
+                        <input type="text" class="form-control data_nascimento" name="data_nascimento" id="data_nascimento" placeholder="DD/MM/AAAA" maxlength="10" autocomplete="off">
                         <div class="invalid-feedback" id="dataError"></div>
                     </div>
                     <div class="col-12">
@@ -146,8 +146,12 @@ class Login {
                         </select>       
                         <div class="invalid-feedback" id="escolaError"></div> 
                     </div>
-                    <div class="col-12">
-                        Dúvidas e Problemas: (11) 93949-0911
+                    <div class="col-12 duvidas-box">
+                        <span class="duvidas-label">Dúvidas e Problemas?</span>
+                        <a href="https://wa.me/5511939490911" target="_blank" class="duvidas-whatsapp">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="duvidas-wpp-icon"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                            (11) 93949-0911 &nbsp;<em>WhatsApp</em>
+                        </a>
                     </div>                     
                     <div class="col-12 mt-4 pt-3 pb-3">
                         <button type="submit" class="btn btn-primary btn_form_login">Acessar</button>
@@ -192,7 +196,9 @@ class Login {
                 left: 0;
                 width: 100%;
                 height: 100%;
-                background-color: rgb(0 0 0 / 88%);
+                background-color: rgb(0 0 0 / 94%);
+                backdrop-filter: blur(8px);
+                -webkit-backdrop-filter: blur(8px);
                 z-index: 1;
             }
     
@@ -203,6 +209,49 @@ class Login {
                 padding: 20px;
                 border-radius: 10px;
                 box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); 
+            }
+            .duvidas-box{
+                padding: 10px 0px 0px !important;
+                margin-top: 7px;
+                margin-left: 7px;
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+            }
+            .duvidas-label {
+                font-size: 0.87rem;
+                font-weight: 400;
+                color: #999;
+                font-family: "Roboto", Sans-serif;
+            }
+            .duvidas-whatsapp {
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+                color: #25d366;
+                font-weight: 500;
+                font-size: 1.1rem;
+                font-family: "Roboto", Sans-serif;
+                text-decoration: none;
+            }
+            .duvidas-whatsapp:hover {
+                color: #25d366;
+                text-decoration: none;
+            }
+            .duvidas-whatsapp em {
+                color: #8d8d8d;
+                font-style: inherit;
+                font-size: 1rem;
+                font-weight: 400;
+            }
+            .duvidas-wpp-icon {
+                width: 15px;
+                height: 15px;
+                color: #25d366;
+                flex-shrink: 0;
+            }
+            .duvidas-whatsapp:hover .duvidas-wpp-icon {
+                color: #25d366;
             }
             form#form_login input:not(.is-invalid, .is-valid) {
                 border: 1px solid #c2c2c2 !important;
@@ -218,19 +267,22 @@ class Login {
             }
  
             .btn_form_login {
-                background: #C0FF2D !important;
-                color: #000 !important;
+                background: #d32f2f !important;
+                color: #fff !important;
                 font-weight: 500 !important;
-                border: none !important;
+                border: 2px solid #d32f2f !important;
                 text-transform: uppercase !important;
                 margin-top: 8px;
                 padding: 8px 17px !important;
                 font-family: "Roboto", Sans-serif !important;
                 font-size: 1.2rem;
+                transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease !important;
             }
 
             .btn_form_login:focus, .btn_form_login:hover{
-                background: #006DD4 !important;
+                background: #ffffff !important;
+                color: #000000 !important;
+                border-color: #ffffff !important;
             }
 
             .woocommerce-js form#form_login input.is-invalid {
@@ -400,7 +452,7 @@ class Login {
                     </div>
                     <div class="col-md-6">
                         <label for="data_nascimento" class="form-label">Data de Nascimento / Data Evento</label>
-                        <input type="date" class="form-control data_nascimento" name="data_nascimento" id="data_nascimento" placeholder="Data de Nascimento">
+                        <input type="text" class="form-control data_nascimento" name="data_nascimento" id="data_nascimento" placeholder="DD/MM/AAAA" maxlength="10" autocomplete="off">
                         <div class="invalid-feedback" id="dataError"></div>
                     </div>
                     <div class="col-12">
@@ -430,8 +482,12 @@ class Login {
                         </select>       
                         <div class="invalid-feedback" id="eventoError"></div>     
                     </div>
-                    <div class="col-12">
-                        Dúvidas e Problemas: (11) 93949-0911
+                    <div class="col-12 duvidas-box">
+                        <span class="duvidas-label">Dúvidas e Problemas?</span>
+                        <a href="https://wa.me/5511939490911" target="_blank" class="duvidas-whatsapp">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="duvidas-wpp-icon"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                            (11) 93949-0911 &nbsp;<em>WhatsApp</em>
+                        </a>
                     </div>                      
                     <div class="col-12 mt-4 pt-3 pb-3">
                         <button type="submit" class="btn btn-primary btn_form_login">Acessar</button>
@@ -475,7 +531,9 @@ class Login {
                 left: 0;
                 width: 100%;
                 height: 100%;
-                background-color: rgb(0 0 0 / 88%);
+                background-color: rgb(0 0 0 / 97%);
+                backdrop-filter: blur(8px);
+                -webkit-backdrop-filter: blur(8px);
                 z-index: 1;
             }
     
@@ -486,6 +544,46 @@ class Login {
                 padding: 20px;
                 border-radius: 10px;
                 box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); 
+            }
+            .duvidas-box {
+                padding: 2px 0 !important;
+                margin-top: 2px;
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+            }
+            .duvidas-label {
+                font-size: 0.72rem;
+                font-weight: 400;
+                color: #999;
+                font-family: "Roboto", Sans-serif;
+            }
+            .duvidas-whatsapp {
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+                color: #25d366;
+                font-weight: 500;
+                font-size: 0.88rem;
+                font-family: "Roboto", Sans-serif;
+                text-decoration: none;
+            }
+            .duvidas-whatsapp:hover {
+                color: #25d366;
+                text-decoration: none;
+            }
+            .duvidas-whatsapp em {
+                color: #000;
+                font-style: normal;
+            }
+            .duvidas-wpp-icon {
+                width: 15px;
+                height: 15px;
+                color: #25d366;
+                flex-shrink: 0;
+            }
+            .duvidas-whatsapp:hover .duvidas-wpp-icon {
+                color: #25d366;
             }
             form#form_login input:not(.is-invalid, .is-valid) {
                 border: 1px solid #c2c2c2 !important;
@@ -501,19 +599,22 @@ class Login {
             }
  
             .btn_form_login {
-                background: #C0FF2D !important;
-                color: #000 !important;
+                background: #d32f2f !important;
+                color: #fff !important;
                 font-weight: 500 !important;
-                border: none !important;
+                border: 2px solid #d32f2f !important;
                 text-transform: uppercase !important;
                 margin-top: 8px;
                 padding: 8px 17px !important;
                 font-family: "Roboto", Sans-serif !important;
                 font-size: 1.2rem;
+                transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease !important;
             }
 
             .btn_form_login:focus, .btn_form_login:hover{
-                background: #006DD4 !important;
+                background: #ffffff !important;
+                color: #000000 !important;
+                border-color: #ffffff !important;
             }
 
             .woocommerce-js form#form_login input.is-invalid {

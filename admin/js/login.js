@@ -10,6 +10,33 @@ jQuery(document).ready(function($) {
     });
     // LIMPAR ESPAÇOS EM BRANCO DO INPUT SENHA_NOME
 
+    // MÁSCARA DD/MM/AAAA PARA CAMPO DATA
+    function aplicarMascaraData(input) {
+        input.addEventListener('input', function () {
+            let v = this.value.replace(/\D/g, '').substring(0, 8);
+            if (v.length >= 5) {
+                v = v.substring(0,2) + '/' + v.substring(2,4) + '/' + v.substring(4);
+            } else if (v.length >= 3) {
+                v = v.substring(0,2) + '/' + v.substring(2);
+            }
+            this.value = v;
+        });
+    }
+    document.querySelectorAll('#data_nascimento').forEach(function(el) {
+        aplicarMascaraData(el);
+    });
+    // MÁSCARA DD/MM/AAAA PARA CAMPO DATA
+
+    // CONVERTE DD/MM/AAAA → YYYY-MM-DD
+    function converterData(dataBR) {
+        var partes = dataBR.split('/');
+        if (partes.length === 3 && partes[2].length === 4) {
+            return partes[2] + '-' + partes[1] + '-' + partes[0];
+        }
+        return dataBR;
+    }
+    // CONVERTE DD/MM/AAAA → YYYY-MM-DD
+
     // MODAL FOTO HMTL
     document.body.insertAdjacentHTML('beforeend', `
         <div id="customModal" class="custom-modal" style="display: none;">
@@ -28,6 +55,10 @@ jQuery(document).ready(function($) {
         $.each(formDataArray, function() {
             formData[this.name] = this.value;
         });
+        // Converter data de DD/MM/AAAA para YYYY-MM-DD antes do envio
+        if (formData['data_nascimento']) {
+            formData['data_nascimento'] = converterData(formData['data_nascimento']);
+        }
         $.ajax({
             type: 'POST',
             url: `${'https://apreas.com.br'}/wp-admin/admin-ajax.php`,
@@ -165,6 +196,10 @@ jQuery(document).ready(function($) {
         $.each(formDataArray, function() {
             formData[this.name] = this.value;
         });
+        // Converter data de DD/MM/AAAA para YYYY-MM-DD antes do envio
+        if (formData['data_nascimento']) {
+            formData['data_nascimento'] = converterData(formData['data_nascimento']);
+        }
     
         $.ajax({
             type: 'POST',
