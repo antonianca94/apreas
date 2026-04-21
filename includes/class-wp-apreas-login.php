@@ -113,6 +113,16 @@ class Login {
     function render_login_form() {
         ob_start(); ?>
         
+        <script>
+        (function(){
+            try {
+                var s = JSON.parse(localStorage.getItem('apreas_login_sessao') || 'null');
+                if (s && s.expira && Date.now() < s.expira) {
+                    document.write('<style>#loginContainer{display:none!important}</style>');
+                }
+            } catch(e) {}
+        })();
+        </script>
         <div id="loginContainer">
             <div id="loginOverlay"></div>
             <div id="loginContent">
@@ -438,6 +448,16 @@ class Login {
 
         ob_start(); ?>
         
+        <script>
+        (function(){
+            try {
+                var s = JSON.parse(localStorage.getItem('apreas_login_sessao') || 'null');
+                if (s && s.expira && Date.now() < s.expira) {
+                    document.write('<style>#loginContainer{display:none!important}</style>');
+                }
+            } catch(e) {}
+        })();
+        </script>
         <div id="loginContainer">
             <div id="loginOverlay"></div>
             <div id="loginContent">
