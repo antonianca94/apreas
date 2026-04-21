@@ -53,6 +53,8 @@ class APREAS_Plugin {
         $Login = \Apreas\Login::getInstance();
         // Escolas precisa ser instanciada sempre (frontend + admin) para registrar o shortcode
         $Escolas = \Apreas\Escolas::getInstance();
+        // Campos extras do checkout WooCommerce (substitui plugin externo)
+        $Checkout = \Apreas\Checkout::getInstance();
 
         if (is_admin()) {
             // INSTANCIAS
