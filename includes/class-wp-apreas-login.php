@@ -404,6 +404,7 @@ class Login {
             $l2_escolha_data_inicio_escola = get_post_meta(intval($escola_id), 'l2_escolha_data_inicio', true);
             $l2_escolha_data_fim_escola = get_post_meta(intval($escola_id), 'l2_escolha_data_fim', true);
             $l2_entrega_data_escola = get_post_meta(intval($escola_id), 'l2_entrega_data', true);
+            $data_limite_fotos_escola = get_post_meta(intval($escola_id), 'data_limite_fotos', true);
             // ESCOLA | CAMPOS EXTRAS
 
             $dados = [
@@ -420,7 +421,8 @@ class Login {
                     'l1_entrega_data' => $l1_entrega_data_escola,
                     'l2_escolha_data_inicio' => $l2_escolha_data_inicio_escola,
                     'l2_escolha_data_fim' => $l2_escolha_data_fim_escola,
-                    'l2_entrega_data' => $l2_entrega_data_escola
+                    'l2_entrega_data' => $l2_entrega_data_escola,
+                    'data_limite_fotos' => $data_limite_fotos_escola
                 ],
                 'unidade' => [
                     'id' => intval($unidade_id),

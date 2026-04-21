@@ -83,6 +83,8 @@ jQuery(document).ready(function ($) {
             if (l2i) l2i.textContent = data.escola.l2_escolha_data_inicio || '';
             if (l2f) l2f.textContent = data.escola.l2_escolha_data_fim || '';
             if (l2e) l2e.textContent = data.escola.l2_entrega_data || '';
+            var dlf = document.querySelector('.data_limite_fotos_escola');
+            if (dlf) dlf.textContent = data.escola.data_limite_fotos || '';
         }
         if (data.imagem_upload_individual) {
             $('.imagem_upload_individual img').attr('src', data.imagem_upload_individual).attr('srcset', data.imagem_upload_individual);
@@ -233,6 +235,8 @@ jQuery(document).ready(function ($) {
                         if (l2_escolha_data_inicio_escola) l2_escolha_data_inicio_escola.textContent = response.data.escola.l2_escolha_data_inicio || '';
                         if (l2_escolha_data_fim_escola) l2_escolha_data_fim_escola.textContent = response.data.escola.l2_escolha_data_fim || '';
                         if (l2_entrega_data_escola) l2_entrega_data_escola.textContent = response.data.escola.l2_entrega_data || '';
+                        var dlf = document.querySelector('.data_limite_fotos_escola');
+                        if (dlf) dlf.textContent = response.data.escola.data_limite_fotos || '';
                     }
 
                     //console.log(response.data);

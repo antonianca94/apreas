@@ -19,7 +19,7 @@ class Escolas {
         add_action( 'add_meta_boxes', [$this,'adicionar_meta_box_escolas']);
         add_action( 'save_post', [$this,'salvar_meta_box_escolas']);
         add_action('admin_enqueue_scripts', [$this,'enqueue_flatpickr_assets']);
-
+        add_shortcode('data_limite_fotos', [$this, 'shortcode_data_limite_fotos']);
     }
 
     function escolas_posttype () {
@@ -115,6 +115,60 @@ class Escolas {
             'normal', 
             'high' 
         );
+        add_meta_box(
+            'meta-box-data-limite-fotos',
+            'Data Limite das Fotos',
+            [$this,'exibir_meta_box_data_limite_fotos'],
+            'escolas',
+            'normal',
+            'high'
+        );
+    }
+
+    function exibir_meta_box_data_limite_fotos($post) {
+        $data_limite = get_post_meta($post->ID, 'data_limite_fotos', true);
+        ?>
+        <p style=" margin-top: 1rem;margin-bottom:4px; font-size:12px; color:#666;">
+            Data em que as fotos desta escola serão <strong>excluídas</strong> do site.
+        </p>
+        <p style="margin-bottom:4px; font-size:12px; color:#666;">
+            ▸ <strong>Automático</strong> (usa a escola do aluno logado):
+            <code>[data_limite_fotos]</code>
+        </p>
+        <div class="row mt-4 mb-4">
+            <div class="col-xxl-6">
+                <div class="form-group">
+                    <label for="data_limite_fotos" class="mb-2 fw-bold">Data Limite</label>
+                    <div class="input-group">
+                        <input type="text" id="data_limite_fotos" name="data_limite_fotos" class="form-control" value="<?php echo esc_attr($data_limite); ?>" />
+                        <div class="input-group-append">
+                            <span class="input-group-text"><i class="dashicons dashicons-calendar-alt"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            jQuery(document).ready(function($) {
+                $('#data_limite_fotos').flatpickr({
+                    enableTime: false,
+                    dateFormat: "d/m/Y",
+                    time_24hr: false,
+                    locale: 'pt'
+                });
+            });
+        </script>
+        <?php
+    }
+
+    /**
+     * Shortcode [data_limite_fotos]
+     * Renderiza um <span> vazio que o login.js preenche via localStorage,
+     * seguindo o mesmo padrão dos outros campos de escola (lotes, logo, etc.).
+     * O campo data_limite_fotos é incluído no payload AJAX do login.
+     */
+    function shortcode_data_limite_fotos($atts) {
+        return '<span class="data_limite_fotos_escola"></span>';
     }
 
     function exibir_lote_one($post) {
@@ -349,6 +403,12 @@ class Escolas {
         if (isset($_POST['imagem_logo_escola'])) {
             update_post_meta($post_id, 'imagem_logo_escola', $_POST['imagem_logo_escola'] );
         }
+
+        // DATA LIMITE FOTOS
+        if (isset($_POST['data_limite_fotos'])) {
+            update_post_meta($post_id, 'data_limite_fotos', sanitize_text_field($_POST['data_limite_fotos']));
+        }
+        // DATA LIMITE FOTOS
 
         // LOTE 1 
         if (isset($_POST['l1_escolha_data_inicio'])) {

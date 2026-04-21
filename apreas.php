@@ -51,17 +51,19 @@ class APREAS_Plugin {
 
     public function plugin_loaded() {
         $Login = \Apreas\Login::getInstance();
+        // Escolas precisa ser instanciada sempre (frontend + admin) para registrar o shortcode
+        $Escolas = \Apreas\Escolas::getInstance();
 
         if (is_admin()) {
             // INSTANCIAS
             $Alunos = \Apreas\Alunos::getInstance();
-            $Escolas = \Apreas\Escolas::getInstance();
             $Unidades = \Apreas\Unidades::getInstance();
             $Turmas = \Apreas\Turmas::getInstance();
 
             $Participantes = \Apreas\Participantes::getInstance();
             $Eventos = \Apreas\Eventos::getInstance();
             // INSTANCIAS
+
 
 
 
