@@ -62,9 +62,191 @@ class APREAS_Plugin {
             $Participantes = \Apreas\Participantes::getInstance();
             $Eventos = \Apreas\Eventos::getInstance();
             // INSTANCIAS
+
+
+
+
+
+//COLUNA ALUNOS
+add_filter('manage_alunos_posts_columns', function($columns) {
+
+    $new_columns = [
+        'cb'      => $columns['cb'],    // Checkbox de seleção
+        'title'   => 'Aluno',           // Nome do Aluno
+        'escola'  => 'Escola',
+        'turma'   => 'Turma',
+        'unidade' => 'Unidade',
+        'data_nascimento' => 'Data de Nascimento',
+        'date'    => 'Data'             // <--- Adicione esta linha aqui
+    ];
+
+    return $new_columns;
+});
+
+add_action('manage_alunos_posts_custom_column', function($column, $post_id) {
+    switch ($column) {
+        case 'escola':
+            // Buscamos o ID da escola que está associado a este aluno
+            $escola_id = get_post_meta($post_id, 'escola', true); 
+            if ($escola_id) {
+                echo get_the_title($escola_id);
+            } else {
+                echo '—';
+            }
+            break;
+
+        case 'turma':
+            $turma_id = get_post_meta($post_id, 'turma', true);
+            if ($turma_id) {
+                echo get_the_title($turma_id);
+            } else {
+                echo '—';
+            }
+            break;
+
+        case 'unidade':
+            $unidade_id = get_post_meta($post_id, 'unidade', true);
+            if ($unidade_id) {
+                echo get_the_title($unidade_id);
+            } else {
+                echo '—';
+            }
+            break;
+        case 'data_nascimento':
+$data = get_post_meta($post_id, 'data_nascimento', true); // Verifique se é 'data_nascimento' ou 'data_ascimento'
+    
+    if ($data) {
+        // Se a data vier do banco como 2026-04-20, isso transforma em 20/04/2026
+        echo date('d/m/Y', strtotime($data));
+    } else {
+        echo '—';
+    }
+            break;
+    }
+}, 10, 2);
+
+add_filter('manage_edit-alunos_sortable_columns', function($sortable_columns) {
+    $sortable_columns['escola']          = 'escola';
+    $sortable_columns['turma']           = 'turma';
+    $sortable_columns['unidade']         = 'unidade';
+    $sortable_columns['data_nascimento'] = 'data_nascimento';
+    return $sortable_columns;
+});
+
+add_action('pre_get_posts', function($query) {
+    if (!is_admin() || !$query->is_main_query()) {
+        return;
+    }
+
+    $orderby = $query->get('orderby');
+
+    switch ($orderby) {
+        case 'escola':
+        case 'turma':
+        case 'unidade':
+            $query->set('meta_key', $orderby); // Usa o slug da coluna como chave do meta_data
+            $query->set('orderby', 'meta_value_num'); // Ordena como número (já que guarda o ID)
+            break;
+
+        case 'data_nascimento':
+            $query->set('meta_key', 'data_nascimento');
+            $query->set('orderby', 'meta_value'); 
+            // Se a data estiver no formato YYYY-MM-DD, a ordenação de texto funciona perfeitamente.
+            break;
+    }
+});
+
+
+
+
+add_action('restrict_manage_posts', function($post_type) {
+    if ($post_type !== 'alunos') {
+        return;
+    }
+
+    // --- FILTRO DE ESCOLA ---
+    $escolas = get_posts([
+        'post_type'      => 'escolas', // Verifique se o slug do CPT de escolas é 'escola'
+        'posts_per_page' => -1,
+        'orderby'        => 'title',
+        'order'          => 'ASC'
+    ]);
+
+    $escola_sel = isset($_GET['filtro_escola']) ? $_GET['filtro_escola'] : '';
+
+    echo '<select name="filtro_escola">';
+    echo '<option value="">Todas as Escolas</option>';
+    foreach ($escolas as $esc) {
+        printf('<option value="%s" %s>%s</option>', $esc->ID, selected($escola_sel, $esc->ID, false), $esc->post_title);
+    }
+    echo '</select>';
+
+    // --- FILTRO DE TURMA ---
+    $turmas = get_posts([
+        'post_type'      => 'turmas', // Verifique se o slug do CPT de turmas é 'turma'
+        'posts_per_page' => -1,
+        'orderby'        => 'title',
+        'order'          => 'ASC'
+    ]);
+
+    $turma_sel = isset($_GET['filtro_turma']) ? $_GET['filtro_turma'] : '';
+
+    echo '<select name="filtro_turma">';
+    echo '<option value="">Todas as Turmas</option>';
+    foreach ($turmas as $tur) {
+        printf('<option value="%s" %s>%s</option>', $tur->ID, selected($turma_sel, $tur->ID, false), $tur->post_title);
+    }
+    echo '</select>';
+});
+
+
+add_action('pre_get_posts', function($query) {
+    global $pagenow;
+
+    if (!is_admin() || $pagenow !== 'edit.php' || $query->get('post_type') !== 'alunos' || !$query->is_main_query()) {
+        return;
+    }
+
+    $meta_query = [];
+
+    // Se selecionou Escola
+    if (!empty($_GET['filtro_escola'])) {
+        $meta_query[] = [
+            'key'     => 'escola', // Nome da meta_key que você usa para salvar o ID da escola
+            'value'   => $_GET['filtro_escola'],
+            'compare' => '='
+        ];
+    }
+
+    // Se selecionou Turma
+    if (!empty($_GET['filtro_turma'])) {
+        $meta_query[] = [
+            'key'     => 'turma', // Nome da meta_key que você usa para salvar o ID da turma
+            'value'   => $_GET['filtro_turma'],
+            'compare' => '='
+        ];
+    }
+
+    // Se houver algum filtro ativo, aplica na consulta
+    if (count($meta_query) > 0) {
+        if (count($meta_query) > 1) {
+            $meta_query['relation'] = 'AND';
+        }
+        $query->set('meta_query', $meta_query);
+    }
+});
+
+//FIM COLUNA ALUNOS
+
+
+
+
+
+
         } 
 
     }
+
 
     public function load_frontend_assets() {
         $this->enqueue_frontend_styles();
@@ -81,6 +263,25 @@ class APREAS_Plugin {
         wp_enqueue_style('bootstrap', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css', array(), '5.3.0');
         wp_enqueue_style('sweetalert2-css', 'https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css', [], null);
         wp_enqueue_style('bootstrap-icons', 'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css', array(), '1.5.0');
+
+        // Fix: Tabela de revisão do pedido WooCommerce não aplicava largura 100%
+        $checkout_css = "
+            .elementor-jet-checkout-order-review,
+            .woocommerce-checkout-review-order,
+            #order_review,
+            .woocommerce-checkout-review-order-table,
+            table.shop_table.woocommerce-checkout-review-order-table {
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+            }
+            h3#order_review_heading {
+                text-align: left !important;
+                width: 100% !important;
+                margin-top: 4rem !important;
+            }
+        ";
+        wp_add_inline_style('Participantes_CSS', $checkout_css);
 
     }
 
