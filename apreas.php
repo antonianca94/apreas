@@ -3,7 +3,7 @@
 Plugin Name: Apreas WP Plugin
 Plugin URI: https://apreas.com.br/
 Description: Recursos extras para os Alunos.
-Version: 2.1
+Version: 2.1.1
 Author: Apreas Development Team
 Author URI: https://apreas.com.br/
 Text Domain: apreas
