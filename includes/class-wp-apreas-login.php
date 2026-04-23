@@ -111,6 +111,9 @@ class Login {
     }
 
     function render_login_form() {
+        if ( ( class_exists( '\Elementor\Plugin' ) && \Elementor\Plugin::$instance->editor->is_edit_mode() ) || ( isset($_GET['action']) && $_GET['action'] === 'elementor' ) ) {
+            return '<div style="padding: 20px; background: #f1f1f1; border: 2px dashed #ccc; text-align: center; color: #666; border-radius: 5px;"><strong>Apreas: Formulário de Login</strong><br><em>Ocultado durante a edição para não bloquear a tela.</em></div>';
+        }
         ob_start(); ?>
         
         <script>
@@ -442,6 +445,9 @@ class Login {
     }
 
     function render_login_form_eventos($atts) {
+        if ( ( class_exists( '\Elementor\Plugin' ) && \Elementor\Plugin::$instance->editor->is_edit_mode() ) || ( isset($_GET['action']) && $_GET['action'] === 'elementor' ) ) {
+            return '<div style="padding: 20px; background: #f1f1f1; border: 2px dashed #ccc; text-align: center; color: #666; border-radius: 5px;"><strong>Apreas: Formulário de Login (Eventos)</strong><br><em>Ocultado durante a edição para não bloquear a tela.</em></div>';
+        }
         // Recebendo o parâmetro da categoria do evento no shortcode
         $atts = shortcode_atts(array(
             'categoria' => '',  // Valor padrão
