@@ -38,10 +38,10 @@ jQuery(document).ready(function ($) {
     // CONVERTE DD/MM/AAAA → YYYY-MM-DD
 
     // ============================================================
-    // PERSÍSTÊNCIA DE SESSÃO (localStorage - expira em 1 hora)
+    // PERSÍSTÊNCIA DE SESSÃO (localStorage - expira em 10 minutos)
     // ============================================================
     var SESSAO_KEY = 'apreas_login_sessao';
-    var SESSAO_TTL = 60 * 60 * 1000; // 1 hora em ms
+    var SESSAO_TTL = 10 * 60 * 1000; // 10 minutos em ms
 
     function salvarSessao(tipo, dados) {
         try {
@@ -278,6 +278,10 @@ jQuery(document).ready(function ($) {
                     if (loginContainer) {
                         loginContainer.classList.add('d-none');
                     }
+                    var logoutContainer = document.getElementById('logoutContainer');
+                    if (logoutContainer) {
+                        logoutContainer.style.setProperty('display', 'flex', 'important');
+                    }
                     window.scrollTo(0, 0);
                 }
                 if (response.success == false) {
@@ -495,6 +499,10 @@ jQuery(document).ready(function ($) {
                     if (loginContainer) {
                         loginContainer.classList.add('d-none');
                     }
+                    var logoutContainer = document.getElementById('logoutContainer');
+                    if (logoutContainer) {
+                        logoutContainer.style.setProperty('display', 'flex', 'important');
+                    }
                     salvarSessao('eventos', response.data);
                     window.scrollTo(0, 0);
                 } else {
@@ -611,5 +619,13 @@ jQuery(document).ready(function ($) {
         }
     }
     // RESTAURAR SESSÃO AO CARREGAR A PÁGINA
+
+    // SAIR / LOGOUT
+    $(document).on('click', '#btnSairApreas', function (e) {
+        e.preventDefault();
+        localStorage.removeItem(SESSAO_KEY);
+        location.reload();
+    });
+    // SAIR / LOGOUT
 
 });

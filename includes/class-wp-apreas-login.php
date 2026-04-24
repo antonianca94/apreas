@@ -235,11 +235,17 @@ class Login {
             try {
                 var s = JSON.parse(localStorage.getItem('apreas_login_sessao') || 'null');
                 if (s && s.expira && Date.now() < s.expira) {
-                    document.write('<style>#loginContainer{display:none!important}</style>');
+                    document.write('<style>#loginContainer{display:none!important} #logoutContainer{display:flex!important; z-index: 99999;}</style>');
                 }
             } catch(e) {}
         })();
         </script>
+        <div id="logoutContainer" style="display:none; position: fixed; bottom: 30px; left: 30px; z-index: 999999; background-color: #fff; padding: 15px 25px; border-radius: 50px; box-shadow: 0 5px 20px rgba(0,0,0,0.25); align-items: center; gap: 15px; border: 1px solid #eee;">
+            <span style="font-family: 'Roboto', Sans-serif; font-size: 14px; color: #555; font-weight: 500;">Você está logado.</span>
+            <a href="#" id="btnSairApreas" style="color: #d32f2f; font-weight: 700; font-size: 14px; text-decoration: none; font-family: 'Roboto', Sans-serif; display: flex; align-items: center; gap: 5px;">
+                Sair <svg width="15" height="15" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"/><path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/></svg>
+            </a>
+        </div>
         <div id="loginContainer">
             <div id="loginOverlay"></div>
             <div id="loginContent">
@@ -473,6 +479,11 @@ class Login {
         $senha_nome = $_POST['formData']['senha_nome'];
         $senha_nome_transformada = strtolower(str_replace(' ', '_', $senha_nome));
         $data_nascimento = $_POST['formData']['data_nascimento'];
+        $data_nascimento_br = '';
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $data_nascimento)) {
+            $data_nascimento_br = date('d/m/Y', strtotime($data_nascimento));
+        }
+
         $escola = $_POST['formData']['escola'];
     
         $args = array(
@@ -485,9 +496,17 @@ class Login {
                     'compare' => '='
                 ),
                 array(
-                    'key' => 'data_nascimento',
-                    'value' => $data_nascimento,
-                    'compare' => '='
+                    'relation' => 'OR',
+                    array(
+                        'key' => 'data_nascimento',
+                        'value' => $data_nascimento,
+                        'compare' => '='
+                    ),
+                    array(
+                        'key' => 'data_nascimento',
+                        'value' => $data_nascimento_br,
+                        'compare' => '='
+                    )
                 ),
                 array(
                     'key' => 'escola',
@@ -576,11 +595,17 @@ class Login {
             try {
                 var s = JSON.parse(localStorage.getItem('apreas_login_sessao') || 'null');
                 if (s && s.expira && Date.now() < s.expira) {
-                    document.write('<style>#loginContainer{display:none!important}</style>');
+                    document.write('<style>#loginContainer{display:none!important} #logoutContainer{display:flex!important; z-index: 99999;}</style>');
                 }
             } catch(e) {}
         })();
         </script>
+        <div id="logoutContainer" style="display:none; position: fixed; bottom: 30px; left: 30px; z-index: 999999; background-color: #fff; padding: 15px 25px; border-radius: 50px; box-shadow: 0 5px 20px rgba(0,0,0,0.25); align-items: center; gap: 15px; border: 1px solid #eee;">
+            <span style="font-family: 'Roboto', Sans-serif; font-size: 14px; color: #555; font-weight: 500;">Você está logado.</span>
+            <a href="#" id="btnSairApreas" style="color: #d32f2f; font-weight: 700; font-size: 14px; text-decoration: none; font-family: 'Roboto', Sans-serif; display: flex; align-items: center; gap: 5px;">
+                Sair <svg width="15" height="15" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"/><path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/></svg>
+            </a>
+        </div>
         <div id="loginContainer">
             <div id="loginOverlay"></div>
             <div id="loginContent">
@@ -864,6 +889,11 @@ class Login {
         $senha_nome = $_POST['formData']['senha_nome'];
         $senha_nome_transformada = strtolower(str_replace(' ', '_', $senha_nome));
         $data_nascimento = $_POST['formData']['data_nascimento'];
+        $data_nascimento_br = '';
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $data_nascimento)) {
+            $data_nascimento_br = date('d/m/Y', strtotime($data_nascimento));
+        }
+
         $evento = $_POST['formData']['evento'];
     
         
@@ -877,9 +907,17 @@ class Login {
                     'compare' => '='
                 ),
                 array(
-                    'key' => 'data_nascimento',
-                    'value' => $data_nascimento,
-                    'compare' => '='
+                    'relation' => 'OR',
+                    array(
+                        'key' => 'data_nascimento',
+                        'value' => $data_nascimento,
+                        'compare' => '='
+                    ),
+                    array(
+                        'key' => 'data_nascimento',
+                        'value' => $data_nascimento_br,
+                        'compare' => '='
+                    )
                 ),
                 array(
                     'key' => 'evento',
