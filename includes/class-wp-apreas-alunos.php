@@ -40,6 +40,9 @@ class Alunos {
         $ultimo_nome = get_post_meta($post->ID, 'ultimo_nome', true);
         $senha_nome = get_post_meta($post->ID, 'senha_nome', true);
         $data_nascimento = get_post_meta($post->ID, 'data_nascimento', true);
+        if ($data_nascimento && preg_match('/^\d{4}-\d{2}-\d{2}$/', $data_nascimento)) {
+            $data_nascimento = date('d/m/Y', strtotime($data_nascimento));
+        }
         $escola = get_post_meta($post->ID, 'escola', true);
         $escola = !empty($escola) ? explode(',', $escola) : [];
 
@@ -59,7 +62,9 @@ class Alunos {
         // ESCOLAS
         $args = array(
             'post_type' => 'escolas',
-            'posts_per_page' => -1, 
+            'posts_per_page' => -1,
+            'orderby' => 'title',
+            'order' => 'ASC'
         );
         $escolas_query = new \WP_Query($args);
         // ESCOLAS
@@ -67,7 +72,9 @@ class Alunos {
         // UNIDADES
         $args_unidades = array(
             'post_type' => 'unidades',
-            'posts_per_page' => -1, 
+            'posts_per_page' => -1,
+            'orderby' => 'title',
+            'order' => 'ASC'
         );
         $unidades_query = new \WP_Query($args_unidades);
         // UNIDADES
@@ -75,7 +82,9 @@ class Alunos {
         // TURMAS
         $args_turmas = array(
             'post_type' => 'turmas',
-            'posts_per_page' => -1, 
+            'posts_per_page' => -1,
+            'orderby' => 'title',
+            'order' => 'ASC'
         );
         $turmas_query = new \WP_Query($args_turmas);
         // TURMAS
@@ -120,9 +129,6 @@ class Alunos {
         <script>
 
             jQuery(document).ready(function($) {
-                $('.select2').select2({
-                    maximumSelectionLength: 1
-                });
                 function removeDiacritics(str) {
                     return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
                 }
@@ -152,6 +158,15 @@ class Alunos {
                 if ($('#title').val()) {
                     splitName($('#title').val());
                 }
+
+                // Mask for data_nascimento: dd/mm/aaaa
+                $('#data_nascimento').on('input', function() {
+                    var v = $(this).val();
+                    v = v.replace(/\D/g, "");
+                    if (v.length > 2) v = v.substring(0,2) + "/" + v.substring(2);
+                    if (v.length > 5) v = v.substring(0,5) + "/" + v.substring(5, 9);
+                    $(this).val(v);
+                });
             });
         </script>
         <div class="row mt-4 mb-4">
@@ -176,7 +191,7 @@ class Alunos {
             <div class="col">
                 <div class="form-group">
                     <label for="data_nascimento" class="mb-2 fw-bold">Data de Nascimento</label>
-                    <input type="date" id="data_nascimento" name="data_nascimento" class="form-control" value="<?php echo esc_attr($data_nascimento); ?>" />
+                    <input type="text" id="data_nascimento" name="data_nascimento" class="form-control" placeholder="dd/mm/aaaa" maxlength="10" value="<?php echo esc_attr($data_nascimento); ?>" />
                 </div>
             </div>
         </div>
@@ -185,7 +200,8 @@ class Alunos {
             <div class="col">
                 <div class="form-group">
                     <label for="escola" class="mb-2 fw-bold">Escola</label>
-                    <select id="escola" name="escola" class="form-control select2" multiple="multiple">
+                    <select id="escola" name="escola" class="form-control">
+                        <option value=""></option>
                         <?php while ($escolas_query->have_posts()) : $escolas_query->the_post(); ?>
                             <?php
                             $selected = is_array($escola) && in_array(get_the_ID(), $escola) ? 'selected' : '';
@@ -202,7 +218,8 @@ class Alunos {
             <div class="col">
                 <div class="form-group">
                     <label for="unidade" class="mb-2 fw-bold">Unidade</label>
-                    <select id="unidade" name="unidade" class="form-control select2" multiple="multiple">
+                    <select id="unidade" name="unidade" class="form-control">
+                        <option value=""></option>
                         <?php while ($unidades_query->have_posts()) : $unidades_query->the_post(); ?>
                             <?php
                             $selected = is_array($unidade) && in_array(get_the_ID(), $unidade) ? 'selected' : '';
@@ -219,7 +236,8 @@ class Alunos {
             <div class="col">
                 <div class="form-group">
                     <label for="turma" class="mb-2 fw-bold">Turma</label>
-                    <select id="turma" name="turma" class="form-control select2" multiple="multiple">
+                    <select id="turma" name="turma" class="form-control">
+                        <option value=""></option>
                         <?php while ($turmas_query->have_posts()) : $turmas_query->the_post(); ?>
                             <?php
                             $selected = is_array($turma) && in_array(get_the_ID(), $turma) ? 'selected' : '';
@@ -286,7 +304,12 @@ class Alunos {
             update_post_meta($post_id, 'senha_nome', sanitize_text_field($_POST['senha_nome']));
         }
         if (isset($_POST['data_nascimento'])) {
-            update_post_meta($post_id, 'data_nascimento', sanitize_text_field($_POST['data_nascimento']));
+            $data_nascimento = sanitize_text_field($_POST['data_nascimento']);
+            // Convert back to yyyy-mm-dd for consistent database storage
+            if (preg_match('/^(\d{2})\/(\d{2})\/(\d{4})$/', $data_nascimento, $matches)) {
+                $data_nascimento = $matches[3] . '-' . $matches[2] . '-' . $matches[1];
+            }
+            update_post_meta($post_id, 'data_nascimento', $data_nascimento);
         }
         if (isset($_POST['escola'])) {
             update_post_meta($post_id, 'escola', $_POST['escola'] );
