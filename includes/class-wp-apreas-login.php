@@ -38,6 +38,120 @@ class Login {
         // EVENTOS
         add_shortcode('lotes_evento', [$this,'mostrar_lotes_eventos']);
         // EVENTOS
+
+        // DADOS DO ALUNO
+        add_shortcode('dados_aluno', [$this,'mostrar_dados_aluno']);
+        // DADOS DO ALUNO
+    }
+
+    function mostrar_dados_aluno($atts) {
+        $a = shortcode_atts( array(
+            'cor' => '',
+            'tamanho' => '',
+            'peso' => '',
+            'alinhar' => '',
+            'fonte' => '',
+            'espacamento' => '5px',
+            'fundo' => '',
+            'padding' => '0',
+            'borda_raio' => '0',
+            'cor_label' => '',
+            'peso_label' => 'bold',
+            'tamanho_label' => '',
+            'label_nome' => 'Nome:',
+            'label_escola' => 'Escola:',
+            'label_turma' => 'Turma:',
+            'label_unidade' => 'Unidade:',
+            'label_data' => 'Data de Nascimento:',
+            'mostrar_nome' => 'true',
+            'mostrar_escola' => 'true',
+            'mostrar_turma' => 'true',
+            'mostrar_unidade' => 'true',
+            'mostrar_data' => 'true'
+        ), $atts );
+
+        $container_style = 'display: none; ';
+        if (!empty($a['alinhar'])) $container_style .= 'text-align: ' . esc_attr($a['alinhar']) . '; ';
+        if (!empty($a['fonte'])) $container_style .= 'font-family: ' . esc_attr($a['fonte']) . '; ';
+        if (!empty($a['fundo'])) $container_style .= 'background-color: ' . esc_attr($a['fundo']) . '; ';
+        if (!empty($a['padding'])) $container_style .= 'padding: ' . esc_attr($a['padding']) . '; ';
+        if (!empty($a['borda_raio'])) $container_style .= 'border-radius: ' . esc_attr($a['borda_raio']) . '; ';
+        
+        $p_style = 'margin-bottom: ' . esc_attr($a['espacamento']) . '; ';
+        if (!empty($a['cor'])) $p_style .= 'color: ' . esc_attr($a['cor']) . '; ';
+        if (!empty($a['tamanho'])) $p_style .= 'font-size: ' . esc_attr($a['tamanho']) . '; ';
+        
+        $span_style = '';
+        if (!empty($a['peso'])) $span_style .= 'font-weight: ' . esc_attr($a['peso']) . '; ';
+
+        $label_style = '';
+        if (!empty($a['cor_label'])) $label_style .= 'color: ' . esc_attr($a['cor_label']) . '; ';
+        if (!empty($a['peso_label'])) $label_style .= 'font-weight: ' . esc_attr($a['peso_label']) . '; ';
+        if (!empty($a['tamanho_label'])) $label_style .= 'font-size: ' . esc_attr($a['tamanho_label']) . '; ';
+
+        ob_start();
+        ?>
+        <div class="dados-aluno-container" style="<?php echo $container_style; ?>">
+            <?php if ($a['mostrar_nome'] !== 'false' && $a['mostrar_nome'] !== '0') : ?>
+                <p style="<?php echo $p_style; ?>"><strong style="<?php echo $label_style; ?>"><?php echo esc_html($a['label_nome']); ?></strong> <span class="aluno-nome" style="<?php echo $span_style; ?>"></span></p>
+            <?php endif; ?>
+            <?php if ($a['mostrar_escola'] !== 'false' && $a['mostrar_escola'] !== '0') : ?>
+                <p style="<?php echo $p_style; ?>"><strong style="<?php echo $label_style; ?>"><?php echo esc_html($a['label_escola']); ?></strong> <span class="aluno-escola" style="<?php echo $span_style; ?>"></span></p>
+            <?php endif; ?>
+            <?php if ($a['mostrar_turma'] !== 'false' && $a['mostrar_turma'] !== '0') : ?>
+                <p style="<?php echo $p_style; ?>"><strong style="<?php echo $label_style; ?>"><?php echo esc_html($a['label_turma']); ?></strong> <span class="aluno-turma" style="<?php echo $span_style; ?>"></span></p>
+            <?php endif; ?>
+            <?php if ($a['mostrar_unidade'] !== 'false' && $a['mostrar_unidade'] !== '0') : ?>
+                <p style="<?php echo $p_style; ?>"><strong style="<?php echo $label_style; ?>"><?php echo esc_html($a['label_unidade']); ?></strong> <span class="aluno-unidade" style="<?php echo $span_style; ?>"></span></p>
+            <?php endif; ?>
+            <?php if ($a['mostrar_data'] !== 'false' && $a['mostrar_data'] !== '0') : ?>
+                <p style="<?php echo $p_style; ?>"><strong style="<?php echo $label_style; ?>"><?php echo esc_html($a['label_data']); ?></strong> <span class="aluno-data-nascimento" style="<?php echo $span_style; ?>"></span></p>
+            <?php endif; ?>
+        </div>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                try {
+                    var raw = localStorage.getItem('apreas_login_sessao');
+                    if (raw) {
+                        var s = JSON.parse(raw);
+                        if (Date.now() <= s.expira) {
+                            var dados = s.dados;
+                            if (s.tipo === 'eventos' && Array.isArray(dados) && dados.length > 0) {
+                                dados = dados[0];
+                            }
+                            if (dados) {
+                                var container = document.querySelector('.dados-aluno-container');
+                                if (container) {
+                                    container.style.display = 'block';
+                                    var elNome = document.querySelector('.aluno-nome');
+                                    var elEscola = document.querySelector('.aluno-escola');
+                                    var elTurma = document.querySelector('.aluno-turma');
+                                    var elUnidade = document.querySelector('.aluno-unidade');
+                                    var elDataNasc = document.querySelector('.aluno-data-nascimento');
+
+                                    if(elNome) elNome.textContent = dados.nome || '';
+                                    if(elEscola && dados.escola) elEscola.textContent = dados.escola.nome || '';
+                                    if(elTurma && dados.turma) elTurma.textContent = dados.turma.nome || '';
+                                    if(elUnidade && dados.unidade) elUnidade.textContent = dados.unidade.nome || '';
+                                    
+                                    if(elDataNasc && dados.data_nascimento) {
+                                        // converter YYYY-MM-DD para DD/MM/AAAA se vier no formato do banco
+                                        var dn = dados.data_nascimento;
+                                        if(dn.includes('-')) {
+                                            var p = dn.split('-');
+                                            if(p.length === 3) dn = p[2] + '/' + p[1] + '/' + p[0];
+                                        }
+                                        elDataNasc.textContent = dn;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } catch(e) { console.error("Erro ao carregar dados do aluno", e); }
+            });
+        </script>
+        <?php
+        return ob_get_clean();
     }
 
 
@@ -434,7 +548,8 @@ class Login {
                 'turma' => [
                     'id' => intval($turma_id),
                     'nome' => $turma_post ? $turma_post->post_title : null
-                ]
+                ],
+                'data_nascimento' => get_post_meta($post_id, 'data_nascimento', true)
             ];
         }
         if ($query->have_posts()) {
@@ -864,7 +979,8 @@ class Login {
                     'turma' => [
                         'id' => intval($turma_id),
                         'nome' => $turma_post ? $turma_post->post_title : null
-                    ]
+                    ],
+                    'data_nascimento' => get_post_meta($post_id, 'data_nascimento', true)
                 ];
             }
             wp_send_json_success($dados);
