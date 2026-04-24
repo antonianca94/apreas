@@ -145,6 +145,70 @@ class Eventos {
             'normal', 
             'high' 
         );
+        add_meta_box(
+            'meta-box-shortcodes-gerais',
+            'Shortcodes Gerais',
+            [$this,'exibir_meta_box_shortcodes_gerais'],
+            'eventos',
+            'normal',
+            'low'
+        );
+    }
+
+    function exibir_meta_box_shortcodes_gerais() {
+        ?>
+        <div style="padding: 10px;">
+            <p style="margin-bottom:15px; font-size:13px; color:#444;">
+                Estes shortcodes podem ser utilizados em qualquer página para exibir informações dinâmicas do evento.
+            </p>
+
+            <div style="margin-bottom: 20px; padding: 12px; background: #f9f9f9; border-left: 4px solid #d32f2f;">
+                <strong style="display:block; margin-bottom:5px;">Formulário de Login (Eventos)</strong>
+                <code>[login_form_eventos categoria="slug-da-categoria"]</code>
+                <p style="font-size:13px; color:#666; margin-top:5px;">Exibe o formulário de acesso para eventos de uma categoria específica.</p>
+            </div>
+
+            <div style="margin-bottom: 20px; padding: 12px; background: #f9f9f9; border-left: 4px solid #d32f2f;">
+                <strong style="display:block; margin-bottom:5px;">Dados do Aluno (Customizável)</strong>
+                <code>[dados_aluno]</code>
+                <p style="font-size:13px; color:#666; margin-top:5px;">Exibe dados dinâmicos do aluno com customização total:</p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size:13px; color:#666; background: #fff; padding: 10px; border: 1px solid #eee;">
+                    <div>
+                        <strong>Visibilidade:</strong><br>
+                        - <code>mostrar_nome="false"</code><br>
+                        - <code>mostrar_escola="false"</code><br>
+                        - <code>mostrar_turma="false"</code><br>
+                        - <code>mostrar_unidade="false"</code><br>
+                        - <code>mostrar_data="false"</code>
+                    </div>
+                    <div>
+                        <strong>Rótulos:</strong><br>
+                        - <code>label_nome="Estudante:"</code><br>
+                        - <code>label_escola="Instituição:"</code><br>
+                        - <code>label_turma="Sala:"</code><br>
+                        - <code>label_unidade="Unidade:"</code><br>
+                        - <code>label_data="Data:"</code>
+                    </div>
+                    <div>
+                        <strong>Estilo Dados:</strong><br>
+                        - <code>cor="#ff0000"</code><br>
+                        - <code>tamanho="18px"</code><br>
+                        - <code>peso="300"</code><br>
+                        - <code>fonte="Arial"</code>
+                    </div>
+                    <div>
+                        <strong>Estilo Rótulos:</strong><br>
+                        - <code>cor_label="#555"</code><br>
+                        - <code>tamanho_label="12px"</code><br>
+                        - <code>peso_label="bold"</code>
+                    </div>
+                    <div style="grid-column: span 2;">
+                        <strong>Container:</strong> <code>fundo="#eee"</code>, <code>padding="15px"</code>, <code>borda_raio="10px"</code>, <code>alinhar="center"</code>, <code>espacamento="5px"</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <?php
     }
 
     function exibir_lote_one($post) {
@@ -154,6 +218,9 @@ class Eventos {
         ?>
         <div class="row mt-4 mb-4">
             <label for="nome" class="mb-4 fw-bold" style="font-size: 1rem; color:#7A7A7A;">ESCOLHA</label>
+            <p style="margin-bottom:15px; font-size:12px; color:#666;">
+                ▸ <strong>Shortcode dos Lotes</strong>: <code>[lotes_evento]</code>
+            </p>
             <div class="col">
                 <div class="form-group">
                     <label for="l1_escolha_data_inicio" class="mb-2 fw-bold">Data de Início</label>
@@ -420,6 +487,9 @@ class Eventos {
         <div class="col-xxl" style="padding-top: 20px;">
         <span class="" style="width: 70px; display: inline-block; padding-right: 20px; font-weight:600; color:#000;"><label> <h6 class="mb-0"> CATEGORIAS </h6> </label> </span> 
             <div class="selecionar-todos" style="padding-top:11px; padding-bottom: 15px; display: block; width: 100%;" > 
+                <p style="margin-bottom:10px; font-size:12px; color:#666;">
+                    ▸ <strong>Shortcode de Login</strong> (use uma categoria): <code>[login_form_eventos categoria="slug-da-categoria"]</code>
+                </p>
                 <input type="checkbox" id="checkbox_categorias_eventos" > Selecionar Todos(as)
             </div>
             <select id="categorias_eventos" class="categorias_eventos" name="categorias_eventos[]" multiple="multiple">
@@ -445,6 +515,9 @@ class Eventos {
         <div class="row mb-4">
             <div class="col-xxl mt-2">
                 <span class="" style="width: 150px; display: inline-block; padding-right: 20px; font-weight:600; color:#000;"><label> <h6> LOGO EVENTO </h6> </label> </span> 
+                <p style="margin-bottom:10px; font-size:12px; color:#666;">
+                    ▸ <strong>Shortcode da Logo</strong>: <code>[imagem_logo_evento]</code>
+                </p>
                 <div class="corpo-upload" style="width:100%; margin-bottom:10px;"><a href="#" id="imagem_logo_evento_upload" name="imagem_logo_evento_upload" class="imagem_logo_evento_btn button button-secondary"><span class="dashicons dashicons-cloud-upload"></span> Carregar Imagem</a></div>
                 <div style="width:100%;">
                     <input type="text" id="imagem_logo_evento" name="imagem_logo_evento" class="imagem_logo_evento" value="<?php  echo $imagem_logo_evento; ?>" />
