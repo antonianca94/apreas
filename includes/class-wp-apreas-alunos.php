@@ -18,7 +18,7 @@ class Alunos {
         add_action( 'admin_init', [$this,'adicionar_capacidades_para_administrador']);
         add_action( 'add_meta_boxes', [$this,'adicionar_meta_box_alunos']);
         add_action( 'save_post', [$this,'salvar_meta_box_alunos']);
-
+        add_action( 'pmxi_saved_post', [$this, 'importar_alunos_wp_all_import'], 10, 3 );
     }
 
     // Função para adicionar o meta box
@@ -305,9 +305,22 @@ class Alunos {
         }
         if (isset($_POST['data_nascimento'])) {
             $data_nascimento = sanitize_text_field($_POST['data_nascimento']);
-            // Convert back to yyyy-mm-dd for consistent database storage
-            if (preg_match('/^(\d{2})\/(\d{2})\/(\d{4})$/', $data_nascimento, $matches)) {
-                $data_nascimento = $matches[3] . '-' . $matches[2] . '-' . $matches[1];
+            
+            // Tratamento robusto para salvar manualmente
+            if (strpos($data_nascimento, '/') !== false) {
+                $parts = explode('/', $data_nascimento);
+                if (count($parts) === 3) {
+                    $dia = (int)$parts[0];
+                    $mes = (int)$parts[1];
+                    $ano = (int)$parts[2];
+
+                    // Se o mês for > 12, inverteu (MM/DD/YYYY)
+                    if ($mes > 12 && $dia <= 12) {
+                        $data_nascimento = sprintf('%04d-%02d-%02d', $ano, $dia, $mes);
+                    } else {
+                        $data_nascimento = sprintf('%04d-%02d-%02d', $ano, $mes, $dia);
+                    }
+                }
             }
             update_post_meta($post_id, 'data_nascimento', $data_nascimento);
         }
@@ -328,6 +341,65 @@ class Alunos {
         }
         if (isset($_POST['imagem_upload_turma'])) {
             update_post_meta($post_id, 'imagem_upload_turma', $_POST['imagem_upload_turma'] );
+        }
+    }
+
+    /**
+     * Integração manual com WP All Import (Versão Gratuita)
+     * Salva os metadados dos Alunos que a versão free não importa nativamente.
+     */
+    public function importar_alunos_wp_all_import($post_id, $xml_node, $is_update) {
+        if (get_post_type($post_id) !== 'alunos') return;
+
+        // Converte o objeto XML para array para facilitar o acesso
+        $data = json_decode(json_encode($xml_node), true);
+
+        // Mapeamento de Tags do XML para Meta Keys do Banco
+        $meta_to_import = [
+            'data_nascimento' => isset($data['data_nascimento']) ? $data['data_nascimento'] : (isset($data['data nascimento']) ? $data['data nascimento'] : ''),
+            'escola'          => isset($data['escola']) ? $data['escola'] : '',
+            'turma'           => isset($data['turma']) ? $data['turma'] : '',
+            'unidade'         => isset($data['unidade']) ? $data['unidade'] : '',
+            'nome'            => isset($data['nome']) ? $data['nome'] : '',
+            'ultimo_nome'     => isset($data['ultimo_nome']) ? $data['ultimo_nome'] : (isset($data['ultimo nome']) ? $data['ultimo nome'] : ''),
+        ];
+
+        foreach ($meta_to_import as $key => $value) {
+            if (!empty($value)) {
+                // Tratamento robusto para Data de Nascimento
+                if ($key === 'data_nascimento') {
+                    $value = trim($value);
+                    
+                    if (strpos($value, '/') !== false) {
+                        $parts = explode('/', $value);
+                        if (count($parts) === 3) {
+                            $dia = (int)$parts[0];
+                            $mes = (int)$parts[1];
+                            $ano = (int)$parts[2];
+
+                            if ($mes > 12 && $dia <= 12) {
+                                $value = sprintf('%04d-%02d-%02d', $ano, $dia, $mes);
+                            } else {
+                                $value = sprintf('%04d-%02d-%02d', $ano, $mes, $dia);
+                            }
+                        }
+                    } elseif (preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
+                        // Formato correto, mantém
+                    } else {
+                        $time = strtotime($value);
+                        if ($time) $value = date('Y-m-d', $time);
+                    }
+                }
+                update_post_meta($post_id, $key, $value);
+            }
+        }
+
+        // Gera a Senha Nome automaticamente caso não tenha sido importada
+        $nome = get_post_meta($post_id, 'nome', true);
+        $u_nome = get_post_meta($post_id, 'ultimo_nome', true);
+        if ($nome && $u_nome) {
+            $senha = sanitize_title($nome) . '_' . sanitize_title($u_nome);
+            update_post_meta($post_id, 'senha_nome', str_replace('-', '', $senha));
         }
     }
 
