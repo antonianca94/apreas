@@ -49,14 +49,16 @@ class APREAS_Plugin {
 
     }
 
-    public function plugin_loaded() {
+        public function plugin_loaded()
+    {
         $Login = \Apreas\Login::getInstance();
         // Escolas precisa ser instanciada sempre (frontend + admin) para registrar o shortcode
         $Escolas = \Apreas\Escolas::getInstance();
         // Campos extras do checkout WooCommerce (substitui plugin externo)
         $Checkout = \Apreas\Checkout::getInstance();
 
-        if (is_admin()) {
+        if (is_admin())
+        {
             // INSTANCIAS
             $Alunos = \Apreas\Alunos::getInstance();
             $Unidades = \Apreas\Unidades::getInstance();
@@ -65,189 +67,317 @@ class APREAS_Plugin {
             $Participantes = \Apreas\Participantes::getInstance();
             $Eventos = \Apreas\Eventos::getInstance();
             // INSTANCIAS
+            
 
+            //COLUNA ALUNOS
+            add_filter('manage_alunos_posts_columns', function ($columns)
+            {
 
+                $new_columns = ['cb' => $columns['cb'], // Checkbox de seleção
+                'title' => 'Aluno', // Nome do Aluno
+                'escola' => 'Escola', 'turma' => 'Turma', 'unidade' => 'Unidade', 'data_nascimento' => 'Data de Nascimento', 'date' => 'Data'
+                // <--- Adicione esta linha aqui
+                ];
 
+                return $new_columns;
+            });
 
+            add_action('manage_alunos_posts_custom_column', function ($column, $post_id)
+            {
+                switch ($column)
+                {
+                    case 'escola':
+                        // Buscamos o ID da escola que está associado a este aluno
+                        $escola_id = get_post_meta($post_id, 'escola', true);
+                        if ($escola_id)
+                        {
+                            echo get_the_title($escola_id);
+                        }
+                        else
+                        {
+                            echo '—';
+                        }
+                    break;
 
+                    case 'turma':
+                        $turma_id = get_post_meta($post_id, 'turma', true);
+                        if ($turma_id)
+                        {
+                            echo get_the_title($turma_id);
+                        }
+                        else
+                        {
+                            echo '—';
+                        }
+                    break;
 
-//COLUNA ALUNOS
-add_filter('manage_alunos_posts_columns', function($columns) {
-
-    $new_columns = [
-        'cb'      => $columns['cb'],    // Checkbox de seleção
-        'title'   => 'Aluno',           // Nome do Aluno
-        'escola'  => 'Escola',
-        'turma'   => 'Turma',
-        'unidade' => 'Unidade',
-        'data_nascimento' => 'Data de Nascimento',
-        'date'    => 'Data'             // <--- Adicione esta linha aqui
-    ];
-
-    return $new_columns;
-});
-
-add_action('manage_alunos_posts_custom_column', function($column, $post_id) {
-    switch ($column) {
-        case 'escola':
-            // Buscamos o ID da escola que está associado a este aluno
-            $escola_id = get_post_meta($post_id, 'escola', true); 
-            if ($escola_id) {
-                echo get_the_title($escola_id);
-            } else {
-                echo '—';
+                    case 'unidade':
+                        $unidade_id = get_post_meta($post_id, 'unidade', true);
+                        if ($unidade_id)
+                        {
+                            echo get_the_title($unidade_id);
+                        }
+                        else
+                        {
+                            echo '—';
+                        }
+                    break;
+                    case 'data_nascimento':
+                        $data = get_post_meta($post_id, 'data_nascimento', true); // Verifique se é 'data_nascimento' ou 'data_ascimento'
+                        if ($data)
+                        {
+                            // Se a data vier do banco como 2026-04-20, isso transforma em 20/04/2026
+                            echo date('d/m/Y', strtotime($data));
+                        }
+                        else
+                        {
+                            echo '—';
+                        }
+                    break;
+                }
             }
-            break;
+            , 10, 2);
 
-        case 'turma':
-            $turma_id = get_post_meta($post_id, 'turma', true);
-            if ($turma_id) {
-                echo get_the_title($turma_id);
-            } else {
-                echo '—';
+            add_filter('manage_edit-alunos_sortable_columns', function ($sortable_columns)
+            {
+                $sortable_columns['escola'] = 'escola';
+                $sortable_columns['turma'] = 'turma';
+                $sortable_columns['unidade'] = 'unidade';
+                $sortable_columns['data_nascimento'] = 'data_nascimento';
+                return $sortable_columns;
+            });
+
+            add_action('pre_get_posts', function ($query)
+            {
+                if (!is_admin() || !$query->is_main_query())
+                {
+                    return;
+                }
+
+                $orderby = $query->get('orderby');
+
+                switch ($orderby)
+                {
+                    case 'escola':
+                    case 'turma':
+                    case 'unidade':
+                        $query->set('meta_key', $orderby); // Usa o slug da coluna como chave do meta_data
+                        $query->set('orderby', 'meta_value_num'); // Ordena como número (já que guarda o ID)
+                        
+                    break;
+
+                    case 'data_nascimento':
+                        $query->set('meta_key', 'data_nascimento');
+                        $query->set('orderby', 'meta_value');
+                        // Se a data estiver no formato YYYY-MM-DD, a ordenação de texto funciona perfeitamente.
+                        
+                    break;
+                }
+            });
+
+            add_action('restrict_manage_posts', function ($post_type)
+            {
+                if ($post_type !== 'alunos')
+                {
+                    return;
+                }
+
+                // --- FILTRO DE ESCOLA ---
+                $escolas = get_posts(['post_type' => 'escolas', // Verifique se o slug do CPT de escolas é 'escola'
+                'posts_per_page' => - 1, 'orderby' => 'title', 'order' => 'ASC']);
+
+                $escola_sel = isset($_GET['filtro_escola']) ? $_GET['filtro_escola'] : '';
+
+                echo '<select name="filtro_escola">';
+                echo '<option value="">Todas as Escolas</option>';
+                foreach ($escolas as $esc)
+                {
+                    printf('<option value="%s" %s>%s</option>', $esc->ID, selected($escola_sel, $esc->ID, false) , $esc->post_title);
+                }
+                echo '</select>';
+
+                // --- FILTRO DE TURMA ---
+                $turmas = get_posts(['post_type' => 'turmas', // Verifique se o slug do CPT de turmas é 'turma'
+                'posts_per_page' => - 1, 'orderby' => 'title', 'order' => 'ASC']);
+
+                $turma_sel = isset($_GET['filtro_turma']) ? $_GET['filtro_turma'] : '';
+
+                echo '<select name="filtro_turma">';
+                echo '<option value="">Todas as Turmas</option>';
+                foreach ($turmas as $tur)
+                {
+                    printf('<option value="%s" %s>%s</option>', $tur->ID, selected($turma_sel, $tur->ID, false) , $tur->post_title);
+                }
+                echo '</select>';
+            });
+
+            add_action('pre_get_posts', function ($query)
+            {
+                global $pagenow;
+
+                if (!is_admin() || $pagenow !== 'edit.php' || $query->get('post_type') !== 'alunos' || !$query->is_main_query())
+                {
+                    return;
+                }
+
+                $meta_query = [];
+
+                // Se selecionou Escola
+                if (!empty($_GET['filtro_escola']))
+                {
+                    $meta_query[] = ['key' => 'escola', // Nome da meta_key que você usa para salvar o ID da escola
+                    'value' => $_GET['filtro_escola'], 'compare' => '='];
+                }
+
+                // Se selecionou Turma
+                if (!empty($_GET['filtro_turma']))
+                {
+                    $meta_query[] = ['key' => 'turma', // Nome da meta_key que você usa para salvar o ID da turma
+                    'value' => $_GET['filtro_turma'], 'compare' => '='];
+                }
+
+                // Se houver algum filtro ativo, aplica na consulta
+                if (count($meta_query) > 0)
+                {
+                    if (count($meta_query) > 1)
+                    {
+                        $meta_query['relation'] = 'AND';
+                    }
+                    $query->set('meta_query', $meta_query);
+                }
+            });
+
+            //FIM COLUNA ALUNOS
+            
+
+            //INICIO DA COLUNA ESCOLA
+            
+
+            // 1. Define as colunas e a ordem
+            add_filter('manage_escolas_posts_columns', 'reorder_escolas_columns');
+            function reorder_escolas_columns($columns)
+            {
+                // Criamos um novo array com a ordem desejada
+                $new_columns = array();
+
+                // 1. Colocamos o Checkbox de seleção em primeiro (padrão do WP)
+                if (isset($columns['cb']))
+                {
+                    $new_columns['cb'] = $columns['cb'];
+                }
+
+                // 2. Inserimos o ID como a primeira coluna de dados
+                $new_columns['post_id'] = 'ID';
+
+                // 3. Adicionamos o Título
+                if (isset($columns['title']))
+                {
+                    $new_columns['title'] = $columns['title'];
+                }
+
+                // 4. Adicionamos a Data
+                if (isset($columns['date']))
+                {
+                    $new_columns['date'] = $columns['date'];
+                }
+
+                // Caso existam outras colunas de plugins (como SEO, etc) e você queira mantê-las no final:
+                /*
+                foreach ($columns as $key => $value) {
+                if (!isset($new_columns[$key])) {
+                $new_columns[$key] = $value;
+                }
+                }
+                */
+
+                return $new_columns;
             }
-            break;
 
-        case 'unidade':
-            $unidade_id = get_post_meta($post_id, 'unidade', true);
-            if ($unidade_id) {
-                echo get_the_title($unidade_id);
-            } else {
-                echo '—';
+            // 2. Preenche o valor da coluna ID
+            add_action('manage_escolas_posts_custom_column', 'display_escolas_id_value', 10, 2);
+            function display_escolas_id_value($column, $post_id)
+            {
+                if ($column === 'post_id')
+                {
+                    echo '<strong>' . $post_id . '</strong>';
+                }
             }
-            break;
-        case 'data_nascimento':
-$data = get_post_meta($post_id, 'data_nascimento', true); // Verifique se é 'data_nascimento' ou 'data_ascimento'
-    
-    if ($data) {
-        // Se a data vier do banco como 2026-04-20, isso transforma em 20/04/2026
-        echo date('d/m/Y', strtotime($data));
-    } else {
-        echo '—';
-    }
-            break;
-    }
-}, 10, 2);
 
-add_filter('manage_edit-alunos_sortable_columns', function($sortable_columns) {
-    $sortable_columns['escola']          = 'escola';
-    $sortable_columns['turma']           = 'turma';
-    $sortable_columns['unidade']         = 'unidade';
-    $sortable_columns['data_nascimento'] = 'data_nascimento';
-    return $sortable_columns;
-});
+            // 3. Ajusta a largura da coluna ID via CSS para ficar discreto
+            add_action('admin_head', 'style_escolas_id_column');
+            function style_escolas_id_column()
+            {
+                echo '<style type="text/css">
+        .column-post_id { width: 90px !important; text-align: left; }
+    </style>';
+            }
+            //FIM COLUNA ESCOLA
+            
 
-add_action('pre_get_posts', function($query) {
-    if (!is_admin() || !$query->is_main_query()) {
-        return;
-    }
+            //INICIO COLUNA TURMA
+            // 1. Define as colunas e a ordem
+            add_filter('manage_turmas_posts_columns', 'reorder_turmas_columns');
+            function reorder_turmas_columns($columns)
+            {
+                // Criamos um novo array com a ordem desejada
+                $new_columns = array();
 
-    $orderby = $query->get('orderby');
+                // 1. Colocamos o Checkbox de seleção em primeiro (padrão do WP)
+                if (isset($columns['cb']))
+                {
+                    $new_columns['cb'] = $columns['cb'];
+                }
 
-    switch ($orderby) {
-        case 'escola':
-        case 'turma':
-        case 'unidade':
-            $query->set('meta_key', $orderby); // Usa o slug da coluna como chave do meta_data
-            $query->set('orderby', 'meta_value_num'); // Ordena como número (já que guarda o ID)
-            break;
+                // 2. Inserimos o ID como a primeira coluna de dados
+                $new_columns['post_id'] = 'ID';
 
-        case 'data_nascimento':
-            $query->set('meta_key', 'data_nascimento');
-            $query->set('orderby', 'meta_value'); 
-            // Se a data estiver no formato YYYY-MM-DD, a ordenação de texto funciona perfeitamente.
-            break;
-    }
-});
+                // 3. Adicionamos o Título
+                if (isset($columns['title']))
+                {
+                    $new_columns['title'] = $columns['title'];
+                }
 
+                // 4. Adicionamos a Data
+                if (isset($columns['date']))
+                {
+                    $new_columns['date'] = $columns['date'];
+                }
 
+                // Caso existam outras colunas de plugins (como SEO, etc) e você queira mantê-las no final:
+                /*
+                foreach ($columns as $key => $value) {
+                if (!isset($new_columns[$key])) {
+                $new_columns[$key] = $value;
+                }
+                }
+                */
 
+                return $new_columns;
+            }
 
-add_action('restrict_manage_posts', function($post_type) {
-    if ($post_type !== 'alunos') {
-        return;
-    }
+            // 2. Preenche o valor da coluna ID
+            add_action('manage_turmas_posts_custom_column', 'display_turmas_id_value', 10, 2);
+            function display_turmas_id_value($column, $post_id)
+            {
+                if ($column === 'post_id')
+                {
+                    echo '<strong>' . $post_id . '</strong>';
+                }
+            }
 
-    // --- FILTRO DE ESCOLA ---
-    $escolas = get_posts([
-        'post_type'      => 'escolas', // Verifique se o slug do CPT de escolas é 'escola'
-        'posts_per_page' => -1,
-        'orderby'        => 'title',
-        'order'          => 'ASC'
-    ]);
+            // 3. Ajusta a largura da coluna ID via CSS para ficar discreto
+            add_action('admin_head', 'style_turmas_id_column');
+            function style_turmas_id_column()
+            {
+                echo '<style type="text/css">
+        .column-post_id { width: 90px !important; text-align: left; }
+    </style>';
+            }
+            //FIM COLUNA TURMA
+            
 
-    $escola_sel = isset($_GET['filtro_escola']) ? $_GET['filtro_escola'] : '';
-
-    echo '<select name="filtro_escola">';
-    echo '<option value="">Todas as Escolas</option>';
-    foreach ($escolas as $esc) {
-        printf('<option value="%s" %s>%s</option>', $esc->ID, selected($escola_sel, $esc->ID, false), $esc->post_title);
-    }
-    echo '</select>';
-
-    // --- FILTRO DE TURMA ---
-    $turmas = get_posts([
-        'post_type'      => 'turmas', // Verifique se o slug do CPT de turmas é 'turma'
-        'posts_per_page' => -1,
-        'orderby'        => 'title',
-        'order'          => 'ASC'
-    ]);
-
-    $turma_sel = isset($_GET['filtro_turma']) ? $_GET['filtro_turma'] : '';
-
-    echo '<select name="filtro_turma">';
-    echo '<option value="">Todas as Turmas</option>';
-    foreach ($turmas as $tur) {
-        printf('<option value="%s" %s>%s</option>', $tur->ID, selected($turma_sel, $tur->ID, false), $tur->post_title);
-    }
-    echo '</select>';
-});
-
-
-add_action('pre_get_posts', function($query) {
-    global $pagenow;
-
-    if (!is_admin() || $pagenow !== 'edit.php' || $query->get('post_type') !== 'alunos' || !$query->is_main_query()) {
-        return;
-    }
-
-    $meta_query = [];
-
-    // Se selecionou Escola
-    if (!empty($_GET['filtro_escola'])) {
-        $meta_query[] = [
-            'key'     => 'escola', // Nome da meta_key que você usa para salvar o ID da escola
-            'value'   => $_GET['filtro_escola'],
-            'compare' => '='
-        ];
-    }
-
-    // Se selecionou Turma
-    if (!empty($_GET['filtro_turma'])) {
-        $meta_query[] = [
-            'key'     => 'turma', // Nome da meta_key que você usa para salvar o ID da turma
-            'value'   => $_GET['filtro_turma'],
-            'compare' => '='
-        ];
-    }
-
-    // Se houver algum filtro ativo, aplica na consulta
-    if (count($meta_query) > 0) {
-        if (count($meta_query) > 1) {
-            $meta_query['relation'] = 'AND';
+            
         }
-        $query->set('meta_query', $meta_query);
-    }
-});
-
-//FIM COLUNA ALUNOS
-
-
-
-
-
-
-        } 
 
     }
 
@@ -293,7 +423,7 @@ add_action('pre_get_posts', function($query) {
         wp_enqueue_script('jquery');
 
         wp_enqueue_script('bootstrap', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js', array('jquery'), '5.3.0', true);
-        wp_enqueue_script('Login_JS', plugins_url('/admin/js/login.js', __FILE__), array(), '1.0.77', true);
+        wp_enqueue_script('Login_JS', plugins_url('/admin/js/login.js', __FILE__), array(), '1.0.78', true);
         wp_enqueue_script('sweetalert2-js', 'https://cdn.jsdelivr.net/npm/sweetalert2@11', [], null, true);
         wp_enqueue_script('Validation_JS', plugins_url('/admin/js/validation.js', __FILE__), array(), '1.0.4', true);
 

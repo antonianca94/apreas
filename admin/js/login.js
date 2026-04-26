@@ -66,7 +66,37 @@ jQuery(document).ready(function ($) {
         }
     }
 
+    function atualizarDadosAluno(dados, tipo) {
+        if (!dados) return;
+
+        var d = (tipo === 'eventos' && Array.isArray(dados) && dados.length > 0) ? dados[0] : dados;
+        var container = document.querySelector('.dados-aluno-container');
+        if (!container) return;
+
+        container.style.display = 'block';
+        var elNome = document.querySelector('.aluno-nome');
+        var elEscola = document.querySelector('.aluno-escola');
+        var elTurma = document.querySelector('.aluno-turma');
+        var elUnidade = document.querySelector('.aluno-unidade');
+        var elDataNasc = document.querySelector('.aluno-data-nascimento');
+
+        if (elNome) elNome.textContent = d.nome || '';
+        if (elEscola && d.escola) elEscola.textContent = d.escola.nome || '';
+        if (elTurma && d.turma) elTurma.textContent = d.turma.nome || '';
+        if (elUnidade && d.unidade) elUnidade.textContent = d.unidade.nome || '';
+
+        if (elDataNasc && d.data_nascimento) {
+            var dn = d.data_nascimento;
+            if (dn.includes('-')) {
+                var p = dn.split('-');
+                if (p.length === 3) dn = p[2] + '/' + p[1] + '/' + p[0];
+            }
+            elDataNasc.textContent = dn;
+        }
+    }
+
     function aplicarSessaoEscola(data) {
+        atualizarDadosAluno(data, 'escola');
         var l1i = document.querySelector('.l1_escolha_data_inicio_escola');
         var l1f = document.querySelector('.l1_escolha_data_fim_escola');
         var l1e = document.querySelector('.l1_entrega_data_escola');
@@ -108,6 +138,7 @@ jQuery(document).ready(function ($) {
     }
 
     function aplicarSessaoEventos(dataArray) {
+        atualizarDadosAluno(dataArray, 'eventos');
         if (!dataArray || !dataArray.length) return;
         var d = dataArray[0];
         if (d.imagem_upload_individual) {
@@ -241,6 +272,8 @@ jQuery(document).ready(function ($) {
 
                     //console.log(response.data);
                     salvarSessao('escola', response.data);
+                    aplicarSessaoEscola(response.data);
+
                     Swal.fire({
                         title: 'Acesso Liberado com Sucesso!',
                         text: '',
@@ -504,6 +537,8 @@ jQuery(document).ready(function ($) {
                         logoutContainer.style.setProperty('display', 'flex', 'important');
                     }
                     salvarSessao('eventos', response.data);
+                    aplicarSessaoEventos(response.data);
+
                     window.scrollTo(0, 0);
                 } else {
                     Swal.fire({
@@ -612,9 +647,9 @@ jQuery(document).ready(function ($) {
     // RESTAURAR SESSÃO AO CARREGAR A PÁGINA
     var sessaoAtiva = lerSessao();
     if (sessaoAtiva) {
-        if (sessaoAtiva.tipo === 'escola' && document.getElementById('form_login')) {
+        if (sessaoAtiva.tipo === 'escola') {
             aplicarSessaoEscola(sessaoAtiva.dados);
-        } else if (sessaoAtiva.tipo === 'eventos' && document.getElementById('form_login_eventos')) {
+        } else if (sessaoAtiva.tipo === 'eventos') {
             aplicarSessaoEventos(sessaoAtiva.dados);
         }
     }

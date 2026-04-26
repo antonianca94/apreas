@@ -108,49 +108,7 @@ class Login {
                 <p style="<?php echo $p_style; ?>"><strong style="<?php echo $label_style; ?>"><?php echo esc_html($a['label_data']); ?></strong> <span class="aluno-data-nascimento" style="<?php echo $span_style; ?>"></span></p>
             <?php endif; ?>
         </div>
-        <script>
-            document.addEventListener("DOMContentLoaded", function() {
-                try {
-                    var raw = localStorage.getItem('apreas_login_sessao');
-                    if (raw) {
-                        var s = JSON.parse(raw);
-                        if (Date.now() <= s.expira) {
-                            var dados = s.dados;
-                            if (s.tipo === 'eventos' && Array.isArray(dados) && dados.length > 0) {
-                                dados = dados[0];
-                            }
-                            if (dados) {
-                                var container = document.querySelector('.dados-aluno-container');
-                                if (container) {
-                                    container.style.display = 'block';
-                                    var elNome = document.querySelector('.aluno-nome');
-                                    var elEscola = document.querySelector('.aluno-escola');
-                                    var elTurma = document.querySelector('.aluno-turma');
-                                    var elUnidade = document.querySelector('.aluno-unidade');
-                                    var elDataNasc = document.querySelector('.aluno-data-nascimento');
-
-                                    if(elNome) elNome.textContent = dados.nome || '';
-                                    if(elEscola && dados.escola) elEscola.textContent = dados.escola.nome || '';
-                                    if(elTurma && dados.turma) elTurma.textContent = dados.turma.nome || '';
-                                    if(elUnidade && dados.unidade) elUnidade.textContent = dados.unidade.nome || '';
-                                    
-                                    if(elDataNasc && dados.data_nascimento) {
-                                        // converter YYYY-MM-DD para DD/MM/AAAA se vier no formato do banco
-                                        var dn = dados.data_nascimento;
-                                        if(dn.includes('-')) {
-                                            var p = dn.split('-');
-                                            if(p.length === 3) dn = p[2] + '/' + p[1] + '/' + p[0];
-                                        }
-                                        elDataNasc.textContent = dn;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                } catch(e) { console.error("Erro ao carregar dados do aluno", e); }
-            });
-        </script>
-        <?php
+<?php
         return ob_get_clean();
     }
 
