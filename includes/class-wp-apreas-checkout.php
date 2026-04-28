@@ -23,13 +23,57 @@ class Checkout {
         add_action( 'woocommerce_checkout_update_order_meta',             [ $this, 'salvar_campos_checkout' ] );
         add_action( 'woocommerce_admin_order_data_after_billing_address', [ $this, 'exibir_campos_admin' ], 10, 1 );
         add_filter( 'woocommerce_email_order_meta_fields',                [ $this, 'campos_no_email' ], 10, 3 );
+        // Corrige mapeamento dos campos de endereço (bairro / cidade / estado)
+        add_filter( 'woocommerce_checkout_fields',                        [ $this, 'corrigir_campos_endereco' ], 99 );
+    }
+
+    // ─────────────────────────────────────────────
+    // CORREÇÃO — campos de endereço billing
+    // ─────────────────────────────────────────────
+    public function corrigir_campos_endereco( $fields ) {
+
+        $billing = &$fields['billing'];
+
+        // BAIRRO — cria o campo se não existir (não é nativo do WooCommerce)
+        // ou corrige o tipo caso outro plugin já o tenha registrado errado
+        $billing['billing_neighborhood'] = wp_parse_args(
+            isset( $billing['billing_neighborhood'] ) ? $billing['billing_neighborhood'] : [],
+            [
+                'type'        => 'text',
+                'label'       => __( 'Bairro', 'apreas' ),
+                'required'    => true,
+                'class'       => [ 'form-row-wide' ],
+                'priority'    => 75,   // entre CEP (70) e Cidade (80)
+                'clear'       => true,
+            ]
+        );
+        // Força type=text independente do que outro plugin definiu
+        $billing['billing_neighborhood']['type'] = 'text';
+
+        // CIDADE — deve ser campo de texto aberto
+        if ( isset( $billing['billing_city'] ) ) {
+            $billing['billing_city']['type']     = 'text';
+            $billing['billing_city']['label']    = __( 'Cidade', 'apreas' );
+            $billing['billing_city']['priority'] = 80;
+            $billing['billing_city']['class']    = [ 'form-row-wide' ];
+        }
+
+        // ESTADO — deve ser select (type = state)
+        if ( isset( $billing['billing_state'] ) ) {
+            $billing['billing_state']['type']     = 'state';
+            $billing['billing_state']['label']    = __( 'Estado', 'apreas' );
+            $billing['billing_state']['priority'] = 85;
+            $billing['billing_state']['class']    = [ 'form-row-wide' ];
+        }
+
+        return $fields;
     }
 
     // ─────────────────────────────────────────────
     // CHECKOUT — renderiza campos no formulário
     // ─────────────────────────────────────────────
     public function render_campos_checkout( $checkout ) {
-        echo '<div class="apreas-campos-aluno" style="margin-bottom:4rem;">';
+        echo '<div class="apreas-campos-aluno" style="margin-bottom:4rem; padding-bottom:6rem;">';
         echo '<h3>' . esc_html__( 'Informações do Aluno', 'apreas' ) . '</h3>';
 
         woocommerce_form_field( 'apreas_aluno', [
@@ -46,18 +90,11 @@ class Checkout {
             'class'    => [ 'form-row-first' ],
         ], $checkout->get_value( 'apreas_escola' ) );
 
-        woocommerce_form_field( 'apreas_serie', [
-            'type'     => 'text',
-            'label'    => __( 'Série', 'apreas' ),
-            'required' => true,
-            'class'    => [ 'form-row-last' ],
-        ], $checkout->get_value( 'apreas_serie' ) );
-
         woocommerce_form_field( 'apreas_turma', [
             'type'     => 'text',
             'label'    => __( 'Turma', 'apreas' ),
             'required' => true,
-            'class'    => [ 'form-row-wide' ],
+            'class'    => [ 'form-row-last' ],
         ], $checkout->get_value( 'apreas_turma' ) );
 
         echo '</div>';
@@ -70,7 +107,6 @@ class Checkout {
         $campos = [
             'apreas_aluno'  => 'Nome Completo do(a) Aluno(a)',
             'apreas_escola' => 'Escola',
-            'apreas_serie'  => 'Série',
             'apreas_turma'  => 'Turma',
         ];
         foreach ( $campos as $key => $label ) {
@@ -87,7 +123,6 @@ class Checkout {
         $campos = [
             'apreas_aluno'  => '_apreas_aluno',
             'apreas_escola' => '_apreas_escola',
-            'apreas_serie'  => '_apreas_serie',
             'apreas_turma'  => '_apreas_turma',
         ];
         foreach ( $campos as $post_key => $meta_key ) {
@@ -103,15 +138,13 @@ class Checkout {
     public function exibir_campos_admin( $order ) {
         $aluno  = get_post_meta( $order->get_id(), '_apreas_aluno',  true );
         $escola = get_post_meta( $order->get_id(), '_apreas_escola', true );
-        $serie  = get_post_meta( $order->get_id(), '_apreas_serie',  true );
         $turma  = get_post_meta( $order->get_id(), '_apreas_turma',  true );
 
-        if ( ! $aluno && ! $escola && ! $serie && ! $turma ) return;
+        if ( ! $aluno && ! $escola && ! $turma ) return;
 
         // SVGs — mesma cor neutra para todos
         $svg_pessoa = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="#6b7280"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8V21h19.2v-1.8c0-3.2-6.4-4.8-9.6-4.8z"/></svg>';
         $svg_escola = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="#6b7280"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zm0 12.27L4.56 11 12 6.73 19.44 11 12 15.27zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>';
-        $svg_serie  = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="#6b7280"><path d="M21 5c-1.11-.35-2.33-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.5 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1zM21 18.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V8c1.35-.85 3.8-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5v11.5z"/></svg>';
         $svg_turma  = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="#6b7280"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>';
         $svg_header = '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="rgba(255,255,255,0.85)"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8V21h19.2v-1.8c0-3.2-6.4-4.8-9.6-4.8z"/></svg>';
 
@@ -158,7 +191,6 @@ class Checkout {
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
                     <?php
                     if ( $escola ) echo $row( $svg_escola, 'Escola', $escola );
-                    if ( $serie  ) echo $row( $svg_serie,  'Série',  $serie  );
                     if ( $turma  ) echo $row( $svg_turma,  'Turma',  $turma  );
                     ?>
                 </div>
@@ -176,7 +208,6 @@ class Checkout {
         $mapa = [
             'aluno'  => [ 'label' => 'Nome do Aluno', 'value' => get_post_meta( $id, '_apreas_aluno',  true ) ],
             'escola' => [ 'label' => 'Escola',         'value' => get_post_meta( $id, '_apreas_escola', true ) ],
-            'serie'  => [ 'label' => 'Série',          'value' => get_post_meta( $id, '_apreas_serie',  true ) ],
             'turma'  => [ 'label' => 'Turma',          'value' => get_post_meta( $id, '_apreas_turma',  true ) ],
         ];
         foreach ( $mapa as $key => $data ) {
