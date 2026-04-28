@@ -70,9 +70,26 @@ class Checkout {
     }
 
     // ─────────────────────────────────────────────
+    // HELPER — Verifica se há produto da categoria
+    // ─────────────────────────────────────────────
+    private function tem_produto_recordacao_escolar() {
+        if ( ! WC()->cart ) return false;
+        foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
+            if ( has_term( 'recordacao-escolar', 'product_cat', $cart_item['product_id'] ) ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // ─────────────────────────────────────────────
     // CHECKOUT — renderiza campos no formulário
     // ─────────────────────────────────────────────
     public function render_campos_checkout( $checkout ) {
+        if ( ! $this->tem_produto_recordacao_escolar() ) {
+            return;
+        }
+
         echo '<div class="apreas-campos-aluno" style="margin-bottom:4rem; padding-bottom:6rem;">';
         echo '<h3>' . esc_html__( 'Informações do Aluno', 'apreas' ) . '</h3>';
 
@@ -104,6 +121,10 @@ class Checkout {
     // VALIDAÇÃO
     // ─────────────────────────────────────────────
     public function validar_campos_checkout() {
+        if ( ! $this->tem_produto_recordacao_escolar() ) {
+            return;
+        }
+
         $campos = [
             'apreas_aluno'  => 'Nome Completo do(a) Aluno(a)',
             'apreas_escola' => 'Escola',
@@ -120,6 +141,10 @@ class Checkout {
     // SALVAR
     // ─────────────────────────────────────────────
     public function salvar_campos_checkout( $order_id ) {
+        if ( ! $this->tem_produto_recordacao_escolar() ) {
+            return;
+        }
+
         $campos = [
             'apreas_aluno'  => '_apreas_aluno',
             'apreas_escola' => '_apreas_escola',
