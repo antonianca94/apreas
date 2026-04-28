@@ -25,6 +25,9 @@ class Checkout {
         add_filter( 'woocommerce_email_order_meta_fields',                [ $this, 'campos_no_email' ], 10, 3 );
         // Corrige mapeamento dos campos de endereço (bairro / cidade / estado)
         add_filter( 'woocommerce_checkout_fields',                        [ $this, 'corrigir_campos_endereco' ], 99 );
+
+        // Adiciona taxa de entrega fixa
+        add_action( 'woocommerce_cart_calculate_fees',                    [ $this, 'adicionar_taxa_entrega' ] );
     }
 
     // ─────────────────────────────────────────────
@@ -67,6 +70,21 @@ class Checkout {
         }
 
         return $fields;
+    }
+
+    // ─────────────────────────────────────────────
+    // TAXA DE ENTREGA FIXA
+    // ─────────────────────────────────────────────
+    public function adicionar_taxa_entrega( $cart ) {
+        if ( is_admin() && ! defined( 'DOING_AJAX' ) ) {
+            return;
+        }
+
+        // Valor fixo do frete/taxa de entrega (exemplo: 20 reais)
+        $valor_frete = 20.00;
+
+        // Adiciona a taxa no final da compra
+        $cart->add_fee( __( 'Taxa de Entrega', 'apreas' ), $valor_frete, false );
     }
 
     // ─────────────────────────────────────────────
