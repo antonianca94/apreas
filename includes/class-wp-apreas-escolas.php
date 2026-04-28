@@ -158,6 +158,46 @@ class Escolas {
                 <p style="font-size:13px; color:#666; margin-top:5px;">Mostra a quantidade de fotos que o aluno já escolheu.</p>
             </div>
 
+            <div style="margin-bottom: 20px; padding: 12px; background: #f9f9f9; border-left: 4px solid #d32f2f;">
+                <strong style="display:block; margin-bottom:5px;">Data Limite das Fotos</strong>
+                <code>[data_limite_fotos]</code>
+                <p style="font-size:13px; color:#666; margin-top:5px;">Exibe a data limite configurada nesta escola para exclusão das fotos. Preenchida automaticamente com os dados da escola do aluno logado.</p>
+                <p style="font-size:12px; color:#888; margin-top:4px;"><em>Atributos de estilo disponíveis: <code>label</code>, <code>mostrar_label</code>, <code>cor</code>, <code>tamanho</code>, <code>peso</code>, <code>alinhar</code>, <code>fonte</code>, <code>fundo</code>, <code>padding</code>, <code>borda_raio</code>, <code>cor_label</code>, <code>peso_label</code>, <code>tamanho_label</code></em></p>
+            </div>
+
+            <div style="margin-bottom: 20px; padding: 12px; background: #f9f9f9; border-left: 4px solid #1976d2;">
+                <strong style="display:block; margin-bottom:8px;">Datas dos Lotes — Shortcodes Individuais</strong>
+                <p style="font-size:13px; color:#666; margin-bottom:10px;">Cada shortcode abaixo exibe uma data específica dos lotes da escola do aluno logado. Use <code>tipo="escola"</code> (padrão) ou <code>tipo="evento"</code> para selecionar a origem dos dados.</p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size:13px;">
+                    <div style="background:#fff; padding:8px; border:1px solid #e0e0e0; border-radius:4px;">
+                        <strong>Lote 1 — Início da Escolha</strong><br>
+                        <code>[lote1_escolha_inicio]</code>
+                    </div>
+                    <div style="background:#fff; padding:8px; border:1px solid #e0e0e0; border-radius:4px;">
+                        <strong>Lote 1 — Fim da Escolha</strong><br>
+                        <code>[lote1_escolha_fim]</code>
+                    </div>
+                    <div style="background:#fff; padding:8px; border:1px solid #e0e0e0; border-radius:4px;">
+                        <strong>Lote 1 — Entrega</strong><br>
+                        <code>[lote1_entrega]</code>
+                    </div>
+                    <div style="background:#fff; padding:8px; border:1px solid #e0e0e0; border-radius:4px;">
+                        <strong>Lote 2 — Início da Escolha</strong><br>
+                        <code>[lote2_escolha_inicio]</code>
+                    </div>
+                    <div style="background:#fff; padding:8px; border:1px solid #e0e0e0; border-radius:4px;">
+                        <strong>Lote 2 — Fim da Escolha</strong><br>
+                        <code>[lote2_escolha_fim]</code>
+                    </div>
+                    <div style="background:#fff; padding:8px; border:1px solid #e0e0e0; border-radius:4px;">
+                        <strong>Lote 2 — Entrega</strong><br>
+                        <code>[lote2_entrega]</code>
+                    </div>
+                </div>
+                <p style="font-size:12px; color:#888; margin-top:10px;"><em>Todos aceitam os mesmos atributos: <code>label</code>, <code>mostrar_label</code>, <code>tipo="escola"</code>, <code>cor</code>, <code>tamanho</code>, <code>peso</code>, <code>alinhar</code>, <code>fonte</code>, <code>fundo</code>, <code>padding</code>, <code>borda_raio</code>, <code>cor_label</code>, <code>peso_label</code>, <code>tamanho_label</code></em></p>
+                <p style="font-size:12px; color:#888; margin-top:4px;"><strong>Exemplo:</strong> <code>[lote1_escolha_inicio label="Início:" cor="#d32f2f" peso="bold" tipo="escola"]</code></p>
+            </div>
+
             <div style="margin-bottom: 10px; padding: 12px; background: #f9f9f9; border-left: 4px solid #d32f2f;">
                 <strong style="display:block; margin-bottom:5px;">Dados do Aluno (Customizável)</strong>
                 <code>[dados_aluno]</code>
@@ -304,6 +344,7 @@ class Escolas {
             <div class="col">
                 <div class="form-group">
                     <label for="l1_escolha_data_inicio" class="mb-2 fw-bold">Data de Início</label>
+                    <p style="margin-bottom:6px; font-size:11px; color:#888;">▸ Shortcode individual: <code>[lote1_escolha_inicio]</code></p>
                     <div class="input-group">
                         <input type="text" id="l1_escolha_data_inicio" name="l1_escolha_data_inicio" class="form-control" value="<?php echo esc_attr($l1_escolha_data_inicio); ?>" />
                         <div class="input-group-append">
@@ -315,6 +356,7 @@ class Escolas {
             <div class="col">
                 <div class="form-group">
                     <label for="l1_escolha_data_fim" class="mb-2 fw-bold">Data de Fim</label>
+                    <p style="margin-bottom:6px; font-size:11px; color:#888;">▸ Shortcode individual: <code>[lote1_escolha_fim]</code></p>
                     <div class="input-group">
                         <input type="text" id="l1_escolha_data_fim" name="l1_escolha_data_fim" class="form-control" value="<?php echo esc_attr($l1_escolha_data_fim); ?>" />
                         <div class="input-group-append">
@@ -355,6 +397,7 @@ class Escolas {
             <div class="col-xxl-6">
                 <div class="form-group">
                     <label for="l1_entrega_data" class="mb-2 fw-bold">Data de Entrega</label>
+                    <p style="margin-bottom:6px; font-size:11px; color:#888;">▸ Shortcode individual: <code>[lote1_entrega]</code></p>
                     <div class="input-group">
                         <input type="text" id="l1_entrega_data" name="l1_entrega_data" class="form-control" value="<?php echo esc_attr($l1_entrega_data); ?>" />
                         <div class="input-group-append">
@@ -391,6 +434,7 @@ class Escolas {
             <div class="col">
                 <div class="form-group">
                     <label for="l2_escolha_data_inicio" class="mb-2 fw-bold">Data de Início</label>
+                    <p style="margin-bottom:6px; font-size:11px; color:#888;">▸ Shortcode individual: <code>[lote2_escolha_inicio]</code></p>
                     <div class="input-group">
                         <input type="text" id="l2_escolha_data_inicio" name="l2_escolha_data_inicio" class="form-control" value="<?php echo esc_attr($l2_escolha_data_inicio); ?>" />
                         <div class="input-group-append">
@@ -402,6 +446,7 @@ class Escolas {
             <div class="col">
                 <div class="form-group">
                     <label for="l2_escolha_data_fim" class="mb-2 fw-bold">Data de Fim</label>
+                    <p style="margin-bottom:6px; font-size:11px; color:#888;">▸ Shortcode individual: <code>[lote2_escolha_fim]</code></p>
                     <div class="input-group">
                         <input type="text" id="l2_escolha_data_fim" name="l2_escolha_data_fim" class="form-control" value="<?php echo esc_attr($l2_escolha_data_fim); ?>" />
                         <div class="input-group-append">
@@ -442,6 +487,7 @@ class Escolas {
             <div class="col-xxl-6">
                 <div class="form-group">
                     <label for="l2_entrega_data" class="mb-2 fw-bold">Data de Entrega</label>
+                    <p style="margin-bottom:6px; font-size:11px; color:#888;">▸ Shortcode individual: <code>[lote2_entrega]</code></p>
                     <div class="input-group">
                         <input type="text" id="l2_entrega_data" name="l2_entrega_data" class="form-control" value="<?php echo esc_attr($l2_entrega_data); ?>" />
                         <div class="input-group-append">
