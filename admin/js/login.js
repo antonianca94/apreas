@@ -2,12 +2,15 @@ jQuery(document).ready(function ($) {
 
     // LIMPAR ESPAÇOS EM BRANCO DO INPUT SENHA_NOME
     let timeout;
-    document.getElementById("senha_nome").addEventListener("input", function () {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => {
-            this.value = this.value.trim();
-        }, 4000);
-    });
+    var elSenhaNome = document.getElementById("senha_nome");
+    if (elSenhaNome) {
+        elSenhaNome.addEventListener("input", function () {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                this.value = this.value.trim();
+            }, 4000);
+        });
+    }
     // LIMPAR ESPAÇOS EM BRANCO DO INPUT SENHA_NOME
 
     // MÁSCARA DD/MM/AAAA PARA CAMPO DATA

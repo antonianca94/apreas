@@ -239,12 +239,56 @@ class Escolas {
 
     /**
      * Shortcode [data_limite_fotos]
-     * Renderiza um <span> vazio que o login.js preenche via localStorage,
-     * seguindo o mesmo padrão dos outros campos de escola (lotes, logo, etc.).
-     * O campo data_limite_fotos é incluído no payload AJAX do login.
+     * Renderiza um <span> vazio que o login.js preenche via localStorage.
+     * Aceita os mesmos atributos de estilizacao dos outros shortcodes de data.
      */
     function shortcode_data_limite_fotos($atts) {
-        return '<span class="data_limite_fotos_escola"></span>';
+        // Garante que $atts e sempre array
+        if ( ! is_array($atts) ) $atts = [];
+
+        $a = shortcode_atts( array(
+            'label'         => '',
+            'mostrar_label' => 'true',
+            'cor'           => '',
+            'tamanho'       => '',
+            'peso'          => '',
+            'alinhar'       => '',
+            'fonte'         => '',
+            'fundo'         => '',
+            'padding'       => '',
+            'borda_raio'    => '',
+            'cor_label'     => '',
+            'peso_label'    => 'bold',
+            'tamanho_label' => '',
+        ), $atts );
+
+        $wrap_style = '';
+        if ( !empty($a['alinhar']) )    $wrap_style .= 'text-align:'       . esc_attr($a['alinhar'])    . ';';
+        if ( !empty($a['fonte']) )      $wrap_style .= 'font-family:'      . esc_attr($a['fonte'])      . ';';
+        if ( !empty($a['fundo']) )      $wrap_style .= 'background-color:' . esc_attr($a['fundo'])      . ';';
+        if ( !empty($a['padding']) )    $wrap_style .= 'padding:'          . esc_attr($a['padding'])    . ';';
+        if ( !empty($a['borda_raio']) ) $wrap_style .= 'border-radius:'    . esc_attr($a['borda_raio']) . ';';
+
+        $val_style = '';
+        if ( !empty($a['cor']) )     $val_style .= 'color:'       . esc_attr($a['cor'])     . ';';
+        if ( !empty($a['tamanho']) ) $val_style .= 'font-size:'   . esc_attr($a['tamanho']) . ';';
+        if ( !empty($a['peso']) )    $val_style .= 'font-weight:' . esc_attr($a['peso'])    . ';';
+
+        $label_style = '';
+        if ( !empty($a['cor_label']) )     $label_style .= 'color:'       . esc_attr($a['cor_label'])      . ';';
+        if ( !empty($a['peso_label']) )    $label_style .= 'font-weight:' . esc_attr($a['peso_label'])     . ';';
+        if ( !empty($a['tamanho_label']) ) $label_style .= 'font-size:'   . esc_attr($a['tamanho_label'])  . ';';
+
+        $show_label = ( $a['mostrar_label'] !== 'false' && $a['mostrar_label'] !== '0' && !empty($a['label']) );
+
+        $html  = '<span class="apreas-data-wrap" style="' . $wrap_style . '">';
+        if ( $show_label ) {
+            $html .= '<strong class="apreas-data-label" style="' . $label_style . '">' . esc_html($a['label']) . ' </strong>';
+        }
+        $html .= '<span class="data_limite_fotos_escola" style="' . $val_style . '"></span>';
+        $html .= '</span>';
+
+        return $html;
     }
 
     function exibir_lote_one($post) {
