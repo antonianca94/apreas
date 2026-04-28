@@ -23,6 +23,11 @@ class Checkout {
         add_action( 'woocommerce_checkout_update_order_meta',             [ $this, 'salvar_campos_checkout' ] );
         add_action( 'woocommerce_admin_order_data_after_billing_address', [ $this, 'exibir_campos_admin' ], 10, 1 );
         add_filter( 'woocommerce_email_order_meta_fields',                [ $this, 'campos_no_email' ], 10, 3 );
+        add_filter( 'woocommerce_admin_billing_fields',                   [ $this, 'adicionar_bairro_admin_billing' ] );
+        add_filter( 'woocommerce_localisation_address_formats',           [ $this, 'formatar_endereco_br' ], 99 );
+        add_filter( 'woocommerce_formatted_address_replacements',         [ $this, 'substituir_bairro_endereco' ], 10, 2 );
+        add_filter( 'woocommerce_order_formatted_billing_address',        [ $this, 'adicionar_bairro_endereco_objeto' ], 10, 2 );
+        add_filter( 'woocommerce_order_get_formatted_billing_address',    [ $this, 'adicionar_bairro_string_admin' ], 10, 3 );
         // Corrige mapeamento dos campos de endereço (bairro / cidade / estado)
         add_filter( 'woocommerce_checkout_fields',                        [ $this, 'corrigir_campos_endereco' ], 99 );
 
@@ -348,9 +353,10 @@ class Checkout {
         }
 
         $campos = [
-            'apreas_aluno'  => '_apreas_aluno',
-            'apreas_escola' => '_apreas_escola',
-            'apreas_turma'  => '_apreas_turma',
+            'apreas_aluno'         => '_apreas_aluno',
+            'apreas_escola'        => '_apreas_escola',
+            'apreas_turma'         => '_apreas_turma',
+            'billing_neighborhood' => '_billing_neighborhood',
         ];
         foreach ( $campos as $post_key => $meta_key ) {
             if ( ! empty( $_POST[ $post_key ] ) ) {
@@ -366,13 +372,15 @@ class Checkout {
         $aluno  = get_post_meta( $order->get_id(), '_apreas_aluno',  true );
         $escola = get_post_meta( $order->get_id(), '_apreas_escola', true );
         $turma  = get_post_meta( $order->get_id(), '_apreas_turma',  true );
+        $bairro = get_post_meta( $order->get_id(), '_billing_neighborhood', true );
 
-        if ( ! $aluno && ! $escola && ! $turma ) return;
+        if ( ! $aluno && ! $escola && ! $turma && ! $bairro ) return;
 
         // SVGs — mesma cor neutra para todos
         $svg_pessoa = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="#6b7280"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8V21h19.2v-1.8c0-3.2-6.4-4.8-9.6-4.8z"/></svg>';
         $svg_escola = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="#6b7280"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zm0 12.27L4.56 11 12 6.73 19.44 11 12 15.27zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>';
         $svg_turma  = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="#6b7280"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>';
+        $svg_bairro = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="#6b7280" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>';
         $svg_header = '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="rgba(255,255,255,0.85)"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8V21h19.2v-1.8c0-3.2-6.4-4.8-9.6-4.8z"/></svg>';
 
         // Estilos reutilizáveis
@@ -440,7 +448,75 @@ class Checkout {
         foreach ( $mapa as $key => $data ) {
             if ( ! empty( $data['value'] ) ) $fields[ $key ] = $data;
         }
+
+        // Adiciona Bairro separadamente se existir
+        $bairro = get_post_meta( $id, '_billing_neighborhood', true );
+        if ( $bairro ) {
+            $fields['bairro'] = [ 'label' => 'Bairro', 'value' => $bairro ];
+        }
+
         return $fields;
+    }
+
+    /**
+     * Adiciona o campo Bairro nos campos de faturamento do admin para ser editável.
+     */
+    public function adicionar_bairro_admin_billing( $fields ) {
+        $fields['neighborhood'] = [
+            'label' => __( 'Bairro', 'apreas' ),
+            'show'  => false, // oculta a linha separada, pois vamos injetar no endereço formatado
+        ];
+        return $fields;
+    }
+
+    /**
+     * Formata o endereço para o Brasil incluindo o Bairro.
+     */
+    public function formatar_endereco_br( $formats ) {
+        $formats['BR'] = "{address_1}, {address_2}\n{neighborhood}\n{city} - {state}\n{postcode}\n{country}";
+        return $formats;
+    }
+
+    /**
+     * Injeta o valor do bairro no array de endereço para que o placeholder funcione.
+     */
+    public function adicionar_bairro_endereco_objeto( $address, $order ) {
+        $bairro = $order->get_meta( '_billing_neighborhood' );
+        if ( $bairro ) {
+            $address['neighborhood'] = $bairro;
+        }
+        return $address;
+    }
+
+    /**
+     * Substitui o placeholder {neighborhood} pelo valor real.
+     */
+    public function substituir_bairro_endereco( $replacements, $args ) {
+        $replacements['{neighborhood}'] = ! empty( $args['neighborhood'] ) ? $args['neighborhood'] : '';
+        return $replacements;
+    }
+
+    /**
+     * Força a inserção do bairro na string final do endereço (útil no Admin).
+     */
+    public function adicionar_bairro_string_admin( $address, $raw_address, $order ) {
+        // Se já contiver o bairro ou não for admin, retorna (evita duplicação)
+        $bairro = $order->get_meta( '_billing_neighborhood' );
+        if ( ! $bairro ) return $address;
+
+        // Se o bairro já está na string (limpa tags para comparar)
+        if ( strpos( strip_tags( $address ), $bairro ) !== false ) {
+            return $address;
+        }
+
+        // Tenta inserir logo após a Rua (address_1)
+        $rua = $order->get_billing_address_1();
+        if ( $rua && strpos( $address, $rua ) !== false ) {
+            return str_replace( $rua, $rua . '<br>' . $bairro, $address );
+        }
+
+        // Se não achou a rua, apenas concatena no início ou fim
+        return $address . '<br>' . $bairro;
     }
 }
 
