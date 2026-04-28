@@ -28,6 +28,17 @@ class Checkout {
 
         // Adiciona taxa de entrega fixa
         add_action( 'woocommerce_cart_calculate_fees',                    [ $this, 'adicionar_taxa_entrega' ] );
+
+        // Aplica o cupom nativo digitado no campo customizado
+        add_action( 'woocommerce_checkout_update_order_review',           [ $this, 'aplicar_cupom_nativo_customizado' ] );
+
+        // Injeta o feedback do cupom como fragment (mensagem inline)
+        add_filter( 'woocommerce_update_order_review_fragments',          [ $this, 'fragment_cupom_feedback' ] );
+
+        // Remove o bloco nativo de cupom do WooCommerce (usamos o campo customizado)
+        // Obs: não desativamos woocommerce_coupons_enabled para não bloquear apply_coupon()
+        remove_action( 'woocommerce_before_checkout_form',                'woocommerce_checkout_coupon_form', 10 );
+        add_action( 'wp_head',                                            [ $this, 'esconder_cupom_nativo_css' ] );
     }
 
     // ─────────────────────────────────────────────
@@ -88,6 +99,109 @@ class Checkout {
     }
 
     // ─────────────────────────────────────────────
+    // APLICAR CUPOM NATIVO VIA CAMPO CUSTOMIZADO
+    // ─────────────────────────────────────────────
+    public function aplicar_cupom_nativo_customizado( $post_data_string ) {
+        $post_data = [];
+        parse_str( $post_data_string, $post_data );
+
+        $codigo  = isset( $post_data['apreas_codigo_desconto'] ) ? sanitize_text_field( trim( $post_data['apreas_codigo_desconto'] ) ) : '';
+        $remover = ! empty( $post_data['apreas_remover_cupom'] ) && $post_data['apreas_remover_cupom'] === '1';
+        $codigo  = strtolower( $codigo );
+
+        // Se o usuário clicou em Remover ou o campo está vazio, limpa os cupões
+        if ( $remover || empty( $codigo ) ) {
+            WC()->cart->remove_coupons();
+            WC()->cart->calculate_totals();
+            return;
+        }
+
+        // Evita re-aplicar o mesmo cupom se já está aplicado
+        if ( WC()->cart->has_discount( $codigo ) ) {
+            return;
+        }
+
+        // Remove qualquer cupom anterior e aplica o novo
+        WC()->cart->remove_coupons();
+
+        $coupon = new \WC_Coupon( $codigo );
+        if ( $coupon->get_id() ) {
+            // Suprime os avisos nativos do WooCommerce (usamos nosso feedback inline)
+            add_filter( 'woocommerce_coupon_message', '__return_empty_string', 999 );
+            add_filter( 'woocommerce_coupon_error',   '__return_empty_string', 999 );
+
+            WC()->cart->apply_coupon( $codigo );
+
+            remove_filter( 'woocommerce_coupon_message', '__return_empty_string', 999 );
+            remove_filter( 'woocommerce_coupon_error',   '__return_empty_string', 999 );
+            wc_clear_notices(); // limpa qualquer notice residual
+
+            WC()->session->set( 'apreas_cupom_feedback', [
+                'tipo'  => 'sucesso',
+                'texto' => sprintf( __( 'Cupom <strong>%s</strong> aplicado com sucesso!', 'apreas' ), strtoupper( $codigo ) ),
+            ] );
+        } else {
+            WC()->session->set( 'apreas_cupom_feedback', [
+                'tipo'  => 'erro',
+                'texto' => __( 'Cupom inválido ou não encontrado.', 'apreas' ),
+            ] );
+        }
+        WC()->cart->calculate_totals();
+    }
+
+    // ─────────────────────────────────────────────
+    // FRAGMENT — Feedback inline do cupom
+    // ─────────────────────────────────────────────
+    public function fragment_cupom_feedback( $fragments ) {
+        $feedback = WC()->session->get( 'apreas_cupom_feedback' );
+
+        $html = '<div id="apreas-cupom-feedback" style="margin-top:10px;">';
+        if ( ! empty( $feedback['tipo'] ) ) {
+            if ( $feedback['tipo'] === 'sucesso' ) {
+                $html .= '<div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:#f0fdf4;border:1px solid #86efac;border-radius:6px;font-size:13px;color:#15803d;">';
+                $html .= '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>';
+                $html .= '<span>' . wp_kses_post( $feedback['texto'] ) . '</span>';
+                $html .= '</div>';
+            } else {
+                $html .= '<div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:#fef2f2;border:1px solid #fca5a5;border-radius:6px;font-size:13px;color:#dc2626;">';
+                $html .= '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+                $html .= '<span>' . esc_html( $feedback['texto'] ) . '</span>';
+                $html .= '</div>';
+            }
+            // Limpa após exibir
+            WC()->session->set( 'apreas_cupom_feedback', null );
+        }
+        $html .= '</div>';
+
+        $fragments['#apreas-cupom-feedback'] = $html;
+        return $fragments;
+    }
+
+    // ─────────────────────────────────────────────
+    // ESCONDER CAMPO NATIVO DE CUPOM VIA CSS
+    // ─────────────────────────────────────────────
+    public function esconder_cupom_nativo_css() {
+        if ( ! is_checkout() ) return;
+        echo '<style>
+            .woocommerce-form-coupon-toggle,
+            .woocommerce-form-coupon,
+            .checkout_coupon,
+            .woocommerce-remove-coupon { display: none !important; }
+
+            /* Estilo premium para o botão Aplicar */
+            #btn_apreas_aplicar_cupom {
+                background-color: #1e293b !important;
+                color: #ffffff !important;
+                transition: background-color 0.2s ease;
+                border: none !important;
+            }
+            #btn_apreas_aplicar_cupom:hover {
+                background-color: #334155 !important;
+            }
+        </style>';
+    }
+
+    // ─────────────────────────────────────────────
     // HELPER — Verifica se há produto da categoria
     // ─────────────────────────────────────────────
     private function tem_produto_recordacao_escolar() {
@@ -108,7 +222,7 @@ class Checkout {
             return;
         }
 
-        echo '<div class="apreas-campos-aluno" style="margin-bottom:4rem; padding-bottom:6rem;">';
+        echo '<div class="apreas-campos-aluno" style="margin-bottom:4rem;">';
         echo '<h3>' . esc_html__( 'Informações do Aluno', 'apreas' ) . '</h3>';
 
         woocommerce_form_field( 'apreas_aluno', [
@@ -131,6 +245,76 @@ class Checkout {
             'required' => true,
             'class'    => [ 'form-row-last' ],
         ], $checkout->get_value( 'apreas_turma' ) );
+
+        // Adiciona um espaçador/quebra de linha para limpar o float do first/last
+        echo '<div style="clear:both;"></div>';
+
+        // ─────────────────────────────────────────────
+        // Design Customizado - Cupom de Desconto
+        // ─────────────────────────────────────────────
+        echo '<div class="apreas-cupom-desconto" style="margin-top:2rem; padding:1.5rem; background:#f8fafc; border:1px dashed #cbd5e1; border-radius:8px;">';
+        echo '<h4 style="margin-top:0; margin-bottom:1rem; font-size:16px; color:#334155; display:flex; align-items:center; gap:8px;">';
+        echo '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 12H16c-.7 2-2 3-4 3s-3.3-1-4-3H2.5"/><path d="M5.5 5.1L2 12v6c0 1.1.9 2 2 2h16a2 2 0 002-2v-6l-3.5-6.9A2 2 0 0017 4.5h-10a2 2 0 00-1.5.6z"/></svg>';
+        echo esc_html__( 'Tem um cupom de desconto?', 'apreas' ) . '</h4>';
+
+        // Label + linha com input e botão
+        echo '<label for="apreas_codigo_desconto" style="display:block; font-weight:600; font-size:13px; margin-bottom:6px; color:#374151;">' . esc_html__( 'Código do Cupom', 'apreas' ) . ' <span style="font-weight:400; color:#9ca3af;">(opcional)</span></label>';
+        echo '<div style="display:flex; gap:8px; align-items:center;">';
+        echo '<input type="text" id="apreas_codigo_desconto" name="apreas_codigo_desconto" placeholder="' . esc_attr__( 'Digite seu código aqui', 'apreas' ) . '" value="' . esc_attr( $checkout->get_value( 'apreas_codigo_desconto' ) ) . '" style="flex:1; height:44px; padding:0 12px; border:1px solid #d1d5db; border-radius:4px; font-size:14px; background:#fff; box-sizing:border-box;" />';
+        echo '<input type="hidden" id="apreas_remover_cupom" name="apreas_remover_cupom" value="0" />';
+        echo '<button type="button" id="btn_apreas_aplicar_cupom" class="button alt" style="flex-shrink:0; height:44px; padding:0 20px; font-size:14px; border-radius:4px; cursor:pointer;">Aplicar</button>';
+        echo '<button type="button" id="btn_apreas_remover_cupom" class="button" style="flex-shrink:0; height:44px; padding:0 16px; font-size:14px; border-radius:4px; cursor:pointer; display:none; background:#fee2e2; color:#dc2626; border-color:#fca5a5;">Remover</button>';
+        echo '</div>'; // fecha flex row (input + botões)
+
+        // Div de feedback inline — atualizado via fragment AJAX
+        echo '<div id="apreas-cupom-feedback" style="margin-top:10px;"></div>';
+
+        echo '<p style="font-size:12px; color:#64748b; margin-top:8px; margin-bottom:0;">Insira seu código e clique em <strong>Aplicar</strong> para ganhar descontos na sua compra.</p>';
+        echo '</div>'; // fecha apreas-cupom-desconto
+
+
+        // JavaScript: Aplicar e Remover cupom
+        echo "<script>
+        jQuery(document).ready(function($){
+
+            // Mostrar/ocultar botão Remover com base no valor do campo
+            function apreakToggleRemove() {
+                var val = $('#apreas_codigo_desconto').val().trim();
+                if ( val.length > 0 ) {
+                    $('#btn_apreas_remover_cupom').show();
+                } else {
+                    $('#btn_apreas_remover_cupom').hide();
+                }
+            }
+            apreakToggleRemove();
+            $('#apreas_codigo_desconto').on('input', apreakToggleRemove);
+
+            // Aplicar
+            $('#btn_apreas_aplicar_cupom').on('click', function(e){
+                e.preventDefault();
+                $('#apreas_remover_cupom').val('0');
+                $('body').trigger('update_checkout');
+            });
+
+            // Remover
+            $('#btn_apreas_remover_cupom').on('click', function(e){
+                e.preventDefault();
+                $('#apreas_remover_cupom').val('1');
+                $('#apreas_codigo_desconto').val('');
+                $(this).hide();
+                $('body').trigger('update_checkout');
+            });
+
+            // Enter no campo = Aplicar
+            $('#apreas_codigo_desconto').on('keypress', function(e){
+                if(e.which === 13) {
+                    e.preventDefault();
+                    $('#apreas_remover_cupom').val('0');
+                    $('body').trigger('update_checkout');
+                }
+            });
+        });
+        </script>";
 
         echo '</div>';
     }
