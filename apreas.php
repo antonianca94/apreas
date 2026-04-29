@@ -3,7 +3,7 @@
 Plugin Name: Apreas WP Plugin
 Plugin URI: https://apreas.com.br/
 Description: Recursos extras para os Alunos.
-Version: 2.1.2
+Version: 2.2.0
 Author: Apreas Development Team
 Author URI: https://apreas.com.br/
 Text Domain: apreas
@@ -56,6 +56,7 @@ class APREAS_Plugin
         add_action("plugins_loaded", [$this, "plugin_loaded"]);
         add_action("admin_enqueue_scripts", [$this, "load_admin_assets"]);
         add_action("wp_enqueue_scripts", [$this, "load_frontend_assets"]);
+        add_action("wp_footer", [$this, "render_minicart_html"]);
     }
 
     public function plugin_loaded()
@@ -65,6 +66,16 @@ class APREAS_Plugin
         $Escolas = \Apreas\Escolas::getInstance();
         // Campos extras do checkout WooCommerce (substitui plugin externo)
         $Checkout = \Apreas\Checkout::getInstance();
+
+        // ─────────────────────────────────────────────
+        // AJAX — Mini Carrinho: dados do carrinho
+        // ─────────────────────────────────────────────
+        add_action('wp_ajax_apreas_get_minicart_data',        [$this, 'ajax_get_minicart_data']);
+        add_action('wp_ajax_nopriv_apreas_get_minicart_data', [$this, 'ajax_get_minicart_data']);
+
+        // AJAX — Mini Carrinho: remover item
+        add_action('wp_ajax_apreas_remove_minicart_item',        [$this, 'ajax_remove_minicart_item']);
+        add_action('wp_ajax_nopriv_apreas_remove_minicart_item', [$this, 'ajax_remove_minicart_item']);
 
         if (is_admin()) {
             // INSTANCIAS
@@ -584,6 +595,163 @@ class APREAS_Plugin
         $this->enqueue_frontend_scripts();
     }
 
+    // ─────────────────────────────────────────────
+    // MINI CARRINHO — HTML do widget (wp_footer)
+    // ─────────────────────────────────────────────
+    public function render_minicart_html()
+    {
+        // Só exibe no frontend, fora do admin e quando WooCommerce está ativo
+        if (is_admin() || !function_exists('WC')) {
+            return;
+        }
+        $cart_url     = wc_get_cart_url();
+        $checkout_url = wc_get_checkout_url();
+        ?>
+        <!-- Apreas Mini Carrinho Flutuante -->
+        <div id="apreas-minicart-overlay" aria-hidden="true"></div>
+
+        <button id="apreas-minicart-trigger"
+                aria-label="Ver carrinho"
+                aria-expanded="false"
+                aria-controls="apreas-minicart-panel">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="9"  cy="21" r="1"/>
+                <circle cx="20" cy="21" r="1"/>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+            </svg>
+            <span id="apreas-minicart-badge" aria-live="polite">0</span>
+        </button>
+
+        <aside id="apreas-minicart-panel"
+               role="dialog"
+               aria-label="Mini Carrinho"
+               aria-modal="true">
+
+            <div class="apreas-minicart__header">
+                <div class="apreas-minicart__header-title">
+                    <div class="apreas-minicart__header-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="9"  cy="21" r="1"/>
+                            <circle cx="20" cy="21" r="1"/>
+                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                        </svg>
+                    </div>
+                    Meu Carrinho
+                </div>
+                <button class="apreas-minicart__close" aria-label="Fechar carrinho"
+                        onclick="document.getElementById('apreas-minicart-panel').classList.remove('apreas-minicart--open'); document.getElementById('apreas-minicart-overlay').classList.remove('apreas-minicart-overlay--visible');">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6"  y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="apreas-minicart__body">
+
+                <!-- Empty State -->
+                <div id="apreas-minicart-empty">
+                    <div class="apreas-minicart-empty__icon-wrap">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="9"  cy="21" r="1"/>
+                            <circle cx="20" cy="21" r="1"/>
+                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                        </svg>
+                    </div>
+                    <strong class="apreas-minicart-empty__title">Carrinho vazio</strong>
+                    <p class="apreas-minicart-empty__text">Adicione produtos para continuar comprando.</p>
+                </div>
+
+                <!-- Items (preenchido via JS) -->
+                <div id="apreas-minicart-items-wrap" style="display:none;">
+                    <ul id="apreas-minicart-items"></ul>
+                </div>
+
+            </div><!-- /.apreas-minicart__body -->
+
+            <!-- Rodapé com subtotal e botões -->
+            <div class="apreas-minicart__footer">
+                <div id="apreas-minicart-items-wrap-footer" style="display:none;">
+                    <div class="apreas-minicart__subtotal">
+                        <span class="apreas-minicart__subtotal-label">Subtotal</span>
+                        <span id="apreas-minicart-subtotal-value">R$&nbsp;0,00</span>
+                    </div>
+                    <div class="apreas-minicart__actions">
+                        <a href="<?php echo esc_url($checkout_url); ?>" class="apreas-minicart__btn-checkout">
+                            Finalizar Pedido
+                        </a>
+                        <a href="<?php echo esc_url($cart_url); ?>" class="apreas-minicart__btn-cart">
+                            Ver Carrinho
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </aside><!-- /#apreas-minicart-panel -->
+        <?php
+    }
+
+    // ─────────────────────────────────────────────
+    // AJAX — Retorna dados do carrinho (JSON)
+    // ─────────────────────────────────────────────
+    public function ajax_get_minicart_data()
+    {
+        check_ajax_referer('apreas_minicart_nonce', 'nonce');
+
+        if (!function_exists('WC') || !WC()->cart) {
+            wp_send_json_success(['count' => 0, 'subtotal' => '', 'items' => []]);
+        }
+
+        WC()->cart->calculate_totals();
+
+        $items = [];
+        foreach (WC()->cart->get_cart() as $key => $cart_item) {
+            $product = $cart_item['data'];
+            $thumb   = '';
+            $img_id  = $product->get_image_id();
+            if ($img_id) {
+                $src   = wp_get_attachment_image_src($img_id, 'thumbnail');
+                $thumb = $src ? $src[0] : '';
+            }
+            $items[] = [
+                'key'   => $key,
+                'name'  => $product->get_name(),
+                'qty'   => $cart_item['quantity'],
+                'price' => wc_price($product->get_price()),
+                'thumb' => $thumb,
+            ];
+        }
+
+        wp_send_json_success([
+            'count'    => WC()->cart->get_cart_contents_count(),
+            'subtotal' => WC()->cart->get_cart_subtotal(),
+            'items'    => $items,
+        ]);
+    }
+
+    // ─────────────────────────────────────────────
+    // AJAX — Remove item do carrinho
+    // ─────────────────────────────────────────────
+    public function ajax_remove_minicart_item()
+    {
+        check_ajax_referer('apreas_minicart_nonce', 'nonce');
+
+        $key = sanitize_text_field($_POST['key'] ?? '');
+        if (!$key || !function_exists('WC') || !WC()->cart) {
+            wp_send_json_error('Chave inválida');
+        }
+
+        $removed = WC()->cart->remove_cart_item($key);
+        if ($removed) {
+            WC()->cart->calculate_totals();
+            wp_send_json_success();
+        } else {
+            wp_send_json_error('Não foi possível remover o item');
+        }
+    }
+
     public function load_admin_assets()
     {
         $this->enqueue_admin_styles();
@@ -597,6 +765,12 @@ class APREAS_Plugin
             plugins_url("/admin/css/participantes.css", __FILE__),
             [],
             "1.0.33"
+        );
+        wp_enqueue_style(
+            "Apreas_Minicart_CSS",
+            plugins_url("/admin/css/minicart.css", __FILE__),
+            [],
+            "1.0.2"
         );
         wp_enqueue_style(
             "bootstrap",
@@ -668,6 +842,24 @@ class APREAS_Plugin
             [],
             "1.0.4",
             true
+        );
+        // Mini Carrinho Flutuante
+        wp_enqueue_script(
+            "Apreas_Minicart_JS",
+            plugins_url("/admin/js/minicart.js", __FILE__),
+            ["jquery"],
+            "1.0.0",
+            true
+        );
+        wp_localize_script(
+            "Apreas_Minicart_JS",
+            "apreas_minicart",
+            [
+                "ajax_url" => admin_url("admin-ajax.php"),
+                "nonce"    => wp_create_nonce("apreas_minicart_nonce"),
+                "cart_url"     => wc_get_cart_url(),
+                "checkout_url" => wc_get_checkout_url(),
+            ]
         );
     }
 
