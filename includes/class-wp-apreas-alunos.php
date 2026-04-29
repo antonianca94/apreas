@@ -362,6 +362,9 @@ class Alunos {
             'unidade'         => isset($data['unidade']) ? $data['unidade'] : '',
             'nome'            => isset($data['nome']) ? $data['nome'] : '',
             'ultimo_nome'     => isset($data['ultimo_nome']) ? $data['ultimo_nome'] : (isset($data['ultimo nome']) ? $data['ultimo nome'] : ''),
+            'imagem_upload_individual'  => isset($data['fotoindividual']) ? $data['fotoindividual'] : (isset($data['foto_individual']) ? $data['foto_individual'] : (isset($data['imagem_upload_individual']) ? $data['imagem_upload_individual'] : (isset($data['foto individual']) ? $data['foto individual'] : ''))),
+            'imagem_upload_individual2' => isset($data['fotodivertida']) ? $data['fotodivertida'] : (isset($data['foto_divertida']) ? $data['foto_divertida'] : (isset($data['imagem_upload_individual2']) ? $data['imagem_upload_individual2'] : (isset($data['foto divertida']) ? $data['foto divertida'] : ''))),
+            'imagem_upload_turma'       => isset($data['fotocoletiva']) ? $data['fotocoletiva'] : (isset($data['foto_coletiva']) ? $data['foto_coletiva'] : (isset($data['imagem_upload_turma']) ? $data['imagem_upload_turma'] : (isset($data['foto coletiva']) ? $data['foto coletiva'] : ''))),
         ];
 
         foreach ($meta_to_import as $key => $value) {

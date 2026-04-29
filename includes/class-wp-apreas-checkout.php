@@ -31,8 +31,8 @@ class Checkout {
         // Corrige mapeamento dos campos de endereço (bairro / cidade / estado)
         add_filter( 'woocommerce_checkout_fields',                        [ $this, 'corrigir_campos_endereco' ], 99 );
 
-        // Adiciona taxa de entrega fixa
-        add_action( 'woocommerce_cart_calculate_fees',                    [ $this, 'adicionar_taxa_entrega' ] );
+        // Adiciona taxa de entrega fixa'
+        //add_action( 'woocommerce_cart_calculate_fees',                    [ $this, 'adicionar_taxa_entrega' ] );
 
         // Aplica o cupom nativo digitado no campo customizado
         add_action( 'woocommerce_checkout_update_order_review',           [ $this, 'aplicar_cupom_nativo_customizado' ] );
