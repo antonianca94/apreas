@@ -58,6 +58,7 @@ class Alunos {
         $imagem_upload_individual = get_post_meta($post->ID, 'imagem_upload_individual', true);
         $imagem_upload_individual2 = get_post_meta($post->ID, 'imagem_upload_individual2', true);
         $imagem_upload_turma = get_post_meta($post->ID, 'imagem_upload_turma', true);
+        $faltou = get_post_meta($post->ID, 'faltou', true);
 
         // ESCOLAS
         $args = array(
@@ -248,7 +249,18 @@ class Alunos {
                 </div>
             </div>
         </div>
-        <!-- TURMAS -->
+        <!-- Faltou -->
+        <div class="row mt-4 mb-2">
+            <div class="col">
+                <div class="form-group">
+                    <label class="mb-2 fw-bold" style="cursor:pointer;">
+                        <input type="checkbox" name="faltou" value="1" <?php checked($faltou, '1'); ?> />
+                        Aluno Faltou? (Marque se o aluno não compareceu e portanto não possui fotos)
+                    </label>
+                </div>
+            </div>
+        </div>
+        <!-- Faltou -->
         <!-- IMAGEM -->
         <div class="row mb-4">
             <div class="col-xxl-6 mt-3">
@@ -342,6 +354,9 @@ class Alunos {
         if (isset($_POST['imagem_upload_turma'])) {
             update_post_meta($post_id, 'imagem_upload_turma', $_POST['imagem_upload_turma'] );
         }
+        
+        $faltou = isset($_POST['faltou']) ? '1' : '0';
+        update_post_meta($post_id, 'faltou', $faltou);
     }
 
     /**
@@ -362,13 +377,14 @@ class Alunos {
             'unidade'         => isset($data['unidade']) ? $data['unidade'] : '',
             'nome'            => isset($data['nome']) ? $data['nome'] : '',
             'ultimo_nome'     => isset($data['ultimo_nome']) ? $data['ultimo_nome'] : (isset($data['ultimo nome']) ? $data['ultimo nome'] : ''),
+            'faltou'          => isset($data['faltou']) ? $data['faltou'] : '',
             'imagem_upload_individual'  => isset($data['fotoindividual']) ? $data['fotoindividual'] : (isset($data['foto_individual']) ? $data['foto_individual'] : (isset($data['imagem_upload_individual']) ? $data['imagem_upload_individual'] : (isset($data['foto individual']) ? $data['foto individual'] : ''))),
             'imagem_upload_individual2' => isset($data['fotodivertida']) ? $data['fotodivertida'] : (isset($data['foto_divertida']) ? $data['foto_divertida'] : (isset($data['imagem_upload_individual2']) ? $data['imagem_upload_individual2'] : (isset($data['foto divertida']) ? $data['foto divertida'] : ''))),
             'imagem_upload_turma'       => isset($data['fotocoletiva']) ? $data['fotocoletiva'] : (isset($data['foto_coletiva']) ? $data['foto_coletiva'] : (isset($data['imagem_upload_turma']) ? $data['imagem_upload_turma'] : (isset($data['foto coletiva']) ? $data['foto coletiva'] : ''))),
         ];
 
         foreach ($meta_to_import as $key => $value) {
-            if (!empty($value)) {
+            if (!empty($value) || $value === '0' || $key === 'faltou') {
                 // Tratamento robusto para Data de Nascimento
                 if ($key === 'data_nascimento') {
                     $value = trim($value);
@@ -392,6 +408,11 @@ class Alunos {
                         $time = strtotime($value);
                         if ($time) $value = date('Y-m-d', $time);
                     }
+                }
+                
+                if ($key === 'faltou') {
+                    $v = strtolower(trim($value));
+                    $value = ($v === 'sim' || $v === 'true' || $v === '1' || $v === 'yes' || $v === 'verdadeiro' || $v === 'v') ? '1' : '0';
                 }
                 update_post_meta($post_id, $key, $value);
             }

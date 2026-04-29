@@ -86,7 +86,7 @@ class APREAS_Plugin
                     "unidade" => "Unidade",
                     "data_nascimento" => "Data de Nascimento",
                     "date" => "Data",
-                    // <--- Adicione esta linha aqui
+                    "faltou" => "Faltou?",
                 ];
 
                 return $new_columns;
@@ -96,6 +96,18 @@ class APREAS_Plugin
                 "manage_alunos_posts_custom_column",
                 function ($column, $post_id) {
                     switch ($column) {
+                        case "faltou":
+                            $faltou = get_post_meta($post_id, "faltou", true);
+                            $is_checked = ($faltou == "1");
+                            $toggle_class = $is_checked ? 'apreas-toggle apreas-toggle--on' : 'apreas-toggle';
+                            $label_text   = $is_checked ? 'Faltou' : 'Presente';
+                            $label_color  = $is_checked ? '#c0392b' : '#27ae60';
+                            echo '<div class="' . $toggle_class . '" data-post-id="' . $post_id . '" title="Clique para alternar">';
+                            echo '  <div class="apreas-toggle__track"><div class="apreas-toggle__thumb"></div></div>';
+                            echo '  <span class="apreas-toggle__label" style="color:' . $label_color . '">' . $label_text . '</span>';
+                            echo '</div>';
+                            break;
+
                         case "escola":
                             // Buscamos o ID da escola que está associado a este aluno
                             $escola_id = get_post_meta(
@@ -278,6 +290,98 @@ class APREAS_Plugin
                     }
                     $query->set("meta_query", $meta_query);
                 }
+            });
+
+            // AJAX handler para salvar o campo 'faltou' inline da listagem
+            add_action('wp_ajax_apreas_toggle_faltou', function () {
+                check_ajax_referer('apreas_toggle_faltou_nonce', 'nonce');
+                $post_id = intval($_POST['post_id']);
+                $value   = sanitize_text_field($_POST['value']);
+                if (!current_user_can('edit_post', $post_id)) {
+                    wp_send_json_error('Sem permissão');
+                }
+                update_post_meta($post_id, 'faltou', $value === '1' ? '1' : '0');
+                wp_send_json_success();
+            });
+
+            // Script inline para o toggle AJAX
+            add_action('admin_footer', function () {
+                global $pagenow, $typenow;
+                if ($pagenow !== 'edit.php' || $typenow !== 'alunos') return;
+                $nonce = wp_create_nonce('apreas_toggle_faltou_nonce');
+                echo "<style>
+                .apreas-toggle {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 8px;
+                    cursor: pointer;
+                    user-select: none;
+                }
+                .apreas-toggle__track {
+                    position: relative;
+                    width: 40px;
+                    height: 22px;
+                    background: #ccc;
+                    border-radius: 999px;
+                    transition: background 0.25s ease;
+                    flex-shrink: 0;
+                }
+                .apreas-toggle--on .apreas-toggle__track {
+                    background: #e74c3c;
+                }
+                .apreas-toggle__thumb {
+                    position: absolute;
+                    top: 3px;
+                    left: 3px;
+                    width: 16px;
+                    height: 16px;
+                    background: #fff;
+                    border-radius: 50%;
+                    box-shadow: 0 1px 4px rgba(0,0,0,.25);
+                    transition: transform 0.25s ease;
+                }
+                .apreas-toggle--on .apreas-toggle__thumb {
+                    transform: translateX(18px);
+                }
+                .apreas-toggle__label {
+                    font-size: 11px;
+                    font-weight: 700;
+                    letter-spacing: .3px;
+                    transition: color 0.25s ease;
+                    min-width: 52px;
+                }
+                .apreas-toggle--loading .apreas-toggle__track {
+                    opacity: 0.5;
+                    pointer-events: none;
+                }
+                </style>";
+                echo "<script>
+                jQuery(document).ready(function($) {
+                    $(document).on('click', '.apreas-toggle', function() {
+                        var el      = $(this);
+                        var post_id = el.data('post-id');
+                        var is_on   = el.hasClass('apreas-toggle--on');
+                        var value   = is_on ? '0' : '1';
+                        el.addClass('apreas-toggle--loading');
+                        $.post(ajaxurl, {
+                            action:  'apreas_toggle_faltou',
+                            nonce:   '{$nonce}',
+                            post_id: post_id,
+                            value:   value
+                        }, function(res) {
+                            el.removeClass('apreas-toggle--loading');
+                            if (res.success) {
+                                el.toggleClass('apreas-toggle--on', value === '1');
+                                if (value === '1') {
+                                    el.find('.apreas-toggle__label').text('Faltou').css('color','#c0392b');
+                                } else {
+                                    el.find('.apreas-toggle__label').text('Presente').css('color','#27ae60');
+                                }
+                            }
+                        });
+                    });
+                });
+                </script>";
             });
 
             //FIM COLUNA ALUNOS
