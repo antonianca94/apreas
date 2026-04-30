@@ -17,9 +17,17 @@
         $badge      = $('#apreas-minicart-badge');
         $itemsList  = $('#apreas-minicart-items');
         $subtotalVal= $('#apreas-minicart-subtotal-value');
+        var $feeRow = $('#apreas-minicart-fee-row');
+        var $feeVal = $('#apreas-minicart-fee-value');
+        var $totalVal= $('#apreas-minicart-total-value');
         $emptyMsg   = $('#apreas-minicart-empty');
         $itemsWrap  = $('#apreas-minicart-items-wrap');
         $footerWrap = $('#apreas-minicart-items-wrap-footer');
+
+        // Store these for renderCart if not global
+        window.$apreas_fee_row = $feeRow;
+        window.$apreas_fee_val = $feeVal;
+        window.$apreas_total_val = $totalVal;
 
         bindEvents();
         updateFromFragment();
@@ -150,6 +158,17 @@
             });
 
             $subtotalVal.html(subtotal);
+
+            // Fee
+            if (data.fee_raw && parseFloat(data.fee_raw) > 0) {
+                window.$apreas_fee_val.html(data.fee);
+                window.$apreas_fee_row.css('display', 'flex');
+            } else {
+                window.$apreas_fee_row.hide();
+            }
+
+            // Total
+            window.$apreas_total_val.html(data.total);
         }
     }
 

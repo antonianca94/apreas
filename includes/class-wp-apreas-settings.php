@@ -40,6 +40,7 @@ class Settings
     {
         register_setting('apreas_settings_group', 'apreas_minicart_enabled');
         register_setting('apreas_settings_group', 'apreas_taxa_fixa_enabled');
+        register_setting('apreas_settings_group', 'apreas_taxa_fixa_valor');
         register_setting('apreas_settings_group', 'apreas_custom_coupon_enabled');
     }
 
@@ -88,16 +89,27 @@ class Settings
                     <div class="apreas-setting-row">
                         <div class="apreas-setting-info">
                             <strong>Taxa de Entrega Fixa</strong>
-                            <p>Adiciona uma taxa fixa de R$ 20,00 no checkout para todos os pedidos.</p>
+                            <p>Adiciona uma taxa fixa no checkout para todos os pedidos.</p>
+                            
+                            <div class="apreas-setting-input-wrapper" style="margin-top: 12px; <?php echo get_option('apreas_taxa_fixa_enabled', 0) ? '' : 'display: none;'; ?>" id="wrapper_taxa_fixa_valor">
+                                <label style="font-size: 12px; color: var(--apreas-text-muted); display: block; margin-bottom: 4px;">Valor da Taxa (R$)</label>
+                                <input type="number" step="0.01" name="apreas_taxa_fixa_valor" value="<?php echo esc_attr(get_option('apreas_taxa_fixa_valor', '20.00')); ?>" class="regular-text" style="width: 100px; border-radius: 4px;">
+                            </div>
                         </div>
                         <div class="apreas-setting-control">
                             <label class="apreas-switch">
                                 <input type="hidden" name="apreas_taxa_fixa_enabled" value="0">
-                                <input type="checkbox" name="apreas_taxa_fixa_enabled" value="1" <?php checked(1, get_option('apreas_taxa_fixa_enabled', 0)); ?>>
+                                <input type="checkbox" name="apreas_taxa_fixa_enabled" value="1" id="apreas_taxa_fixa_enabled" <?php checked(1, get_option('apreas_taxa_fixa_enabled', 0)); ?>>
                                 <span class="apreas-slider round"></span>
                             </label>
                         </div>
                     </div>
+
+                    <script>
+                        document.getElementById('apreas_taxa_fixa_enabled').addEventListener('change', function() {
+                            document.getElementById('wrapper_taxa_fixa_valor').style.display = this.checked ? 'block' : 'none';
+                        });
+                    </script>
 
                     <div class="apreas-setting-row">
                         <div class="apreas-setting-info">

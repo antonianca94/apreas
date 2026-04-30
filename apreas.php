@@ -675,10 +675,26 @@ class APREAS_Plugin
             <!-- Rodapé com subtotal e botões -->
             <div class="apreas-minicart__footer">
                 <div id="apreas-minicart-items-wrap-footer" style="display:none;">
-                    <div class="apreas-minicart__subtotal">
-                        <span class="apreas-minicart__subtotal-label">Subtotal</span>
-                        <span id="apreas-minicart-subtotal-value">R$&nbsp;0,00</span>
+                    <div class="apreas-minicart__summary">
+                        <div class="apreas-minicart__summary-row">
+                            <span class="apreas-minicart__summary-label">Subtotal</span>
+                            <span id="apreas-minicart-subtotal-value" class="apreas-minicart__summary-value">R$&nbsp;0,00</span>
+                        </div>
+                        
+                        <div id="apreas-minicart-fee-row" class="apreas-minicart__summary-row apreas-minicart__summary-row--fee" style="display:none;">
+                            <span class="apreas-minicart__summary-label">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+                                Taxa de Entrega
+                            </span>
+                            <span id="apreas-minicart-fee-value" class="apreas-minicart__summary-value">R$&nbsp;0,00</span>
+                        </div>
+                        
+                        <div class="apreas-minicart__summary-total">
+                            <span class="apreas-minicart__total-label">Total</span>
+                            <span id="apreas-minicart-total-value" class="apreas-minicart__total-value">R$&nbsp;0,00</span>
+                        </div>
                     </div>
+                    
                     <div class="apreas-minicart__actions">
                         <a href="<?php echo esc_url($checkout_url); ?>" class="apreas-minicart__btn-checkout">
                             Finalizar Pedido
@@ -731,6 +747,9 @@ class APREAS_Plugin
         wp_send_json_success([
             'count'    => WC()->cart->get_cart_contents_count(),
             'subtotal' => WC()->cart->get_cart_subtotal(),
+            'fee'      => wc_price( WC()->cart->get_fee_total() ),
+            'fee_raw'  => WC()->cart->get_fee_total(),
+            'total'    => WC()->cart->get_total(),
             'items'    => $items,
         ]);
     }

@@ -103,8 +103,8 @@ class Checkout {
             return;
         }
 
-        // Valor fixo do frete/taxa de entrega (exemplo: 20 reais)
-        $valor_frete = 20.00;
+        // Valor fixo do frete/taxa de entrega vindo das configurações (default 20.00)
+        $valor_frete = floatval( get_option( 'apreas_taxa_fixa_valor', 20.00 ) );
 
         // Adiciona a taxa no final da compra
         $cart->add_fee( __( 'Taxa de Entrega', 'apreas' ), $valor_frete, false );

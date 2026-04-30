@@ -340,39 +340,78 @@
     cursor: not-allowed;
 }
 
-/* ── Rodapé ── */
+/* ── Rodapé / Resumo ── */
 .apreas-minicart__footer {
-    padding: 16px 20px;
+    padding: 20px;
     border-top: 1px solid #f3f4f6;
-    background: #fff;
+    background: #ffffff;
     flex-shrink: 0;
 }
 
-#apreas-minicart-items-wrap {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
+.apreas-minicart__summary {
+    background: #f8fafc;
+    border: 1px solid #f1f5f9;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 20px;
 }
 
-.apreas-minicart__subtotal {
+.apreas-minicart__summary-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 14px;
+    margin-bottom: 10px;
 }
 
-.apreas-minicart__subtotal-label {
-    font-size: 13px;
-    color: #6b7280;
+.apreas-minicart__summary-row:last-of-type {
+    margin-bottom: 0;
+}
+
+.apreas-minicart__summary-label {
+    font-size: 12px;
+    color: #64748b;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.4px;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
 }
 
-#apreas-minicart-subtotal-value {
-    font-size: 18px;
-    font-weight: bold;
+.apreas-minicart__summary-value {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.apreas-minicart__summary-row--fee .apreas-minicart__summary-label {
+    color: #0891b2; /* Um azul/ciano suave para destacar a taxa de forma profissional */
+}
+
+.apreas-minicart__summary-row--fee .apreas-minicart__summary-value {
+    color: #0891b2;
+}
+
+.apreas-minicart__summary-total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 2px dashed #e2e8f0;
+}
+
+.apreas-minicart__total-label {
+    font-size: 14px;
+    font-weight: 800;
     color: #111827;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+.apreas-minicart__total-value {
+    font-size: 22px;
+    font-weight: 900;
+    color: #D90D28;
 }
 
 .apreas-minicart__actions {
