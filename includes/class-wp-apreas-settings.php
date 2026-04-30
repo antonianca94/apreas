@@ -39,6 +39,7 @@ class Settings
     public function register_settings()
     {
         register_setting('apreas_settings_group', 'apreas_minicart_enabled');
+        register_setting('apreas_settings_group', 'apreas_taxa_fixa_enabled');
     }
 
     public function render_settings_page()
@@ -71,6 +72,27 @@ class Settings
                             <label class="apreas-switch">
                                 <input type="hidden" name="apreas_minicart_enabled" value="0">
                                 <input type="checkbox" name="apreas_minicart_enabled" value="1" <?php checked(1, get_option('apreas_minicart_enabled', 1)); ?>>
+                                <span class="apreas-slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="apreas-card">
+                    <div class="apreas-card-header">
+                        <span class="dashicons dashicons-money-alt"></span>
+                        <h2>Módulo de Taxas</h2>
+                    </div>
+                    
+                    <div class="apreas-setting-row">
+                        <div class="apreas-setting-info">
+                            <strong>Taxa de Entrega Fixa</strong>
+                            <p>Adiciona uma taxa fixa de R$ 20,00 no checkout para todos os pedidos.</p>
+                        </div>
+                        <div class="apreas-setting-control">
+                            <label class="apreas-switch">
+                                <input type="hidden" name="apreas_taxa_fixa_enabled" value="0">
+                                <input type="checkbox" name="apreas_taxa_fixa_enabled" value="1" <?php checked(1, get_option('apreas_taxa_fixa_enabled', 0)); ?>>
                                 <span class="apreas-slider round"></span>
                             </label>
                         </div>
