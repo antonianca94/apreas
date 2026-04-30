@@ -778,7 +778,7 @@ class APREAS_Plugin
                 "Apreas_Minicart_CSS",
                 plugins_url("/admin/css/minicart.css", __FILE__),
                 [],
-                "1.0.2"
+                "1.0.5"
             );
         }
         wp_enqueue_style(

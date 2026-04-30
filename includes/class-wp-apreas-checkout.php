@@ -200,13 +200,13 @@ class Checkout {
 
             /* Estilo premium para o botão Aplicar */
             #btn_apreas_aplicar_cupom {
-                background-color: #1e293b !important;
+                background-color: #D90D28 !important;
                 color: #ffffff !important;
                 transition: background-color 0.2s ease;
                 border: none !important;
             }
             #btn_apreas_aplicar_cupom:hover {
-                background-color: #334155 !important;
+                background-color: #b00b20 !important;
             }
         </style>';
     }

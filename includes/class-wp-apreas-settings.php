@@ -107,7 +107,7 @@ class Settings
 
         <style>
             :root {
-                --apreas-primary: #2271b1;
+                --apreas-primary: #D90D28;
                 --apreas-bg: #f0f0f1;
                 --apreas-card-bg: #ffffff;
                 --apreas-text: #1d2327;
