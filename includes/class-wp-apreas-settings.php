@@ -40,6 +40,7 @@ class Settings
     {
         register_setting('apreas_settings_group', 'apreas_minicart_enabled');
         register_setting('apreas_settings_group', 'apreas_taxa_fixa_enabled');
+        register_setting('apreas_settings_group', 'apreas_custom_coupon_enabled');
     }
 
     public function render_settings_page()
@@ -81,7 +82,7 @@ class Settings
                 <div class="apreas-card">
                     <div class="apreas-card-header">
                         <span class="dashicons dashicons-money-alt"></span>
-                        <h2>Módulo de Taxas</h2>
+                        <h2>Módulo de Taxas e Descontos</h2>
                     </div>
                     
                     <div class="apreas-setting-row">
@@ -93,6 +94,20 @@ class Settings
                             <label class="apreas-switch">
                                 <input type="hidden" name="apreas_taxa_fixa_enabled" value="0">
                                 <input type="checkbox" name="apreas_taxa_fixa_enabled" value="1" <?php checked(1, get_option('apreas_taxa_fixa_enabled', 0)); ?>>
+                                <span class="apreas-slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="apreas-setting-row">
+                        <div class="apreas-setting-info">
+                            <strong>Cupom de Desconto Customizado</strong>
+                            <p>Substitui o campo de cupom padrão do WooCommerce por uma versão otimizada no checkout.</p>
+                        </div>
+                        <div class="apreas-setting-control">
+                            <label class="apreas-switch">
+                                <input type="hidden" name="apreas_custom_coupon_enabled" value="0">
+                                <input type="checkbox" name="apreas_custom_coupon_enabled" value="1" <?php checked(1, get_option('apreas_custom_coupon_enabled', 1)); ?>>
                                 <span class="apreas-slider round"></span>
                             </label>
                         </div>

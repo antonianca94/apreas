@@ -34,16 +34,18 @@ class Checkout {
         // Adiciona taxa de entrega fixa
         add_action( 'woocommerce_cart_calculate_fees',                    [ $this, 'adicionar_taxa_entrega' ] );
 
-        // Aplica o cupom nativo digitado no campo customizado
-        add_action( 'woocommerce_checkout_update_order_review',           [ $this, 'aplicar_cupom_nativo_customizado' ] );
+        // Remove o bloco nativo de cupom do WooCommerce (Sempre oculto)
+        remove_action( 'woocommerce_before_checkout_form', 'woocommerce_checkout_coupon_form', 10 );
+        add_action( 'wp_head', [ $this, 'esconder_cupom_nativo_css' ] );
 
-        // Injeta o feedback do cupom como fragment (mensagem inline)
-        add_filter( 'woocommerce_update_order_review_fragments',          [ $this, 'fragment_cupom_feedback' ] );
+        // Recursos de Cupom Customizado
+        if ( get_option( 'apreas_custom_coupon_enabled', 1 ) ) {
+            // Aplica o cupom nativo digitado no campo customizado
+            add_action( 'woocommerce_checkout_update_order_review',           [ $this, 'aplicar_cupom_nativo_customizado' ] );
 
-        // Remove o bloco nativo de cupom do WooCommerce (usamos o campo customizado)
-        // Obs: não desativamos woocommerce_coupons_enabled para não bloquear apply_coupon()
-        remove_action( 'woocommerce_before_checkout_form',                'woocommerce_checkout_coupon_form', 10 );
-        add_action( 'wp_head',                                            [ $this, 'esconder_cupom_nativo_css' ] );
+            // Injeta o feedback do cupom como fragment (mensagem inline)
+            add_filter( 'woocommerce_update_order_review_fragments',          [ $this, 'fragment_cupom_feedback' ] );
+        }
     }
 
     // ─────────────────────────────────────────────
@@ -262,69 +264,71 @@ class Checkout {
         // ─────────────────────────────────────────────
         // Design Customizado - Cupom de Desconto
         // ─────────────────────────────────────────────
-        echo '<div class="apreas-cupom-desconto" style="margin-top:2rem; padding:1.5rem; background:#f8fafc; border:1px dashed #cbd5e1; border-radius:8px;">';
-        echo '<h4 style="margin-top:0; margin-bottom:1rem; font-size:16px; color:#334155; display:flex; align-items:center; gap:8px;">';
-        echo '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 12H16c-.7 2-2 3-4 3s-3.3-1-4-3H2.5"/><path d="M5.5 5.1L2 12v6c0 1.1.9 2 2 2h16a2 2 0 002-2v-6l-3.5-6.9A2 2 0 0017 4.5h-10a2 2 0 00-1.5.6z"/></svg>';
-        echo esc_html__( 'Tem um cupom de desconto?', 'apreas' ) . '</h4>';
+        if ( get_option( 'apreas_custom_coupon_enabled', 1 ) ) {
+            echo '<div class="apreas-cupom-desconto" style="margin-top:2rem; padding:1.5rem; background:#f8fafc; border:1px dashed #cbd5e1; border-radius:8px;">';
+            echo '<h4 style="margin-top:0; margin-bottom:1rem; font-size:16px; color:#334155; display:flex; align-items:center; gap:8px;">';
+            echo '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 12H16c-.7 2-2 3-4 3s-3.3-1-4-3H2.5"/><path d="M5.5 5.1L2 12v6c0 1.1.9 2 2 2h16a2 2 0 002-2v-6l-3.5-6.9A2 2 0 0017 4.5h-10a2 2 0 00-1.5.6z"/></svg>';
+            echo esc_html__( 'Tem um cupom de desconto?', 'apreas' ) . '</h4>';
 
-        // Label + linha com input e botão
-        echo '<label for="apreas_codigo_desconto" style="display:block; font-weight:600; font-size:13px; margin-bottom:6px; color:#374151;">' . esc_html__( 'Código do Cupom', 'apreas' ) . ' <span style="font-weight:400; color:#9ca3af;">(opcional)</span></label>';
-        echo '<div style="display:flex; gap:8px; align-items:center;">';
-        echo '<input type="text" id="apreas_codigo_desconto" name="apreas_codigo_desconto" placeholder="' . esc_attr__( 'Digite seu código aqui', 'apreas' ) . '" value="' . esc_attr( $checkout->get_value( 'apreas_codigo_desconto' ) ) . '" style="flex:1; height:44px; padding:0 12px; border:1px solid #d1d5db; border-radius:4px; font-size:14px; background:#fff; box-sizing:border-box;" />';
-        echo '<input type="hidden" id="apreas_remover_cupom" name="apreas_remover_cupom" value="0" />';
-        echo '<button type="button" id="btn_apreas_aplicar_cupom" class="button alt" style="flex-shrink:0; height:44px; padding:0 20px; font-size:14px; border-radius:4px; cursor:pointer;">Aplicar</button>';
-        echo '<button type="button" id="btn_apreas_remover_cupom" class="button" style="flex-shrink:0; height:44px; padding:0 16px; font-size:14px; border-radius:4px; cursor:pointer; display:none; background:#fee2e2; color:#dc2626; border-color:#fca5a5;">Remover</button>';
-        echo '</div>'; // fecha flex row (input + botões)
+            // Label + linha com input e botão
+            echo '<label for="apreas_codigo_desconto" style="display:block; font-weight:600; font-size:13px; margin-bottom:6px; color:#374151;">' . esc_html__( 'Código do Cupom', 'apreas' ) . ' <span style="font-weight:400; color:#9ca3af;">(opcional)</span></label>';
+            echo '<div style="display:flex; gap:8px; align-items:center;">';
+            echo '<input type="text" id="apreas_codigo_desconto" name="apreas_codigo_desconto" placeholder="' . esc_attr__( 'Digite seu código aqui', 'apreas' ) . '" value="' . esc_attr( $checkout->get_value( 'apreas_codigo_desconto' ) ) . '" style="flex:1; height:44px; padding:0 12px; border:1px solid #d1d5db; border-radius:4px; font-size:14px; background:#fff; box-sizing:border-box;" />';
+            echo '<input type="hidden" id="apreas_remover_cupom" name="apreas_remover_cupom" value="0" />';
+            echo '<button type="button" id="btn_apreas_aplicar_cupom" class="button alt" style="flex-shrink:0; height:44px; padding:0 20px; font-size:14px; border-radius:4px; cursor:pointer;">Aplicar</button>';
+            echo '<button type="button" id="btn_apreas_remover_cupom" class="button" style="flex-shrink:0; height:44px; padding:0 16px; font-size:14px; border-radius:4px; cursor:pointer; display:none; background:#fee2e2; color:#dc2626; border-color:#fca5a5;">Remover</button>';
+            echo '</div>'; // fecha flex row (input + botões)
 
-        // Div de feedback inline — atualizado via fragment AJAX
-        echo '<div id="apreas-cupom-feedback" style="margin-top:10px;"></div>';
+            // Div de feedback inline — atualizado via fragment AJAX
+            echo '<div id="apreas-cupom-feedback" style="margin-top:10px;"></div>';
 
-        echo '<p style="font-size:12px; color:#64748b; margin-top:8px; margin-bottom:0;">Insira seu código e clique em <strong>Aplicar</strong> para ganhar descontos na sua compra.</p>';
-        echo '</div>'; // fecha apreas-cupom-desconto
+            echo '<p style="font-size:12px; color:#64748b; margin-top:8px; margin-bottom:0;">Insira seu código e clique em <strong>Aplicar</strong> para ganhar descontos na sua compra.</p>';
+            echo '</div>'; // fecha apreas-cupom-desconto
 
 
-        // JavaScript: Aplicar e Remover cupom
-        echo "<script>
-        jQuery(document).ready(function($){
+            // JavaScript: Aplicar e Remover cupom
+            echo "<script>
+            jQuery(document).ready(function($){
 
-            // Mostrar/ocultar botão Remover com base no valor do campo
-            function apreakToggleRemove() {
-                var val = $('#apreas_codigo_desconto').val().trim();
-                if ( val.length > 0 ) {
-                    $('#btn_apreas_remover_cupom').show();
-                } else {
-                    $('#btn_apreas_remover_cupom').hide();
+                // Mostrar/ocultar botão Remover com base no valor do campo
+                function apreakToggleRemove() {
+                    var val = $('#apreas_codigo_desconto').val().trim();
+                    if ( val.length > 0 ) {
+                        $('#btn_apreas_remover_cupom').show();
+                    } else {
+                        $('#btn_apreas_remover_cupom').hide();
+                    }
                 }
-            }
-            apreakToggleRemove();
-            $('#apreas_codigo_desconto').on('input', apreakToggleRemove);
+                apreakToggleRemove();
+                $('#apreas_codigo_desconto').on('input', apreakToggleRemove);
 
-            // Aplicar
-            $('#btn_apreas_aplicar_cupom').on('click', function(e){
-                e.preventDefault();
-                $('#apreas_remover_cupom').val('0');
-                $('body').trigger('update_checkout');
-            });
-
-            // Remover
-            $('#btn_apreas_remover_cupom').on('click', function(e){
-                e.preventDefault();
-                $('#apreas_remover_cupom').val('1');
-                $('#apreas_codigo_desconto').val('');
-                $(this).hide();
-                $('body').trigger('update_checkout');
-            });
-
-            // Enter no campo = Aplicar
-            $('#apreas_codigo_desconto').on('keypress', function(e){
-                if(e.which === 13) {
+                // Aplicar
+                $('#btn_apreas_aplicar_cupom').on('click', function(e){
                     e.preventDefault();
                     $('#apreas_remover_cupom').val('0');
                     $('body').trigger('update_checkout');
-                }
+                });
+
+                // Remover
+                $('#btn_apreas_remover_cupom').on('click', function(e){
+                    e.preventDefault();
+                    $('#apreas_remover_cupom').val('1');
+                    $('#apreas_codigo_desconto').val('');
+                    $(this).hide();
+                    $('body').trigger('update_checkout');
+                });
+
+                // Enter no campo = Aplicar
+                $('#apreas_codigo_desconto').on('keypress', function(e){
+                    if(e.which === 13) {
+                        e.preventDefault();
+                        $('#apreas_remover_cupom').val('0');
+                        $('body').trigger('update_checkout');
+                    }
+                });
             });
-        });
-        </script>";
+            </script>";
+        }
 
         echo '</div>';
     }
