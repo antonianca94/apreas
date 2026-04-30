@@ -66,6 +66,7 @@ class APREAS_Plugin
         $Escolas = \Apreas\Escolas::getInstance();
         // Campos extras do checkout WooCommerce (substitui plugin externo)
         $Checkout = \Apreas\Checkout::getInstance();
+        $Settings = \Apreas\Settings::getInstance();
 
         // ─────────────────────────────────────────────
         // AJAX — Mini Carrinho: dados do carrinho
@@ -600,8 +601,8 @@ class APREAS_Plugin
     // ─────────────────────────────────────────────
     public function render_minicart_html()
     {
-        // Só exibe no frontend, fora do admin e quando WooCommerce está ativo
-        if (is_admin() || !function_exists('WC')) {
+        // Só exibe no frontend, fora do admin e quando WooCommerce está ativo e recurso habilitado
+        if (is_admin() || !function_exists('WC') || !get_option('apreas_minicart_enabled', 1)) {
             return;
         }
         $cart_url     = wc_get_cart_url();
@@ -698,6 +699,9 @@ class APREAS_Plugin
     // ─────────────────────────────────────────────
     public function ajax_get_minicart_data()
     {
+        if (!get_option('apreas_minicart_enabled', 1)) {
+            wp_send_json_error('Recurso desativado');
+        }
         check_ajax_referer('apreas_minicart_nonce', 'nonce');
 
         if (!function_exists('WC') || !WC()->cart) {
@@ -736,6 +740,9 @@ class APREAS_Plugin
     // ─────────────────────────────────────────────
     public function ajax_remove_minicart_item()
     {
+        if (!get_option('apreas_minicart_enabled', 1)) {
+            wp_send_json_error('Recurso desativado');
+        }
         check_ajax_referer('apreas_minicart_nonce', 'nonce');
 
         $key = sanitize_text_field($_POST['key'] ?? '');
@@ -766,12 +773,14 @@ class APREAS_Plugin
             [],
             "1.0.33"
         );
-        wp_enqueue_style(
-            "Apreas_Minicart_CSS",
-            plugins_url("/admin/css/minicart.css", __FILE__),
-            [],
-            "1.0.2"
-        );
+        if (get_option('apreas_minicart_enabled', 1)) {
+            wp_enqueue_style(
+                "Apreas_Minicart_CSS",
+                plugins_url("/admin/css/minicart.css", __FILE__),
+                [],
+                "1.0.2"
+            );
+        }
         wp_enqueue_style(
             "bootstrap",
             "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css",
@@ -844,23 +853,25 @@ class APREAS_Plugin
             true
         );
         // Mini Carrinho Flutuante
-        wp_enqueue_script(
-            "Apreas_Minicart_JS",
-            plugins_url("/admin/js/minicart.js", __FILE__),
-            ["jquery"],
-            "1.0.0",
-            true
-        );
-        wp_localize_script(
-            "Apreas_Minicart_JS",
-            "apreas_minicart",
-            [
-                "ajax_url" => admin_url("admin-ajax.php"),
-                "nonce"    => wp_create_nonce("apreas_minicart_nonce"),
-                "cart_url"     => wc_get_cart_url(),
-                "checkout_url" => wc_get_checkout_url(),
-            ]
-        );
+        if (get_option('apreas_minicart_enabled', 1)) {
+            wp_enqueue_script(
+                "Apreas_Minicart_JS",
+                plugins_url("/admin/js/minicart.js", __FILE__),
+                ["jquery"],
+                "1.0.0",
+                true
+            );
+            wp_localize_script(
+                "Apreas_Minicart_JS",
+                "apreas_minicart",
+                [
+                    "ajax_url" => admin_url("admin-ajax.php"),
+                    "nonce"    => wp_create_nonce("apreas_minicart_nonce"),
+                    "cart_url"     => wc_get_cart_url(),
+                    "checkout_url" => wc_get_checkout_url(),
+                ]
+            );
+        }
     }
 
     private function enqueue_admin_styles()
