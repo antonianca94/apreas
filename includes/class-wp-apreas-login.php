@@ -146,7 +146,7 @@ class Login {
     // HELPER: gera o HTML do shortcode de data
     // span_class: classe CSS que o JS usa para popular o valor
     // ============================================================
-    private function render_data_shortcode($a, $span_class) {
+    private function render_data_shortcode($a, $span_class, $content = null) {
         $wrap_style = '';
         if (!empty($a['alinhar']))    $wrap_style .= 'text-align:'    . esc_attr($a['alinhar'])    . ';';
         if (!empty($a['fonte']))      $wrap_style .= 'font-family:'   . esc_attr($a['fonte'])      . ';';
@@ -166,53 +166,60 @@ class Login {
 
         $show_label = ($a['mostrar_label'] !== 'false' && $a['mostrar_label'] !== '0' && !empty($a['label']));
 
-        ob_start(); ?>
-        <span class="apreas-data-wrap" style="<?php echo $wrap_style; ?>"><?php if ($show_label): ?><strong class="apreas-data-label" style="<?php echo $label_style; ?>"><?php echo esc_html($a['label']); ?> </strong><?php endif; ?><span class="<?php echo esc_attr($span_class); ?>" style="<?php echo $val_style; ?>"></span></span>
-        <?php
-        return trim(ob_get_clean());
+        $output = '<span class="apreas-data-wrap" style="' . $wrap_style . '">';
+        if ($show_label) {
+            $output .= '<strong class="apreas-data-label" style="' . $label_style . '">' . esc_html($a['label']) . ' </strong>';
+        }
+        $output .= '<span class="' . esc_attr($span_class) . '" style="' . $val_style . '"></span>';
+        if ($content !== null) {
+            $output .= do_shortcode($content);
+        }
+        $output .= '</span>';
+
+        return $output;
     }
 
     // [lote1_escolha_inicio] — Lote 1 · data início de escolha
-    function shortcode_lote1_escolha_inicio($atts) {
+    function shortcode_lote1_escolha_inicio($atts, $content = null) {
         $a = $this->atts_data_shortcode($atts, '');
         // Detecta o sufixo (escola ou evento) via atributo 'tipo', padrão: escola
         $tipo = isset($atts['tipo']) && $atts['tipo'] === 'evento' ? 'evento' : 'escola';
-        return $this->render_data_shortcode($a, 'l1_escolha_data_inicio_' . $tipo);
+        return $this->render_data_shortcode($a, 'l1_escolha_data_inicio_' . $tipo, $content);
     }
 
     // [lote1_escolha_fim] — Lote 1 · data fim de escolha
-    function shortcode_lote1_escolha_fim($atts) {
+    function shortcode_lote1_escolha_fim($atts, $content = null) {
         $a = $this->atts_data_shortcode($atts, '');
         $tipo = isset($atts['tipo']) && $atts['tipo'] === 'evento' ? 'evento' : 'escola';
-        return $this->render_data_shortcode($a, 'l1_escolha_data_fim_' . $tipo);
+        return $this->render_data_shortcode($a, 'l1_escolha_data_fim_' . $tipo, $content);
     }
 
     // [lote1_entrega] — Lote 1 · data de entrega
-    function shortcode_lote1_entrega($atts) {
+    function shortcode_lote1_entrega($atts, $content = null) {
         $a = $this->atts_data_shortcode($atts, '');
         $tipo = isset($atts['tipo']) && $atts['tipo'] === 'evento' ? 'evento' : 'escola';
-        return $this->render_data_shortcode($a, 'l1_entrega_data_' . $tipo);
+        return $this->render_data_shortcode($a, 'l1_entrega_data_' . $tipo, $content);
     }
 
     // [lote2_escolha_inicio] — Lote 2 · data início de escolha
-    function shortcode_lote2_escolha_inicio($atts) {
+    function shortcode_lote2_escolha_inicio($atts, $content = null) {
         $a = $this->atts_data_shortcode($atts, '');
         $tipo = isset($atts['tipo']) && $atts['tipo'] === 'evento' ? 'evento' : 'escola';
-        return $this->render_data_shortcode($a, 'l2_escolha_data_inicio_' . $tipo);
+        return $this->render_data_shortcode($a, 'l2_escolha_data_inicio_' . $tipo, $content);
     }
 
     // [lote2_escolha_fim] — Lote 2 · data fim de escolha
-    function shortcode_lote2_escolha_fim($atts) {
+    function shortcode_lote2_escolha_fim($atts, $content = null) {
         $a = $this->atts_data_shortcode($atts, '');
         $tipo = isset($atts['tipo']) && $atts['tipo'] === 'evento' ? 'evento' : 'escola';
-        return $this->render_data_shortcode($a, 'l2_escolha_data_fim_' . $tipo);
+        return $this->render_data_shortcode($a, 'l2_escolha_data_fim_' . $tipo, $content);
     }
 
     // [lote2_entrega] — Lote 2 · data de entrega
-    function shortcode_lote2_entrega($atts) {
+    function shortcode_lote2_entrega($atts, $content = null) {
         $a = $this->atts_data_shortcode($atts, '');
         $tipo = isset($atts['tipo']) && $atts['tipo'] === 'evento' ? 'evento' : 'escola';
-        return $this->render_data_shortcode($a, 'l2_entrega_data_' . $tipo);
+        return $this->render_data_shortcode($a, 'l2_entrega_data_' . $tipo, $content);
     }
     // ============================================================
 
