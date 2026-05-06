@@ -309,10 +309,10 @@ class Login {
             } catch(e) {}
         })();
         </script>
-        <div id="logoutContainer" style="display:none; position: fixed; bottom: 30px; left: 30px; z-index: 999999; background-color: #fff; padding: 15px 25px; border-radius: 50px; box-shadow: 0 5px 20px rgba(0,0,0,0.25); align-items: center; gap: 15px; border: 1px solid #eee;">
-            <span style="font-family: 'Roboto', Sans-serif; font-size: 14px; color: #555; font-weight: 500;">Você está logado.</span>
-            <a href="#" id="btnSairApreas" style="color: #d32f2f; font-weight: 700; font-size: 14px; text-decoration: none; font-family: 'Roboto', Sans-serif; display: flex; align-items: center; gap: 5px;">
-                Sair <svg width="15" height="15" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"/><path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/></svg>
+        <div id="logoutContainer">
+            <span>Você está logado.</span>
+            <a href="#" id="btnSairApreas" title="Sair da Conta">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
             </a>
         </div>
         <div id="loginContainer">
@@ -669,10 +669,9 @@ class Login {
             } catch(e) {}
         })();
         </script>
-        <div id="logoutContainer" style="display:none; position: fixed; bottom: 30px; left: 30px; z-index: 999999; background-color: #fff; padding: 15px 25px; border-radius: 50px; box-shadow: 0 5px 20px rgba(0,0,0,0.25); align-items: center; gap: 15px; border: 1px solid #eee;">
-            <span style="font-family: 'Roboto', Sans-serif; font-size: 14px; color: #555; font-weight: 500;">Você está logado.</span>
-            <a href="#" id="btnSairApreas" style="color: #d32f2f; font-weight: 700; font-size: 14px; text-decoration: none; font-family: 'Roboto', Sans-serif; display: flex; align-items: center; gap: 5px;">
-                Sair <svg width="15" height="15" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"/><path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/></svg>
+        <div id="logoutContainer">
+            <a href="#" id="btnSairApreas" title="Sair da Conta">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
             </a>
         </div>
         <div id="loginContainer">
