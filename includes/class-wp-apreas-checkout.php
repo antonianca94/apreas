@@ -290,6 +290,32 @@ class Checkout {
             echo "<script>
             jQuery(document).ready(function($){
 
+                // Restaurar dados do aluno da sessão (localStorage)
+                function apreasRestaurarSessao() {
+                    try {
+                        var raw = localStorage.getItem('apreas_login_sessao');
+                        if (!raw) return;
+                        var s = JSON.parse(raw);
+                        if (Date.now() > s.expira) return;
+
+                        var dados = s.dados;
+                        var d = (s.tipo === 'eventos' && Array.isArray(dados) && dados.length > 0) ? dados[0] : dados;
+
+                        if (d) {
+                            var fieldAluno = $('#apreas_aluno');
+                            var fieldEscola = $('#apreas_escola');
+                            var fieldTurma = $('#apreas_turma');
+
+                            // Só preenche se o campo estiver vazio
+                            if (fieldAluno.length && !fieldAluno.val()) fieldAluno.val(d.nome || '');
+                            if (fieldEscola.length && !fieldEscola.val()) fieldEscola.val(d.escola ? d.escola.nome : '');
+                            if (fieldTurma.length && !fieldTurma.val()) fieldTurma.val(d.turma ? d.turma.nome : '');
+                        }
+                    } catch(e) { console.warn('Erro ao restaurar sessão no checkout:', e); }
+                }
+                apreasRestaurarSessao();
+                $(document.body).on('updated_checkout', apreasRestaurarSessao);
+
                 // Mostrar/ocultar botão Remover com base no valor do campo
                 function apreakToggleRemove() {
                     var val = $('#apreas_codigo_desconto').val().trim();
