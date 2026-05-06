@@ -269,6 +269,7 @@ class Alunos {
                 <div style="width:100%;">
                     <input type="text" id="imagem_upload_individual" name="imagem_upload_individual" class="imagem_upload_individual" value="<?php  echo $imagem_upload_individual; ?>" />
                 </div>
+                <p style="font-size:12px; color:#666; margin-top:6px;"><strong>Para exibir no site:</strong> Adicione um elemento de Imagem e defina sua <strong>Classe CSS</strong> como <code>imagem_upload_individual</code></p>
                 <div class="preview-aluno">
                     <div class="preview-aluno-individual">
 
@@ -281,6 +282,7 @@ class Alunos {
                 <div style="width:100%;">
                     <input type="text" id="imagem_upload_individual2" name="imagem_upload_individual2" class="imagem_upload_individual2" value="<?php  echo $imagem_upload_individual2; ?>" />
                 </div>
+                <p style="font-size:12px; color:#666; margin-top:6px;"><strong>Para exibir no site:</strong> Adicione um elemento de Imagem e defina sua <strong>Classe CSS</strong> como <code>imagem_upload_individual2</code></p>
                 <div class="preview-aluno">
                     <div class="preview-aluno-individual2">
 
@@ -293,6 +295,7 @@ class Alunos {
                 <div style="width:100%;">
                     <input type="text" id="imagem_upload_turma" name="imagem_upload_turma" class="imagem_upload_turma" value="<?php echo $imagem_upload_turma; ?>" />
                 </div>
+                <p style="font-size:12px; color:#666; margin-top:6px;"><strong>Para exibir no site:</strong> Adicione um elemento de Imagem e defina sua <strong>Classe CSS</strong> como <code>imagem_upload_turma</code></p>
                 <div class="preview-aluno">
                     <div class="preview-aluno-turma">
 
