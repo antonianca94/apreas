@@ -30,6 +30,9 @@ class Checkout {
         add_filter( 'woocommerce_order_get_formatted_billing_address',    [ $this, 'adicionar_bairro_string_admin' ], 10, 3 );
         // Corrige mapeamento dos campos de endereço (bairro / cidade / estado)
         add_filter( 'woocommerce_checkout_fields',                        [ $this, 'corrigir_campos_endereco' ], 99 );
+        
+        // Remove completamente o bloco de Informações Adicionais / Notas do Pedido
+        add_filter( 'woocommerce_enable_order_notes_field', '__return_false', 9999 );
 
         // Adiciona taxa de entrega fixa
         add_action( 'woocommerce_cart_calculate_fees',                    [ $this, 'adicionar_taxa_entrega' ] );
@@ -85,6 +88,11 @@ class Checkout {
             $billing['billing_state']['label']    = __( 'Estado', 'apreas' );
             $billing['billing_state']['priority'] = 85;
             $billing['billing_state']['class']    = [ 'form-row-wide' ];
+        }
+
+        // REMOVE: "Informações adicionais" (Notas do Pedido)
+        if ( isset( $fields['order']['order_comments'] ) ) {
+            unset( $fields['order']['order_comments'] );
         }
 
         return $fields;
@@ -234,7 +242,7 @@ class Checkout {
             return;
         }
 
-        echo '<div class="apreas-campos-aluno" style="margin-bottom:4rem;">';
+        echo '<div class="apreas-campos-aluno" style="margin-bottom:0rem;">';
         echo '<h3>' . esc_html__( 'Informações do Aluno', 'apreas' ) . '</h3>';
 
         woocommerce_form_field( 'apreas_aluno', [
