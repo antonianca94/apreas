@@ -47,9 +47,13 @@ class Login {
         add_shortcode('lote1_escolha_inicio',   [$this,'shortcode_lote1_escolha_inicio']);
         add_shortcode('lote1_escolha_fim',      [$this,'shortcode_lote1_escolha_fim']);
         add_shortcode('lote1_entrega',          [$this,'shortcode_lote1_entrega']);
+        add_shortcode('lote1_entrega_inicio',   [$this,'shortcode_lote1_entrega_inicio']);
+        add_shortcode('lote1_entrega_fim',      [$this,'shortcode_lote1_entrega_fim']);
         add_shortcode('lote2_escolha_inicio',   [$this,'shortcode_lote2_escolha_inicio']);
         add_shortcode('lote2_escolha_fim',      [$this,'shortcode_lote2_escolha_fim']);
         add_shortcode('lote2_entrega',          [$this,'shortcode_lote2_entrega']);
+        add_shortcode('lote2_entrega_inicio',   [$this,'shortcode_lote2_entrega_inicio']);
+        add_shortcode('lote2_entrega_fim',      [$this,'shortcode_lote2_entrega_fim']);
         // SHORTCODES INDIVIDUAIS DE DATAS
     }
 
@@ -194,11 +198,25 @@ class Login {
         return $this->render_data_shortcode($a, 'l1_escolha_data_fim_' . $tipo, $content);
     }
 
-    // [lote1_entrega] — Lote 1 · data de entrega
+    // [lote1_entrega] — Lote 1 · data de entrega (campo legado - data única)
     function shortcode_lote1_entrega($atts, $content = null) {
         $a = $this->atts_data_shortcode($atts, '');
         $tipo = isset($atts['tipo']) && $atts['tipo'] === 'evento' ? 'evento' : 'escola';
         return $this->render_data_shortcode($a, 'l1_entrega_data_' . $tipo, $content);
+    }
+
+    // [lote1_entrega_inicio] — Lote 1 · data início de entrega
+    function shortcode_lote1_entrega_inicio($atts, $content = null) {
+        $a = $this->atts_data_shortcode($atts, '');
+        $tipo = isset($atts['tipo']) && $atts['tipo'] === 'evento' ? 'evento' : 'escola';
+        return $this->render_data_shortcode($a, 'l1_entrega_data_inicio_' . $tipo, $content);
+    }
+
+    // [lote1_entrega_fim] — Lote 1 · data fim de entrega
+    function shortcode_lote1_entrega_fim($atts, $content = null) {
+        $a = $this->atts_data_shortcode($atts, '');
+        $tipo = isset($atts['tipo']) && $atts['tipo'] === 'evento' ? 'evento' : 'escola';
+        return $this->render_data_shortcode($a, 'l1_entrega_data_fim_' . $tipo, $content);
     }
 
     // [lote2_escolha_inicio] — Lote 2 · data início de escolha
@@ -215,11 +233,25 @@ class Login {
         return $this->render_data_shortcode($a, 'l2_escolha_data_fim_' . $tipo, $content);
     }
 
-    // [lote2_entrega] — Lote 2 · data de entrega
+    // [lote2_entrega] — Lote 2 · data de entrega (campo legado - data única)
     function shortcode_lote2_entrega($atts, $content = null) {
         $a = $this->atts_data_shortcode($atts, '');
         $tipo = isset($atts['tipo']) && $atts['tipo'] === 'evento' ? 'evento' : 'escola';
         return $this->render_data_shortcode($a, 'l2_entrega_data_' . $tipo, $content);
+    }
+
+    // [lote2_entrega_inicio] — Lote 2 · data início de entrega
+    function shortcode_lote2_entrega_inicio($atts, $content = null) {
+        $a = $this->atts_data_shortcode($atts, '');
+        $tipo = isset($atts['tipo']) && $atts['tipo'] === 'evento' ? 'evento' : 'escola';
+        return $this->render_data_shortcode($a, 'l2_entrega_data_inicio_' . $tipo, $content);
+    }
+
+    // [lote2_entrega_fim] — Lote 2 · data fim de entrega
+    function shortcode_lote2_entrega_fim($atts, $content = null) {
+        $a = $this->atts_data_shortcode($atts, '');
+        $tipo = isset($atts['tipo']) && $atts['tipo'] === 'evento' ? 'evento' : 'escola';
+        return $this->render_data_shortcode($a, 'l2_entrega_data_fim_' . $tipo, $content);
     }
     // ============================================================
 
@@ -232,14 +264,14 @@ class Login {
                     <h5>Escolha</h5>
                     <p style="font-size: 1.35rem;"> <span class="l1_escolha_data_inicio_evento"> </span> à <span class="l1_escolha_data_fim_evento"> </span> </p>
                     <h5>Entrega</h5>
-                    <p style="font-size: 1.35rem;"> <span class="l1_entrega_data_evento"> </span> </p>
+                    <p style="font-size: 1.35rem;"> <span class="l1_entrega_data_inicio_evento"> </span> à <span class="l1_entrega_data_fim_evento"> </span> </p>
                 </div>
                 <div class="w-100 p-3 m-3" style="border: 1px solid grey; border-radius: 1rem;">
                     <h3 style="padding-bottom: 0.5rem; font-weight: 700;">Lote 2</h3>
                     <h5>Escolha</h5>
                     <p style="font-size: 1.35rem;"> <span class="l2_escolha_data_inicio_evento"> </span> à <span class="l2_escolha_data_fim_evento"> </span> </p>
                     <h5>Entrega</h5>
-                    <p style="font-size: 1.35rem;"> <span class="l2_entrega_data_evento"> </span> </p>
+                    <p style="font-size: 1.35rem;"> <span class="l2_entrega_data_inicio_evento"> </span> à <span class="l2_entrega_data_fim_evento"> </span> </p>
                 </div>
             </div>
         ';
@@ -253,14 +285,14 @@ class Login {
                     <h5>Escolha</h5>
                     <p style="font-size: 1.35rem;"> <span class="l1_escolha_data_inicio_escola"> </span> à <span class="l1_escolha_data_fim_escola"> </span> </p>
                     <h5>Entrega</h5>
-                    <p style="font-size: 1.35rem;"> <span class="l1_entrega_data_escola"> </span> </p>
+                    <p style="font-size: 1.35rem;"> <span class="l1_entrega_data_inicio_escola"> </span> à <span class="l1_entrega_data_fim_escola"> </span> </p>
                 </div>
                 <div class="w-100 p-3 m-3" style="border: 1px solid grey; border-radius: 1rem;">
                     <h3 style="padding-bottom: 0.5rem; font-weight: 700;">Lote 2</h3>
                     <h5>Escolha</h5>
                     <p style="font-size: 1.35rem;"> <span class="l2_escolha_data_inicio_escola"> </span> à <span class="l2_escolha_data_fim_escola"> </span> </p>
                     <h5>Entrega</h5>
-                    <p style="font-size: 1.35rem;"> <span class="l2_entrega_data_escola"> </span> </p>
+                    <p style="font-size: 1.35rem;"> <span class="l2_entrega_data_inicio_escola"> </span> à <span class="l2_entrega_data_fim_escola"> </span> </p>
                 </div>
             </div>
         ';
@@ -606,9 +638,13 @@ class Login {
             $l1_escolha_data_inicio_escola = get_post_meta(intval($escola_id), 'l1_escolha_data_inicio', true);
             $l1_escolha_data_fim_escola = get_post_meta(intval($escola_id), 'l1_escolha_data_fim', true);
             $l1_entrega_data_escola = get_post_meta(intval($escola_id), 'l1_entrega_data', true);
+            $l1_entrega_data_inicio_escola = get_post_meta(intval($escola_id), 'l1_entrega_data_inicio', true);
+            $l1_entrega_data_fim_escola = get_post_meta(intval($escola_id), 'l1_entrega_data_fim', true);
             $l2_escolha_data_inicio_escola = get_post_meta(intval($escola_id), 'l2_escolha_data_inicio', true);
             $l2_escolha_data_fim_escola = get_post_meta(intval($escola_id), 'l2_escolha_data_fim', true);
             $l2_entrega_data_escola = get_post_meta(intval($escola_id), 'l2_entrega_data', true);
+            $l2_entrega_data_inicio_escola = get_post_meta(intval($escola_id), 'l2_entrega_data_inicio', true);
+            $l2_entrega_data_fim_escola = get_post_meta(intval($escola_id), 'l2_entrega_data_fim', true);
             $data_limite_fotos_escola = get_post_meta(intval($escola_id), 'data_limite_fotos', true);
             // ESCOLA | CAMPOS EXTRAS
 
@@ -624,9 +660,13 @@ class Login {
                     'l1_escolha_data_inicio' => $l1_escolha_data_inicio_escola,
                     'l1_escolha_data_fim' => $l1_escolha_data_fim_escola,
                     'l1_entrega_data' => $l1_entrega_data_escola,
+                    'l1_entrega_data_inicio' => $l1_entrega_data_inicio_escola,
+                    'l1_entrega_data_fim' => $l1_entrega_data_fim_escola,
                     'l2_escolha_data_inicio' => $l2_escolha_data_inicio_escola,
                     'l2_escolha_data_fim' => $l2_escolha_data_fim_escola,
                     'l2_entrega_data' => $l2_entrega_data_escola,
+                    'l2_entrega_data_inicio' => $l2_entrega_data_inicio_escola,
+                    'l2_entrega_data_fim' => $l2_entrega_data_fim_escola,
                     'data_limite_fotos' => $data_limite_fotos_escola
                 ],
                 'unidade' => [

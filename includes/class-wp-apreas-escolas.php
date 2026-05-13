@@ -178,8 +178,12 @@ class Escolas {
                         <code>[lote1_escolha_fim]</code>
                     </div>
                     <div style="background:#fff; padding:8px; border:1px solid #e0e0e0; border-radius:4px;">
-                        <strong>Lote 1 — Entrega</strong><br>
-                        <code>[lote1_entrega]</code>
+                        <strong>Lote 1 — Início da Entrega</strong><br>
+                        <code>[lote1_entrega_inicio]</code>
+                    </div>
+                    <div style="background:#fff; padding:8px; border:1px solid #e0e0e0; border-radius:4px;">
+                        <strong>Lote 1 — Fim da Entrega</strong><br>
+                        <code>[lote1_entrega_fim]</code>
                     </div>
                     <div style="background:#fff; padding:8px; border:1px solid #e0e0e0; border-radius:4px;">
                         <strong>Lote 2 — Início da Escolha</strong><br>
@@ -190,8 +194,12 @@ class Escolas {
                         <code>[lote2_escolha_fim]</code>
                     </div>
                     <div style="background:#fff; padding:8px; border:1px solid #e0e0e0; border-radius:4px;">
-                        <strong>Lote 2 — Entrega</strong><br>
-                        <code>[lote2_entrega]</code>
+                        <strong>Lote 2 — Início da Entrega</strong><br>
+                        <code>[lote2_entrega_inicio]</code>
+                    </div>
+                    <div style="background:#fff; padding:8px; border:1px solid #e0e0e0; border-radius:4px;">
+                        <strong>Lote 2 — Fim da Entrega</strong><br>
+                        <code>[lote2_entrega_fim]</code>
                     </div>
                 </div>
                 <p style="font-size:12px; color:#888; margin-top:10px;"><em>Todos aceitam os mesmos atributos: <code>label</code>, <code>mostrar_label</code>, <code>tipo="escola"</code>, <code>cor</code>, <code>tamanho</code>, <code>peso</code>, <code>alinhar</code>, <code>fonte</code>, <code>fundo</code>, <code>padding</code>, <code>borda_raio</code>, <code>cor_label</code>, <code>peso_label</code>, <code>tamanho_label</code></em></p>
@@ -384,22 +392,35 @@ class Escolas {
         </script>
         
         <?php
-        // ESCOLHA 
+        // ESCOLHA
 
         // ENTREGA
-        $l1_entrega_data = get_post_meta($post->ID, 'l1_entrega_data', true);
+        $l1_entrega_data_inicio = get_post_meta($post->ID, 'l1_entrega_data_inicio', true);
+        $l1_entrega_data_fim    = get_post_meta($post->ID, 'l1_entrega_data_fim', true);
         ?>
-        
+
         <hr class="my-1"/>
 
         <div class="row mt-4 mb-4">
             <label for="nome" class="mb-4 fw-bold" style="font-size: 1rem; color:#7A7A7A;">ENTREGA</label>
-            <div class="col-xxl-6">
+            <div class="col">
                 <div class="form-group">
-                    <label for="l1_entrega_data" class="mb-2 fw-bold">Data de Entrega</label>
-                    <p style="margin-bottom:6px; font-size:11px; color:#888;">▸ Shortcode individual: <code>[lote1_entrega]</code></p>
+                    <label for="l1_entrega_data_inicio" class="mb-2 fw-bold">Início da Entrega</label>
+                    <p style="margin-bottom:6px; font-size:11px; color:#888;">▸ Shortcode individual: <code>[lote1_entrega_inicio]</code></p>
                     <div class="input-group">
-                        <input type="text" id="l1_entrega_data" name="l1_entrega_data" class="form-control" value="<?php echo esc_attr($l1_entrega_data); ?>" />
+                        <input type="text" id="l1_entrega_data_inicio" name="l1_entrega_data_inicio" class="form-control" value="<?php echo esc_attr($l1_entrega_data_inicio); ?>" />
+                        <div class="input-group-append">
+                            <span class="input-group-text"><i class="dashicons dashicons-calendar-alt"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="l1_entrega_data_fim" class="mb-2 fw-bold">Fim da Entrega</label>
+                    <p style="margin-bottom:6px; font-size:11px; color:#888;">▸ Shortcode individual: <code>[lote1_entrega_fim]</code></p>
+                    <div class="input-group">
+                        <input type="text" id="l1_entrega_data_fim" name="l1_entrega_data_fim" class="form-control" value="<?php echo esc_attr($l1_entrega_data_fim); ?>" />
                         <div class="input-group-append">
                             <span class="input-group-text"><i class="dashicons dashicons-calendar-alt"></i></span>
                         </div>
@@ -409,7 +430,13 @@ class Escolas {
         </div>
         <script>
             jQuery(document).ready(function($) {
-                $('#l1_entrega_data').flatpickr({
+                $('#l1_entrega_data_inicio').flatpickr({
+                    enableTime: false,
+                    dateFormat: "d/m/Y",
+                    time_24hr: false,
+                    locale: 'pt'
+                });
+                $('#l1_entrega_data_fim').flatpickr({
                     enableTime: false,
                     dateFormat: "d/m/Y",
                     time_24hr: false,
@@ -474,22 +501,35 @@ class Escolas {
         </script>
         
         <?php
-        // ESCOLHA 
+        // ESCOLHA
 
         // ENTREGA
-        $l2_entrega_data = get_post_meta($post->ID, 'l2_entrega_data', true);
+        $l2_entrega_data_inicio = get_post_meta($post->ID, 'l2_entrega_data_inicio', true);
+        $l2_entrega_data_fim    = get_post_meta($post->ID, 'l2_entrega_data_fim', true);
         ?>
-        
+
         <hr class="my-1"/>
 
         <div class="row mt-4 mb-4">
             <label for="nome" class="mb-4 fw-bold" style="font-size: 1rem; color:#7A7A7A;">ENTREGA</label>
-            <div class="col-xxl-6">
+            <div class="col">
                 <div class="form-group">
-                    <label for="l2_entrega_data" class="mb-2 fw-bold">Data de Entrega</label>
-                    <p style="margin-bottom:6px; font-size:11px; color:#888;">▸ Shortcode individual: <code>[lote2_entrega]</code></p>
+                    <label for="l2_entrega_data_inicio" class="mb-2 fw-bold">Início da Entrega</label>
+                    <p style="margin-bottom:6px; font-size:11px; color:#888;">▸ Shortcode individual: <code>[lote2_entrega_inicio]</code></p>
                     <div class="input-group">
-                        <input type="text" id="l2_entrega_data" name="l2_entrega_data" class="form-control" value="<?php echo esc_attr($l2_entrega_data); ?>" />
+                        <input type="text" id="l2_entrega_data_inicio" name="l2_entrega_data_inicio" class="form-control" value="<?php echo esc_attr($l2_entrega_data_inicio); ?>" />
+                        <div class="input-group-append">
+                            <span class="input-group-text"><i class="dashicons dashicons-calendar-alt"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="l2_entrega_data_fim" class="mb-2 fw-bold">Fim da Entrega</label>
+                    <p style="margin-bottom:6px; font-size:11px; color:#888;">▸ Shortcode individual: <code>[lote2_entrega_fim]</code></p>
+                    <div class="input-group">
+                        <input type="text" id="l2_entrega_data_fim" name="l2_entrega_data_fim" class="form-control" value="<?php echo esc_attr($l2_entrega_data_fim); ?>" />
                         <div class="input-group-append">
                             <span class="input-group-text"><i class="dashicons dashicons-calendar-alt"></i></span>
                         </div>
@@ -499,7 +539,13 @@ class Escolas {
         </div>
         <script>
             jQuery(document).ready(function($) {
-                $('#l2_entrega_data').flatpickr({
+                $('#l2_entrega_data_inicio').flatpickr({
+                    enableTime: false,
+                    dateFormat: "d/m/Y",
+                    time_24hr: false,
+                    locale: 'pt'
+                });
+                $('#l2_entrega_data_fim').flatpickr({
                     enableTime: false,
                     dateFormat: "d/m/Y",
                     time_24hr: false,
@@ -585,27 +631,33 @@ class Escolas {
         }
         // DATA LIMITE FOTOS
 
-        // LOTE 1 
+        // LOTE 1
         if (isset($_POST['l1_escolha_data_inicio'])) {
             update_post_meta($post_id, 'l1_escolha_data_inicio', sanitize_text_field($_POST['l1_escolha_data_inicio']));
         }
         if (isset($_POST['l1_escolha_data_fim'])) {
             update_post_meta($post_id, 'l1_escolha_data_fim', sanitize_text_field($_POST['l1_escolha_data_fim']));
         }
-        if (isset($_POST['l1_entrega_data'])) {
-            update_post_meta($post_id, 'l1_entrega_data', sanitize_text_field($_POST['l1_entrega_data']));
+        if (isset($_POST['l1_entrega_data_inicio'])) {
+            update_post_meta($post_id, 'l1_entrega_data_inicio', sanitize_text_field($_POST['l1_entrega_data_inicio']));
+        }
+        if (isset($_POST['l1_entrega_data_fim'])) {
+            update_post_meta($post_id, 'l1_entrega_data_fim', sanitize_text_field($_POST['l1_entrega_data_fim']));
         }
         // LOTE 1
 
-        // LOTE 2 
+        // LOTE 2
         if (isset($_POST['l2_escolha_data_inicio'])) {
             update_post_meta($post_id, 'l2_escolha_data_inicio', sanitize_text_field($_POST['l2_escolha_data_inicio']));
         }
         if (isset($_POST['l2_escolha_data_fim'])) {
             update_post_meta($post_id, 'l2_escolha_data_fim', sanitize_text_field($_POST['l2_escolha_data_fim']));
         }
-        if (isset($_POST['l2_entrega_data'])) {
-            update_post_meta($post_id, 'l2_entrega_data', sanitize_text_field($_POST['l2_entrega_data']));
+        if (isset($_POST['l2_entrega_data_inicio'])) {
+            update_post_meta($post_id, 'l2_entrega_data_inicio', sanitize_text_field($_POST['l2_entrega_data_inicio']));
+        }
+        if (isset($_POST['l2_entrega_data_fim'])) {
+            update_post_meta($post_id, 'l2_entrega_data_fim', sanitize_text_field($_POST['l2_entrega_data_fim']));
         }
         // LOTE 2
 

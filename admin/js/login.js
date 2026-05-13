@@ -102,10 +102,14 @@ jQuery(document).ready(function ($) {
         atualizarDadosAluno(data, 'escola');
         var l1i = document.querySelector('.l1_escolha_data_inicio_escola');
         var l1f = document.querySelector('.l1_escolha_data_fim_escola');
-        var l1e = document.querySelector('.l1_entrega_data_escola');
-        var l2i = document.querySelector('.l2_escolha_data_inicio_escola');
-        var l2f = document.querySelector('.l2_escolha_data_fim_escola');
-        var l2e = document.querySelector('.l2_entrega_data_escola');
+        var l1e  = document.querySelector('.l1_entrega_data_escola');
+        var l1ei = document.querySelector('.l1_entrega_data_inicio_escola');
+        var l1ef = document.querySelector('.l1_entrega_data_fim_escola');
+        var l2i  = document.querySelector('.l2_escolha_data_inicio_escola');
+        var l2f  = document.querySelector('.l2_escolha_data_fim_escola');
+        var l2e  = document.querySelector('.l2_entrega_data_escola');
+        var l2ei = document.querySelector('.l2_entrega_data_inicio_escola');
+        var l2ef = document.querySelector('.l2_entrega_data_fim_escola');
         if (data.escola) {
             if (data.escola.imagem_logo_escola) {
                 $('.imagem_logo_escola').attr('src', data.escola.imagem_logo_escola).attr('srcset', data.escola.imagem_logo_escola);
@@ -113,9 +117,13 @@ jQuery(document).ready(function ($) {
             if (l1i) l1i.textContent = data.escola.l1_escolha_data_inicio || '';
             if (l1f) l1f.textContent = data.escola.l1_escolha_data_fim || '';
             if (l1e) l1e.textContent = data.escola.l1_entrega_data || '';
+            if (l1ei) l1ei.textContent = data.escola.l1_entrega_data_inicio || '';
+            if (l1ef) l1ef.textContent = data.escola.l1_entrega_data_fim || '';
             if (l2i) l2i.textContent = data.escola.l2_escolha_data_inicio || '';
             if (l2f) l2f.textContent = data.escola.l2_escolha_data_fim || '';
             if (l2e) l2e.textContent = data.escola.l2_entrega_data || '';
+            if (l2ei) l2ei.textContent = data.escola.l2_entrega_data_inicio || '';
+            if (l2ef) l2ef.textContent = data.escola.l2_entrega_data_fim || '';
             var dlf = document.querySelector('.data_limite_fotos_escola');
             if (dlf) dlf.textContent = data.escola.data_limite_fotos || '';
         }
@@ -180,15 +188,26 @@ jQuery(document).ready(function ($) {
         var l1ie = document.querySelector('.l1_escolha_data_inicio_evento');
         var l1fe = document.querySelector('.l1_escolha_data_fim_evento');
         var l1ee = document.querySelector('.l1_entrega_data_evento');
+        var l1eei = document.querySelector('.l1_entrega_data_inicio_evento');
+        var l1eef = document.querySelector('.l1_entrega_data_fim_evento');
+
         var l2ie = document.querySelector('.l2_escolha_data_inicio_evento');
         var l2fe = document.querySelector('.l2_escolha_data_fim_evento');
         var l2ee = document.querySelector('.l2_entrega_data_evento');
+        var l2eei = document.querySelector('.l2_entrega_data_inicio_evento');
+        var l2eef = document.querySelector('.l2_entrega_data_fim_evento');
+
         var l1is = document.querySelector('.l1_escolha_data_inicio_escola');
         var l1fs = document.querySelector('.l1_escolha_data_fim_escola');
         var l1es = document.querySelector('.l1_entrega_data_escola');
+        var l1esi = document.querySelector('.l1_entrega_data_inicio_escola');
+        var l1esf = document.querySelector('.l1_entrega_data_fim_escola');
+
         var l2is = document.querySelector('.l2_escolha_data_inicio_escola');
         var l2fs = document.querySelector('.l2_escolha_data_fim_escola');
         var l2es = document.querySelector('.l2_entrega_data_escola');
+        var l2esi = document.querySelector('.l2_entrega_data_inicio_escola');
+        var l2esf = document.querySelector('.l2_entrega_data_fim_escola');
         if (d.evento) {
             if (d.evento.imagem_logo_evento) {
                 $('.imagem_logo_evento').attr('src', d.evento.imagem_logo_evento).attr('srcset', d.evento.imagem_logo_evento);
@@ -196,9 +215,13 @@ jQuery(document).ready(function ($) {
             if (l1ie) l1ie.textContent = d.evento.l1_escolha_data_inicio || '';
             if (l1fe) l1fe.textContent = d.evento.l1_escolha_data_fim || '';
             if (l1ee) l1ee.textContent = d.evento.l1_entrega_data || '';
+            if (l1eei) l1eei.textContent = d.evento.l1_entrega_data_inicio || '';
+            if (l1eef) l1eef.textContent = d.evento.l1_entrega_data_fim || '';
             if (l2ie) l2ie.textContent = d.evento.l2_escolha_data_inicio || '';
             if (l2fe) l2fe.textContent = d.evento.l2_escolha_data_fim || '';
             if (l2ee) l2ee.textContent = d.evento.l2_entrega_data || '';
+            if (l2eei) l2eei.textContent = d.evento.l2_entrega_data_inicio || '';
+            if (l2eef) l2eef.textContent = d.evento.l2_entrega_data_fim || '';
         }
         if (d.escola) {
             if (d.escola.imagem_logo_escola) {
@@ -207,9 +230,13 @@ jQuery(document).ready(function ($) {
             if (l1is) l1is.textContent = d.escola.l1_escolha_data_inicio || '';
             if (l1fs) l1fs.textContent = d.escola.l1_escolha_data_fim || '';
             if (l1es) l1es.textContent = d.escola.l1_entrega_data || '';
+            if (l1esi) l1esi.textContent = d.escola.l1_entrega_data_inicio || '';
+            if (l1esf) l1esf.textContent = d.escola.l1_entrega_data_fim || '';
             if (l2is) l2is.textContent = d.escola.l2_escolha_data_inicio || '';
             if (l2fs) l2fs.textContent = d.escola.l2_escolha_data_fim || '';
             if (l2es) l2es.textContent = d.escola.l2_entrega_data || '';
+            if (l2esi) l2esi.textContent = d.escola.l2_entrega_data_inicio || '';
+            if (l2esf) l2esf.textContent = d.escola.l2_entrega_data_fim || '';
         }
         var lc = document.getElementById('loginContainer');
         if (lc) lc.classList.add('d-none');
@@ -253,9 +280,13 @@ jQuery(document).ready(function ($) {
                     let l1_escolha_data_inicio_escola = document.querySelector('.l1_escolha_data_inicio_escola');
                     let l1_escolha_data_fim_escola = document.querySelector('.l1_escolha_data_fim_escola');
                     let l1_entrega_data_escola = document.querySelector('.l1_entrega_data_escola');
+                    let l1_entrega_data_inicio_escola = document.querySelector('.l1_entrega_data_inicio_escola');
+                    let l1_entrega_data_fim_escola = document.querySelector('.l1_entrega_data_fim_escola');
                     let l2_escolha_data_inicio_escola = document.querySelector('.l2_escolha_data_inicio_escola');
                     let l2_escolha_data_fim_escola = document.querySelector('.l2_escolha_data_fim_escola');
                     let l2_entrega_data_escola = document.querySelector('.l2_entrega_data_escola');
+                    let l2_entrega_data_inicio_escola = document.querySelector('.l2_entrega_data_inicio_escola');
+                    let l2_entrega_data_fim_escola = document.querySelector('.l2_entrega_data_fim_escola');
                     //  CAMPOS EXTRAS | ESCOLAS
 
                     if (response.data.escola) {
@@ -266,9 +297,13 @@ jQuery(document).ready(function ($) {
                         if (l1_escolha_data_inicio_escola) l1_escolha_data_inicio_escola.textContent = response.data.escola.l1_escolha_data_inicio || '';
                         if (l1_escolha_data_fim_escola) l1_escolha_data_fim_escola.textContent = response.data.escola.l1_escolha_data_fim || '';
                         if (l1_entrega_data_escola) l1_entrega_data_escola.textContent = response.data.escola.l1_entrega_data || '';
+                        if (l1_entrega_data_inicio_escola) l1_entrega_data_inicio_escola.textContent = response.data.escola.l1_entrega_data_inicio || '';
+                        if (l1_entrega_data_fim_escola) l1_entrega_data_fim_escola.textContent = response.data.escola.l1_entrega_data_fim || '';
                         if (l2_escolha_data_inicio_escola) l2_escolha_data_inicio_escola.textContent = response.data.escola.l2_escolha_data_inicio || '';
                         if (l2_escolha_data_fim_escola) l2_escolha_data_fim_escola.textContent = response.data.escola.l2_escolha_data_fim || '';
                         if (l2_entrega_data_escola) l2_entrega_data_escola.textContent = response.data.escola.l2_entrega_data || '';
+                        if (l2_entrega_data_inicio_escola) l2_entrega_data_inicio_escola.textContent = response.data.escola.l2_entrega_data_inicio || '';
+                        if (l2_entrega_data_fim_escola) l2_entrega_data_fim_escola.textContent = response.data.escola.l2_entrega_data_fim || '';
                         var dlf = document.querySelector('.data_limite_fotos_escola');
                         if (dlf) dlf.textContent = response.data.escola.data_limite_fotos || '';
                     }
@@ -483,18 +518,26 @@ jQuery(document).ready(function ($) {
                     let l1_escolha_data_inicio_evento = document.querySelector('.l1_escolha_data_inicio_evento');
                     let l1_escolha_data_fim_evento = document.querySelector('.l1_escolha_data_fim_evento');
                     let l1_entrega_data_evento = document.querySelector('.l1_entrega_data_evento');
+                    let l1_entrega_data_inicio_evento = document.querySelector('.l1_entrega_data_inicio_evento');
+                    let l1_entrega_data_fim_evento = document.querySelector('.l1_entrega_data_fim_evento');
                     let l2_escolha_data_inicio_evento = document.querySelector('.l2_escolha_data_inicio_evento');
                     let l2_escolha_data_fim_evento = document.querySelector('.l2_escolha_data_fim_evento');
                     let l2_entrega_data_evento = document.querySelector('.l2_entrega_data_evento');
+                    let l2_entrega_data_inicio_evento = document.querySelector('.l2_entrega_data_inicio_evento');
+                    let l2_entrega_data_fim_evento = document.querySelector('.l2_entrega_data_fim_evento');
                     //  CAMPOS EXTRAS | EVENTOS
 
                     // CAMPOS EXTRAS | ESCOLAS
                     let l1_escolha_data_inicio_escola = document.querySelector('.l1_escolha_data_inicio_escola');
                     let l1_escolha_data_fim_escola = document.querySelector('.l1_escolha_data_fim_escola');
                     let l1_entrega_data_escola = document.querySelector('.l1_entrega_data_escola');
+                    let l1_entrega_data_inicio_escola = document.querySelector('.l1_entrega_data_inicio_escola');
+                    let l1_entrega_data_fim_escola = document.querySelector('.l1_entrega_data_fim_escola');
                     let l2_escolha_data_inicio_escola = document.querySelector('.l2_escolha_data_inicio_escola');
                     let l2_escolha_data_fim_escola = document.querySelector('.l2_escolha_data_fim_escola');
                     let l2_entrega_data_escola = document.querySelector('.l2_entrega_data_escola');
+                    let l2_entrega_data_inicio_escola = document.querySelector('.l2_entrega_data_inicio_escola');
+                    let l2_entrega_data_fim_escola = document.querySelector('.l2_entrega_data_fim_escola');
                     //  CAMPOS EXTRAS | ESCOLAS
 
                     if (response.data[0].evento) {
@@ -507,9 +550,13 @@ jQuery(document).ready(function ($) {
                         if (l1_escolha_data_inicio_evento) l1_escolha_data_inicio_evento.textContent = response.data[0].evento.l1_escolha_data_inicio || '';
                         if (l1_escolha_data_fim_evento) l1_escolha_data_fim_evento.textContent = response.data[0].evento.l1_escolha_data_fim || '';
                         if (l1_entrega_data_evento) l1_entrega_data_evento.textContent = response.data[0].evento.l1_entrega_data || '';
+                        if (l1_entrega_data_inicio_evento) l1_entrega_data_inicio_evento.textContent = response.data[0].evento.l1_entrega_data_inicio || '';
+                        if (l1_entrega_data_fim_evento) l1_entrega_data_fim_evento.textContent = response.data[0].evento.l1_entrega_data_fim || '';
                         if (l2_escolha_data_inicio_evento) l2_escolha_data_inicio_evento.textContent = response.data[0].evento.l2_escolha_data_inicio || '';
                         if (l2_escolha_data_fim_evento) l2_escolha_data_fim_evento.textContent = response.data[0].evento.l2_escolha_data_fim || '';
                         if (l2_entrega_data_evento) l2_entrega_data_evento.textContent = response.data[0].evento.l2_entrega_data || '';
+                        if (l2_entrega_data_inicio_evento) l2_entrega_data_inicio_evento.textContent = response.data[0].evento.l2_entrega_data_inicio || '';
+                        if (l2_entrega_data_fim_evento) l2_entrega_data_fim_evento.textContent = response.data[0].evento.l2_entrega_data_fim || '';
                     }
 
                     if (response.data[0].escola) {
@@ -520,9 +567,13 @@ jQuery(document).ready(function ($) {
                         if (l1_escolha_data_inicio_escola) l1_escolha_data_inicio_escola.textContent = response.data[0].escola.l1_escolha_data_inicio || '';
                         if (l1_escolha_data_fim_escola) l1_escolha_data_fim_escola.textContent = response.data[0].escola.l1_escolha_data_fim || '';
                         if (l1_entrega_data_escola) l1_entrega_data_escola.textContent = response.data[0].escola.l1_entrega_data || '';
+                        if (l1_entrega_data_inicio_escola) l1_entrega_data_inicio_escola.textContent = response.data[0].escola.l1_entrega_data_inicio || '';
+                        if (l1_entrega_data_fim_escola) l1_entrega_data_fim_escola.textContent = response.data[0].escola.l1_entrega_data_fim || '';
                         if (l2_escolha_data_inicio_escola) l2_escolha_data_inicio_escola.textContent = response.data[0].escola.l2_escolha_data_inicio || '';
                         if (l2_escolha_data_fim_escola) l2_escolha_data_fim_escola.textContent = response.data[0].escola.l2_escolha_data_fim || '';
                         if (l2_entrega_data_escola) l2_entrega_data_escola.textContent = response.data[0].escola.l2_entrega_data || '';
+                        if (l2_entrega_data_inicio_escola) l2_entrega_data_inicio_escola.textContent = response.data[0].escola.l2_entrega_data_inicio || '';
+                        if (l2_entrega_data_fim_escola) l2_entrega_data_fim_escola.textContent = response.data[0].escola.l2_entrega_data_fim || '';
                     }
 
                     Swal.fire({
