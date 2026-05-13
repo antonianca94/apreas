@@ -110,6 +110,8 @@ jQuery(document).ready(function ($) {
         var l2e  = document.querySelector('.l2_entrega_data_escola');
         var l2ei = document.querySelector('.l2_entrega_data_inicio_escola');
         var l2ef = document.querySelector('.l2_entrega_data_fim_escola');
+        var l1s  = document.querySelector('.l1_status_escola');
+        var l2s  = document.querySelector('.l2_status_escola');
         if (data.escola) {
             if (data.escola.imagem_logo_escola) {
                 $('.imagem_logo_escola').attr('src', data.escola.imagem_logo_escola).attr('srcset', data.escola.imagem_logo_escola);
@@ -124,6 +126,8 @@ jQuery(document).ready(function ($) {
             if (l2e) l2e.textContent = data.escola.l2_entrega_data || '';
             if (l2ei) l2ei.textContent = data.escola.l2_entrega_data_inicio || '';
             if (l2ef) l2ef.textContent = data.escola.l2_entrega_data_fim || '';
+            if (l1s) l1s.textContent = data.escola.l1_status || 'FINALIZADO';
+            if (l2s) l2s.textContent = data.escola.l2_status || 'FINALIZADO';
             var dlf = document.querySelector('.data_limite_fotos_escola');
             if (dlf) dlf.textContent = data.escola.data_limite_fotos || '';
         }
@@ -208,6 +212,10 @@ jQuery(document).ready(function ($) {
         var l2es = document.querySelector('.l2_entrega_data_escola');
         var l2esi = document.querySelector('.l2_entrega_data_inicio_escola');
         var l2esf = document.querySelector('.l2_entrega_data_fim_escola');
+        var l1ss = document.querySelector('.l1_status_escola');
+        var l2ss = document.querySelector('.l2_status_escola');
+        var l1se = document.querySelector('.l1_status_evento');
+        var l2se = document.querySelector('.l2_status_evento');
         if (d.evento) {
             if (d.evento.imagem_logo_evento) {
                 $('.imagem_logo_evento').attr('src', d.evento.imagem_logo_evento).attr('srcset', d.evento.imagem_logo_evento);
@@ -222,6 +230,8 @@ jQuery(document).ready(function ($) {
             if (l2ee) l2ee.textContent = d.evento.l2_entrega_data || '';
             if (l2eei) l2eei.textContent = d.evento.l2_entrega_data_inicio || '';
             if (l2eef) l2eef.textContent = d.evento.l2_entrega_data_fim || '';
+            if (l1se) l1se.textContent = d.evento.l1_status || 'FINALIZADO';
+            if (l2se) l2se.textContent = d.evento.l2_status || 'FINALIZADO';
         }
         if (d.escola) {
             if (d.escola.imagem_logo_escola) {
@@ -237,6 +247,8 @@ jQuery(document).ready(function ($) {
             if (l2es) l2es.textContent = d.escola.l2_entrega_data || '';
             if (l2esi) l2esi.textContent = d.escola.l2_entrega_data_inicio || '';
             if (l2esf) l2esf.textContent = d.escola.l2_entrega_data_fim || '';
+            if (l1ss) l1ss.textContent = d.escola.l1_status || 'FINALIZADO';
+            if (l2ss) l2ss.textContent = d.escola.l2_status || 'FINALIZADO';
         }
         var lc = document.getElementById('loginContainer');
         if (lc) lc.classList.add('d-none');
@@ -287,6 +299,8 @@ jQuery(document).ready(function ($) {
                     let l2_entrega_data_escola = document.querySelector('.l2_entrega_data_escola');
                     let l2_entrega_data_inicio_escola = document.querySelector('.l2_entrega_data_inicio_escola');
                     let l2_entrega_data_fim_escola = document.querySelector('.l2_entrega_data_fim_escola');
+                    let l1_status_escola = document.querySelector('.l1_status_escola');
+                    let l2_status_escola = document.querySelector('.l2_status_escola');
                     //  CAMPOS EXTRAS | ESCOLAS
 
                     if (response.data.escola) {
@@ -304,6 +318,8 @@ jQuery(document).ready(function ($) {
                         if (l2_entrega_data_escola) l2_entrega_data_escola.textContent = response.data.escola.l2_entrega_data || '';
                         if (l2_entrega_data_inicio_escola) l2_entrega_data_inicio_escola.textContent = response.data.escola.l2_entrega_data_inicio || '';
                         if (l2_entrega_data_fim_escola) l2_entrega_data_fim_escola.textContent = response.data.escola.l2_entrega_data_fim || '';
+                        if (l1_status_escola) l1_status_escola.textContent = response.data.escola.l1_status || 'FINALIZADO';
+                        if (l2_status_escola) l2_status_escola.textContent = response.data.escola.l2_status || 'FINALIZADO';
                         var dlf = document.querySelector('.data_limite_fotos_escola');
                         if (dlf) dlf.textContent = response.data.escola.data_limite_fotos || '';
                     }
@@ -525,6 +541,8 @@ jQuery(document).ready(function ($) {
                     let l2_entrega_data_evento = document.querySelector('.l2_entrega_data_evento');
                     let l2_entrega_data_inicio_evento = document.querySelector('.l2_entrega_data_inicio_evento');
                     let l2_entrega_data_fim_evento = document.querySelector('.l2_entrega_data_fim_evento');
+                    let l1_status_evento = document.querySelector('.l1_status_evento');
+                    let l2_status_evento = document.querySelector('.l2_status_evento');
                     //  CAMPOS EXTRAS | EVENTOS
 
                     // CAMPOS EXTRAS | ESCOLAS
@@ -538,6 +556,8 @@ jQuery(document).ready(function ($) {
                     let l2_entrega_data_escola = document.querySelector('.l2_entrega_data_escola');
                     let l2_entrega_data_inicio_escola = document.querySelector('.l2_entrega_data_inicio_escola');
                     let l2_entrega_data_fim_escola = document.querySelector('.l2_entrega_data_fim_escola');
+                    let l1_status_escola = document.querySelector('.l1_status_escola');
+                    let l2_status_escola = document.querySelector('.l2_status_escola');
                     //  CAMPOS EXTRAS | ESCOLAS
 
                     if (response.data[0].evento) {
@@ -557,6 +577,8 @@ jQuery(document).ready(function ($) {
                         if (l2_entrega_data_evento) l2_entrega_data_evento.textContent = response.data[0].evento.l2_entrega_data || '';
                         if (l2_entrega_data_inicio_evento) l2_entrega_data_inicio_evento.textContent = response.data[0].evento.l2_entrega_data_inicio || '';
                         if (l2_entrega_data_fim_evento) l2_entrega_data_fim_evento.textContent = response.data[0].evento.l2_entrega_data_fim || '';
+                        if (l1_status_evento) l1_status_evento.textContent = response.data[0].evento.l1_status || 'FINALIZADO';
+                        if (l2_status_evento) l2_status_evento.textContent = response.data[0].evento.l2_status || 'FINALIZADO';
                     }
 
                     if (response.data[0].escola) {
@@ -574,6 +596,8 @@ jQuery(document).ready(function ($) {
                         if (l2_entrega_data_escola) l2_entrega_data_escola.textContent = response.data[0].escola.l2_entrega_data || '';
                         if (l2_entrega_data_inicio_escola) l2_entrega_data_inicio_escola.textContent = response.data[0].escola.l2_entrega_data_inicio || '';
                         if (l2_entrega_data_fim_escola) l2_entrega_data_fim_escola.textContent = response.data[0].escola.l2_entrega_data_fim || '';
+                        if (l1_status_escola) l1_status_escola.textContent = response.data[0].escola.l1_status || 'FINALIZADO';
+                        if (l2_status_escola) l2_status_escola.textContent = response.data[0].escola.l2_status || 'FINALIZADO';
                     }
 
                     Swal.fire({

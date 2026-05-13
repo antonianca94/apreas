@@ -201,6 +201,14 @@ class Escolas {
                         <strong>Lote 2 — Fim da Entrega</strong><br>
                         <code>[lote2_entrega_fim]</code>
                     </div>
+                    <div style="background:#fff; padding:8px; border:1px solid #e0e0e0; border-radius:4px;">
+                        <strong>Lote 1 — Status</strong><br>
+                        <code>[lote1_status]</code>
+                    </div>
+                    <div style="background:#fff; padding:8px; border:1px solid #e0e0e0; border-radius:4px;">
+                        <strong>Lote 2 — Status</strong><br>
+                        <code>[lote2_status]</code>
+                    </div>
                 </div>
                 <p style="font-size:12px; color:#888; margin-top:10px;"><em>Todos aceitam os mesmos atributos: <code>label</code>, <code>mostrar_label</code>, <code>tipo="escola"</code>, <code>cor</code>, <code>tamanho</code>, <code>peso</code>, <code>alinhar</code>, <code>fonte</code>, <code>fundo</code>, <code>padding</code>, <code>borda_raio</code>, <code>cor_label</code>, <code>peso_label</code>, <code>tamanho_label</code></em></p>
                 <p style="font-size:12px; color:#888; margin-top:4px;"><strong>Exemplo:</strong> <code>[lote1_escolha_inicio label="Início:" cor="#d32f2f" peso="bold" tipo="escola"]</code></p>
@@ -340,14 +348,59 @@ class Escolas {
     }
 
     function exibir_lote_one($post) {
-        // ESCOLHA
+        // STATUS E ESCOLHA
+        $l1_status = get_post_meta($post->ID, 'l1_status', true);
+        if (!$l1_status) $l1_status = 'finalizado'; // default
+
         $l1_escolha_data_inicio = get_post_meta($post->ID, 'l1_escolha_data_inicio', true);
         $l1_escolha_data_fim = get_post_meta($post->ID, 'l1_escolha_data_fim', true);
         ?>
-        <div class="row mt-4 mb-4">
-            <label for="nome" class="mb-4 fw-bold" style="font-size: 1rem; color:#7A7A7A;">ESCOLHA</label>
+        <div class="row mt-4 mb-4 align-items-center">
+            <div class="col-md-8">
+                <label for="nome" class="fw-bold" style="font-size: 1rem; color:#7A7A7A;">ESCOLHA</label>
+            </div>
+            <div class="col-md-4 text-end">
+                <div class="status-toggle-wrap" style="display: inline-flex; align-items: center; gap: 10px; background: #f0f0f0; padding: 5px 15px; border-radius: 30px;">
+                    <span style="font-size: 11px; font-weight: bold; color: #666;">STATUS DO LOTE:</span>
+                    <label class="apreas-switch">
+                        <input type="checkbox" name="l1_status" value="aberto" <?php checked($l1_status, 'aberto'); ?>>
+                        <span class="apreas-slider round"></span>
+                    </label>
+                    <span class="status-label" style="font-size: 12px; font-weight: bold; min-width: 70px; color: <?php echo ($l1_status === 'aberto' ? '#27ae60' : '#d32f2f'); ?>;">
+                        <?php echo ($l1_status === 'aberto' ? 'ABERTO' : 'FINALIZADO'); ?>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <style>
+            .apreas-switch { position: relative; display: inline-block; width: 46px; height: 24px; }
+            .apreas-switch input { opacity: 0; width: 0; height: 0; }
+            .apreas-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; }
+            .apreas-slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; }
+            input:checked + .apreas-slider { background-color: #27ae60; }
+            input:focus + .apreas-slider { box-shadow: 0 0 1px #27ae60; }
+            input:checked + .apreas-slider:before { transform: translateX(22px); }
+            .apreas-slider.round { border-radius: 34px; }
+            .apreas-slider.round:before { border-radius: 50%; }
+        </style>
+
+        <script>
+            jQuery(document).ready(function($) {
+                $('input[name="l1_status"], input[name="l2_status"]').on('change', function() {
+                    var label = $(this).closest('.status-toggle-wrap').find('.status-label');
+                    if($(this).is(':checked')) {
+                        label.text('ABERTO').css('color', '#27ae60');
+                    } else {
+                        label.text('FINALIZADO').css('color', '#d32f2f');
+                    }
+                });
+            });
+        </script>
+
+        <div class="row mb-4">
             <p style="margin-bottom:15px; font-size:12px; color:#666;">
-                ▸ <strong>Shortcode dos Lotes</strong>: <code>[lotes_escola]</code>
+                ▸ <strong>Shortcode dos Lotes</strong>: <code>[lotes_escola]</code> | <strong>Status</strong>: <code>[lote1_status]</code>
             </p>
             <div class="col">
                 <div class="form-group">
@@ -449,14 +502,34 @@ class Escolas {
     }
 
     function exibir_lote_two($post) {
-        // ESCOLHA
+        // STATUS E ESCOLHA
+        $l2_status = get_post_meta($post->ID, 'l2_status', true);
+        if (!$l2_status) $l2_status = 'finalizado'; // default
+
         $l2_escolha_data_inicio = get_post_meta($post->ID, 'l2_escolha_data_inicio', true);
         $l2_escolha_data_fim = get_post_meta($post->ID, 'l2_escolha_data_fim', true);
         ?>
-        <div class="row mt-4 mb-4">
-            <label for="nome" class="mb-4 fw-bold" style="font-size: 1rem; color:#7A7A7A;">ESCOLHA</label>
+        <div class="row mt-4 mb-4 align-items-center">
+            <div class="col-md-8">
+                <label for="nome" class="fw-bold" style="font-size: 1rem; color:#7A7A7A;">ESCOLHA</label>
+            </div>
+            <div class="col-md-4 text-end">
+                <div class="status-toggle-wrap" style="display: inline-flex; align-items: center; gap: 10px; background: #f0f0f0; padding: 5px 15px; border-radius: 30px;">
+                    <span style="font-size: 11px; font-weight: bold; color: #666;">STATUS DO LOTE:</span>
+                    <label class="apreas-switch">
+                        <input type="checkbox" name="l2_status" value="aberto" <?php checked($l2_status, 'aberto'); ?>>
+                        <span class="apreas-slider round"></span>
+                    </label>
+                    <span class="status-label" style="font-size: 12px; font-weight: bold; min-width: 70px; color: <?php echo ($l2_status === 'aberto' ? '#27ae60' : '#d32f2f'); ?>;">
+                        <?php echo ($l2_status === 'aberto' ? 'ABERTO' : 'FINALIZADO'); ?>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
             <p style="margin-bottom:15px; font-size:12px; color:#666;">
-                ▸ <strong>Shortcode dos Lotes</strong>: <code>[lotes_escola]</code>
+                ▸ <strong>Shortcode dos Lotes</strong>: <code>[lotes_escola]</code> | <strong>Status</strong>: <code>[lote2_status]</code>
             </p>
             <div class="col">
                 <div class="form-group">
@@ -659,6 +732,11 @@ class Escolas {
         if (isset($_POST['l2_entrega_data_fim'])) {
             update_post_meta($post_id, 'l2_entrega_data_fim', sanitize_text_field($_POST['l2_entrega_data_fim']));
         }
+
+        // STATUS
+        update_post_meta($post_id, 'l1_status', isset($_POST['l1_status']) ? 'aberto' : 'finalizado');
+        update_post_meta($post_id, 'l2_status', isset($_POST['l2_status']) ? 'aberto' : 'finalizado');
+        // STATUS
         // LOTE 2
 
     }

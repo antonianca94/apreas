@@ -54,6 +54,8 @@ class Login {
         add_shortcode('lote2_entrega',          [$this,'shortcode_lote2_entrega']);
         add_shortcode('lote2_entrega_inicio',   [$this,'shortcode_lote2_entrega_inicio']);
         add_shortcode('lote2_entrega_fim',      [$this,'shortcode_lote2_entrega_fim']);
+        add_shortcode('lote1_status',           [$this,'shortcode_lote1_status']);
+        add_shortcode('lote2_status',           [$this,'shortcode_lote2_status']);
         // SHORTCODES INDIVIDUAIS DE DATAS
     }
 
@@ -253,6 +255,20 @@ class Login {
         $tipo = isset($atts['tipo']) && $atts['tipo'] === 'evento' ? 'evento' : 'escola';
         return $this->render_data_shortcode($a, 'l2_entrega_data_fim_' . $tipo, $content);
     }
+
+    // [lote1_status] — Lote 1 · Status (ABERTO/FINALIZADO)
+    function shortcode_lote1_status($atts, $content = null) {
+        $a = $this->atts_data_shortcode($atts, '');
+        $tipo = isset($atts['tipo']) && $atts['tipo'] === 'evento' ? 'evento' : 'escola';
+        return $this->render_data_shortcode($a, 'l1_status_' . $tipo, $content);
+    }
+
+    // [lote2_status] — Lote 2 · Status (ABERTO/FINALIZADO)
+    function shortcode_lote2_status($atts, $content = null) {
+        $a = $this->atts_data_shortcode($atts, '');
+        $tipo = isset($atts['tipo']) && $atts['tipo'] === 'evento' ? 'evento' : 'escola';
+        return $this->render_data_shortcode($a, 'l2_status_' . $tipo, $content);
+    }
     // ============================================================
 
 
@@ -260,14 +276,20 @@ class Login {
         return '
             <div class="d-flex justify-content-start align-items-center">
                 <div class="w-100 p-3 m-3" style="border: 1px solid grey; border-radius: 1rem;">
-                    <h3 style="padding-bottom: 0.5rem; font-weight: 700;">Lote 1</h3>
+                    <div class="d-flex justify-content-between align-items-center" style="padding-bottom: 0.5rem;">
+                        <h3 style="margin: 0; font-weight: 700;">Lote 1</h3>
+                        <span class="l1_status_evento badge bg-secondary" style="font-size: 0.8rem;"></span>
+                    </div>
                     <h5>Escolha</h5>
                     <p style="font-size: 1.35rem;"> <span class="l1_escolha_data_inicio_evento"> </span> à <span class="l1_escolha_data_fim_evento"> </span> </p>
                     <h5>Entrega</h5>
                     <p style="font-size: 1.35rem;"> <span class="l1_entrega_data_inicio_evento"> </span> à <span class="l1_entrega_data_fim_evento"> </span> </p>
                 </div>
                 <div class="w-100 p-3 m-3" style="border: 1px solid grey; border-radius: 1rem;">
-                    <h3 style="padding-bottom: 0.5rem; font-weight: 700;">Lote 2</h3>
+                    <div class="d-flex justify-content-between align-items-center" style="padding-bottom: 0.5rem;">
+                        <h3 style="margin: 0; font-weight: 700;">Lote 2</h3>
+                        <span class="l2_status_evento badge bg-secondary" style="font-size: 0.8rem;"></span>
+                    </div>
                     <h5>Escolha</h5>
                     <p style="font-size: 1.35rem;"> <span class="l2_escolha_data_inicio_evento"> </span> à <span class="l2_escolha_data_fim_evento"> </span> </p>
                     <h5>Entrega</h5>
@@ -281,14 +303,20 @@ class Login {
         return '
             <div class="d-flex justify-content-start align-items-center">
                 <div class="w-100 p-3 m-3" style="border: 1px solid grey; border-radius: 1rem;">
-                    <h3 style="padding-bottom: 0.5rem; font-weight: 700;">Lote 1</h3>
+                    <div class="d-flex justify-content-between align-items-center" style="padding-bottom: 0.5rem;">
+                        <h3 style="margin: 0; font-weight: 700;">Lote 1</h3>
+                        <span class="l1_status_escola badge bg-secondary" style="font-size: 0.8rem;"></span>
+                    </div>
                     <h5>Escolha</h5>
                     <p style="font-size: 1.35rem;"> <span class="l1_escolha_data_inicio_escola"> </span> à <span class="l1_escolha_data_fim_escola"> </span> </p>
                     <h5>Entrega</h5>
                     <p style="font-size: 1.35rem;"> <span class="l1_entrega_data_inicio_escola"> </span> à <span class="l1_entrega_data_fim_escola"> </span> </p>
                 </div>
                 <div class="w-100 p-3 m-3" style="border: 1px solid grey; border-radius: 1rem;">
-                    <h3 style="padding-bottom: 0.5rem; font-weight: 700;">Lote 2</h3>
+                    <div class="d-flex justify-content-between align-items-center" style="padding-bottom: 0.5rem;">
+                        <h3 style="margin: 0; font-weight: 700;">Lote 2</h3>
+                        <span class="l2_status_escola badge bg-secondary" style="font-size: 0.8rem;"></span>
+                    </div>
                     <h5>Escolha</h5>
                     <p style="font-size: 1.35rem;"> <span class="l2_escolha_data_inicio_escola"> </span> à <span class="l2_escolha_data_fim_escola"> </span> </p>
                     <h5>Entrega</h5>
@@ -645,6 +673,8 @@ class Login {
             $l2_entrega_data_escola = get_post_meta(intval($escola_id), 'l2_entrega_data', true);
             $l2_entrega_data_inicio_escola = get_post_meta(intval($escola_id), 'l2_entrega_data_inicio', true);
             $l2_entrega_data_fim_escola = get_post_meta(intval($escola_id), 'l2_entrega_data_fim', true);
+            $l1_status_escola = get_post_meta(intval($escola_id), 'l1_status', true);
+            $l2_status_escola = get_post_meta(intval($escola_id), 'l2_status', true);
             $data_limite_fotos_escola = get_post_meta(intval($escola_id), 'data_limite_fotos', true);
             // ESCOLA | CAMPOS EXTRAS
 
@@ -667,6 +697,8 @@ class Login {
                     'l2_entrega_data' => $l2_entrega_data_escola,
                     'l2_entrega_data_inicio' => $l2_entrega_data_inicio_escola,
                     'l2_entrega_data_fim' => $l2_entrega_data_fim_escola,
+                    'l1_status' => $l1_status_escola ? strtoupper($l1_status_escola) : 'FINALIZADO',
+                    'l2_status' => $l2_status_escola ? strtoupper($l2_status_escola) : 'FINALIZADO',
                     'data_limite_fotos' => $data_limite_fotos_escola
                 ],
                 'unidade' => [
@@ -1074,9 +1106,15 @@ class Login {
                 $l1_escolha_data_inicio_escola = get_post_meta(intval($escola_id), 'l1_escolha_data_inicio', true);
                 $l1_escolha_data_fim_escola = get_post_meta(intval($escola_id), 'l1_escolha_data_fim', true);
                 $l1_entrega_data_escola = get_post_meta(intval($escola_id), 'l1_entrega_data', true);
+                $l1_entrega_data_inicio_escola = get_post_meta(intval($escola_id), 'l1_entrega_data_inicio', true);
+                $l1_entrega_data_fim_escola = get_post_meta(intval($escola_id), 'l1_entrega_data_fim', true);
                 $l2_escolha_data_inicio_escola = get_post_meta(intval($escola_id), 'l2_escolha_data_inicio', true);
                 $l2_escolha_data_fim_escola = get_post_meta(intval($escola_id), 'l2_escolha_data_fim', true);
                 $l2_entrega_data_escola = get_post_meta(intval($escola_id), 'l2_entrega_data', true);
+                $l2_entrega_data_inicio_escola = get_post_meta(intval($escola_id), 'l2_entrega_data_inicio', true);
+                $l2_entrega_data_fim_escola = get_post_meta(intval($escola_id), 'l2_entrega_data_fim', true);
+                $l1_status_escola = get_post_meta(intval($escola_id), 'l1_status', true);
+                $l2_status_escola = get_post_meta(intval($escola_id), 'l2_status', true);
                 // ESCOLA | CAMPOS EXTRAS
 
                 // EVENTO | CAMPOS EXTRAS
@@ -1084,9 +1122,15 @@ class Login {
                 $l1_escolha_data_inicio_evento = get_post_meta(intval($evento_id), 'l1_escolha_data_inicio', true);
                 $l1_escolha_data_fim_evento = get_post_meta(intval($evento_id), 'l1_escolha_data_fim', true);
                 $l1_entrega_data_evento = get_post_meta(intval($evento_id), 'l1_entrega_data', true);
+                $l1_entrega_data_inicio_evento = get_post_meta(intval($evento_id), 'l1_entrega_data_inicio', true);
+                $l1_entrega_data_fim_evento = get_post_meta(intval($evento_id), 'l1_entrega_data_fim', true);
                 $l2_escolha_data_inicio_evento = get_post_meta(intval($evento_id), 'l2_escolha_data_inicio', true);
                 $l2_escolha_data_fim_evento = get_post_meta(intval($evento_id), 'l2_escolha_data_fim', true);
                 $l2_entrega_data_evento = get_post_meta(intval($evento_id), 'l2_entrega_data', true);
+                $l2_entrega_data_inicio_evento = get_post_meta(intval($evento_id), 'l2_entrega_data_inicio', true);
+                $l2_entrega_data_fim_evento = get_post_meta(intval($evento_id), 'l2_entrega_data_fim', true);
+                $l1_status_evento = get_post_meta(intval($evento_id), 'l1_status', true);
+                $l2_status_evento = get_post_meta(intval($evento_id), 'l2_status', true);
                 // EVENTO | CAMPOS EXTRAS
     
                 $dados[] = [
@@ -1103,9 +1147,15 @@ class Login {
                         'l1_escolha_data_inicio' => $l1_escolha_data_inicio_evento,
                         'l1_escolha_data_fim' => $l1_escolha_data_fim_evento,
                         'l1_entrega_data' => $l1_entrega_data_evento,
+                        'l1_entrega_data_inicio' => $l1_entrega_data_inicio_evento,
+                        'l1_entrega_data_fim' => $l1_entrega_data_fim_evento,
                         'l2_escolha_data_inicio' => $l2_escolha_data_inicio_evento,
                         'l2_escolha_data_fim' => $l2_escolha_data_fim_evento,
-                        'l2_entrega_data' => $l2_entrega_data_evento
+                        'l2_entrega_data' => $l2_entrega_data_evento,
+                        'l2_entrega_data_inicio' => $l2_entrega_data_inicio_evento,
+                        'l2_entrega_data_fim' => $l2_entrega_data_fim_evento,
+                        'l1_status' => $l1_status_evento ? strtoupper($l1_status_evento) : 'FINALIZADO',
+                        'l2_status' => $l2_status_evento ? strtoupper($l2_status_evento) : 'FINALIZADO'
                     ],
                     'escola' => [
                         'id' => intval($escola_id),
@@ -1114,9 +1164,15 @@ class Login {
                         'l1_escolha_data_inicio' => $l1_escolha_data_inicio_escola,
                         'l1_escolha_data_fim' => $l1_escolha_data_fim_escola,
                         'l1_entrega_data' => $l1_entrega_data_escola,
+                        'l1_entrega_data_inicio' => $l1_entrega_data_inicio_escola,
+                        'l1_entrega_data_fim' => $l1_entrega_data_fim_escola,
                         'l2_escolha_data_inicio' => $l2_escolha_data_inicio_escola,
                         'l2_escolha_data_fim' => $l2_escolha_data_fim_escola,
-                        'l2_entrega_data' => $l2_entrega_data_escola
+                        'l2_entrega_data' => $l2_entrega_data_escola,
+                        'l2_entrega_data_inicio' => $l2_entrega_data_inicio_escola,
+                        'l2_entrega_data_fim' => $l2_entrega_data_fim_escola,
+                        'l1_status' => $l1_status_escola ? strtoupper($l1_status_escola) : 'FINALIZADO',
+                        'l2_status' => $l2_status_escola ? strtoupper($l2_status_escola) : 'FINALIZADO'
                     ],
                     'unidade' => [
                         'id' => intval($unidade_id),
