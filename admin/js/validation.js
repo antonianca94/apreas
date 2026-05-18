@@ -75,7 +75,7 @@
             }
         }
     }else{
-        if(form_evento!="" || form_evento!=undefined || form_evento!=null){
+        if (form_evento !== null) {
             form_evento.addEventListener('submit', (e) => {
                 validateName(e);
                 validateData(e);

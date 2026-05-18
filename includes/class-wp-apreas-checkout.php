@@ -261,7 +261,7 @@ class Checkout {
 
         woocommerce_form_field( 'apreas_turma', [
             'type'     => 'text',
-            'label'    => __( 'Turma', 'apreas' ),
+            'label'    => __( 'Série e Turma', 'apreas' ),
             'required' => true,
             'class'    => [ 'form-row-last' ],
         ], $checkout->get_value( 'apreas_turma' ) );
@@ -294,37 +294,40 @@ class Checkout {
             echo '</div>'; // fecha apreas-cupom-desconto
 
 
-            // JavaScript: Aplicar e Remover cupom
-            echo "<script>
-            jQuery(document).ready(function($){
+        } // Fecha if ( get_option(...) )
 
-                // Restaurar dados do aluno da sessão (localStorage)
-                function apreasRestaurarSessao() {
-                    try {
-                        var raw = localStorage.getItem('apreas_login_sessao');
-                        if (!raw) return;
-                        var s = JSON.parse(raw);
-                        if (Date.now() > s.expira) return;
+        // JavaScript: Restaurar Sessão e Lógica do Cupom
+        echo "<script>
+        jQuery(document).ready(function($){
 
-                        var dados = s.dados;
-                        var d = (s.tipo === 'eventos' && Array.isArray(dados) && dados.length > 0) ? dados[0] : dados;
+            // Restaurar dados do aluno da sessão (localStorage)
+            function apreasRestaurarSessao() {
+                try {
+                    var raw = localStorage.getItem('apreas_login_sessao');
+                    if (!raw) return;
+                    var s = JSON.parse(raw);
+                    if (Date.now() > s.expira) return;
 
-                        if (d) {
-                            var fieldAluno = $('#apreas_aluno');
-                            var fieldEscola = $('#apreas_escola');
-                            var fieldTurma = $('#apreas_turma');
+                    var dados = s.dados;
+                    var d = (s.tipo === 'eventos' && Array.isArray(dados) && dados.length > 0) ? dados[0] : dados;
 
-                            // Só preenche se o campo estiver vazio
-                            if (fieldAluno.length && !fieldAluno.val()) fieldAluno.val(d.nome || '');
-                            if (fieldEscola.length && !fieldEscola.val()) fieldEscola.val(d.escola ? d.escola.nome : '');
-                            if (fieldTurma.length && !fieldTurma.val()) fieldTurma.val(d.turma ? d.turma.nome : '');
-                        }
-                    } catch(e) { console.warn('Erro ao restaurar sessão no checkout:', e); }
-                }
-                apreasRestaurarSessao();
-                $(document.body).on('updated_checkout', apreasRestaurarSessao);
+                    if (d) {
+                        var fieldAluno = $('#apreas_aluno');
+                        var fieldEscola = $('#apreas_escola');
+                        var fieldTurma = $('#apreas_turma');
 
-                // Mostrar/ocultar botão Remover com base no valor do campo
+                        // Só preenche se o campo estiver vazio
+                        if (fieldAluno.length && !fieldAluno.val()) fieldAluno.val(d.nome || '');
+                        if (fieldEscola.length && !fieldEscola.val()) fieldEscola.val(d.escola ? d.escola.nome : '');
+                        if (fieldTurma.length && !fieldTurma.val()) fieldTurma.val(d.turma ? d.turma.nome : '');
+                    }
+                } catch(e) { console.warn('Erro ao restaurar sessão no checkout:', e); }
+            }
+            apreasRestaurarSessao();
+            $(document.body).on('updated_checkout', apreasRestaurarSessao);
+
+            // Mostrar/ocultar botão Remover com base no valor do campo (apenas se existir)
+            if ($('#apreas_codigo_desconto').length) {
                 function apreakToggleRemove() {
                     var val = $('#apreas_codigo_desconto').val().trim();
                     if ( val.length > 0 ) {
@@ -360,9 +363,9 @@ class Checkout {
                         $('body').trigger('update_checkout');
                     }
                 });
-            });
-            </script>";
-        }
+            }
+        });
+        </script>";
 
         echo '</div>';
     }

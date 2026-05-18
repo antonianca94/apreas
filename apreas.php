@@ -3,7 +3,7 @@
 Plugin Name: Apreas WP Plugin
 Plugin URI: https://apreas.com.br/
 Description: Recursos extras para os Alunos.
-Version: 2.2.1
+Version: 2.2.2
 Author: Apreas Development Team
 Author URI: https://apreas.com.br/
 Text Domain: apreas
@@ -868,7 +868,7 @@ class APREAS_Plugin
             "Validation_JS",
             plugins_url("/admin/js/validation.js", __FILE__),
             [],
-            "1.0.4",
+            "1.0.5",
             true
         );
         // Mini Carrinho Flutuante

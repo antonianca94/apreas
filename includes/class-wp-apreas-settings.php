@@ -27,7 +27,7 @@ class Settings
     {
         add_menu_page(
             'Configurações Apreas',
-            'Apreas',
+            'Configurações Apreas',
             'manage_options',
             'apreas-settings',
             [$this, 'render_settings_page'],
