@@ -174,6 +174,150 @@ class APREAS_Plugin
                 2
             );
 
+    // Adiciona coluna "Escolas"
+    add_filter('manage_edit-shop_order_columns', function($columns){
+
+    $new_columns = [];
+
+    foreach($columns as $key => $value){
+        $new_columns[$key] = $value;
+
+        if($key === 'billing_address'){
+            $new_columns['escolas'] = 'Escolas';
+        }
+    }
+
+    return $new_columns;
+    });
+
+    // Mostra valor do campo adicional
+    add_action('manage_shop_order_posts_custom_column', function($column){
+
+    global $post;
+
+    if($column === 'escolas'){
+
+        $valor = get_post_meta($post->ID, '_apreas_escola', true);
+
+
+        echo esc_html($valor);
+    }
+
+    });
+
+
+    /**
+     * Coluna Escola no WooCommerce Analytics Orders
+     * Compatível com WooCommerce 10.7+
+     */
+
+    /*
+    |--------------------------------------------------------------------------
+    | 1. Injeta o dado 'escola' na API REST do Analytics
+    |--------------------------------------------------------------------------
+    */
+    add_filter( 'woocommerce_rest_prepare_report_orders', 'injeta_escola_api_analytics', 10, 3 );
+    function injeta_escola_api_analytics( $response, $report, $request ) {
+
+    if ( ! isset( $response->data['order_id'] ) ) {
+        return $response;
+    }
+
+    $order_id = $response->data['order_id'];
+    $escola_id = get_post_meta( $order_id, 'escolas', true );
+    $escola_nome = '-';
+
+    if ( $escola_id ) {
+        if ( is_numeric( $escola_id ) ) {
+            $escola_nome = get_the_title( $escola_id );
+        } else {
+            $escola_nome = $escola_id;
+        }
+    }
+
+    // Adiciona o dado na resposta que vai pro JavaScript
+    $response->data['escola'] = $escola_nome ?: '-';
+
+    return $response;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | 2. Injeta o JavaScript no momento exato (Dependência do wc-admin-app)
+    |--------------------------------------------------------------------------
+    */
+    add_action( 'admin_enqueue_scripts', function() {
+    // Só roda se estivermos nas páginas do WooCommerce Admin / Analytics
+    if ( ! function_exists( 'wc_admin_is_connected_page' ) || ! wc_admin_is_connected_page() ) {
+        return;
+    }
+
+    // Criamos um script inline que depende obrigatoriamente do script principal do WooCommerce Admin
+    wp_register_script( 'wc-analytics-escola-js', '' );
+    wp_enqueue_script( 'wc-analytics-escola-js' );
+    wp_add_inline_script( 'wc-analytics-escola-js', "
+        (function() {
+            function injectEscolaColumn() {
+                if ( typeof wp === 'undefined' || ! wp.hooks || ! wp.hooks.addFilter ) {
+                    setTimeout( injectEscolaColumn, 50 );
+                    return;
+                }
+
+                // Filtro principal da Tabela do WooCommerce Admin
+                wp.hooks.addFilter(
+                    'woocommerce_admin_report_table',
+                    'escola-analytics-column',
+                    function( reportTable ) {
+                        // Verifica se estamos na tela de Pedidos (orders)
+                        if ( reportTable.endpoint !== 'orders' ) {
+                            return reportTable;
+                        }
+
+                        // Evita duplicar a coluna se o React re-renderizar
+                        const hasColumn = reportTable.headers.some( h => h.key === 'escola' );
+                        if ( hasColumn ) {
+                            return reportTable;
+                        }
+
+                        // 1. Adiciona o Cabeçalho da Coluna
+                        reportTable.headers.push({
+                            label: 'Escola',
+                            key: 'escola',
+                        });
+
+                        // 2. Mapeia as linhas e injeta o valor vindo da API
+                        if ( reportTable.rows && reportTable.rows.length > 0 ) {
+                            reportTable.rows = reportTable.rows.map( function( row ) {
+                                // Busca o valor que injetamos no passo 1 do PHP
+                                var escolaValue = '-';
+                                
+                                if ( row.original && row.original.escola ) {
+                                    escolaValue = row.original.escola;
+                                } else if ( row.escola ) {
+                                    escolaValue = row.escola;
+                                }
+
+                                // Adiciona a célula no final da linha
+                                row.push({
+                                    display: escolaValue,
+                                    value: escolaValue
+                                });
+
+                                return row;
+                            });
+                        }
+
+                        return reportTable;
+                    }
+                );
+            }
+
+            injectEscolaColumn();
+        })();
+    " );
+    }, 999 );
+
             add_filter("manage_edit-alunos_sortable_columns", function (
                 $sortable_columns
             ) {
