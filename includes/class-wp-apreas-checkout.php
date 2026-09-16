@@ -19,7 +19,7 @@ class Checkout {
 
     private function __construct() {
         add_action( 'woocommerce_before_order_notes',                     [ $this, 'render_campos_checkout' ] );
-        add_action( 'woocommerce_checkout_process',                       [ $this, 'validar_campos_checkout' ] );
+        add_action( 'woocommerce_checkout_process',                   [ $this, 'validar_campos_checkout' ] );
         add_action( 'woocommerce_checkout_update_order_meta',             [ $this, 'salvar_campos_checkout' ] );
         add_action( 'woocommerce_admin_order_data_after_billing_address', [ $this, 'exibir_campos_admin' ], 10, 1 );
         add_filter( 'woocommerce_email_order_meta_fields',                [ $this, 'campos_no_email' ], 10, 3 );
@@ -40,6 +40,9 @@ class Checkout {
         // Remove o bloco nativo de cupom do WooCommerce (Sempre oculto)
         remove_action( 'woocommerce_before_checkout_form', 'woocommerce_checkout_coupon_form', 10 );
         add_action( 'wp_head', [ $this, 'esconder_cupom_nativo_css' ] );
+
+        // Máscara de CEP no campo de faturamento
+        add_action( 'wp_footer', [ $this, 'mascara_cep' ] );
 
         // Recursos de Cupom Customizado
         if ( get_option( 'apreas_custom_coupon_enabled', 1 ) ) {
@@ -88,6 +91,15 @@ class Checkout {
             $billing['billing_state']['label']    = __( 'Estado', 'apreas' );
             $billing['billing_state']['priority'] = 85;
             $billing['billing_state']['class']    = [ 'form-row-wide' ];
+        }
+
+        // COMPLEMENTO — obrigatório com instrução (validação personalizada via JS + server)
+        if ( isset( $billing['billing_address_2'] ) ) {
+            $billing['billing_address_2']['required']    = false; // nativo OFF p/ não gerar aviso padrão
+            $billing['billing_address_2']['label']       = __( 'Complemento', 'apreas' ) . ' <abbr class="required" title="obrigatório" style="color:#e00000;">*</abbr>';
+            $billing['billing_address_2']['placeholder'] = __( 'Ex.: Apto 101, Bloco B', 'apreas' );
+            $billing['billing_address_2']['priority']    = 65;
+            $billing['billing_address_2']['class']       = [ 'form-row-wide' ];
         }
 
         // REMOVE: "Informações adicionais" (Notas do Pedido)
@@ -198,7 +210,7 @@ class Checkout {
     }
 
     // ─────────────────────────────────────────────
-    // ESCONDER CAMPO NATIVO DE CUPOM VIA CSS
+    // CSS — Checkout: esconde cupom nativo
     // ─────────────────────────────────────────────
     public function esconder_cupom_nativo_css() {
         if ( ! is_checkout() ) return;
@@ -207,8 +219,7 @@ class Checkout {
             .woocommerce-form-coupon,
             .checkout_coupon,
             .woocommerce-remove-coupon { display: none !important; }
-
-            /* Estilo premium para o botão Aplicar */
+            #billing_address_2_field .optional { display: none !important; }
             #btn_apreas_aplicar_cupom {
                 background-color: #D90D28 !important;
                 color: #ffffff !important;
@@ -219,6 +230,126 @@ class Checkout {
                 background-color: #b00b20 !important;
             }
         </style>';
+    }
+
+    // ─────────────────────────────────────────────
+    // MÁSCARA DE CEP — campo de faturamento
+    // ─────────────────────────────────────────────
+    // ─────────────────────────────────────────────
+    public function mascara_cep() {
+        if ( ! is_checkout() ) return;
+        echo <<<'APREAS_JS'
+<script>
+jQuery(document).ready(function($) {
+    var msgId = 'apreas-erro-complemento';
+
+    // Garante que o wrapper/identificação do input exista (clássico: #billing_address_2; blocos: #billing-address-2)
+    function campoComplemento() {
+        return $('#billing_address_2').length ? $('#billing_address_2')
+             : ($('#billing-address-2').length ? $('#billing-address-2') : $('input[name="billing_address_2"]'));
+    }
+
+    var htmlErro =
+        '<div id="' + msgId + '" style="display:flex;align-items:center;gap:8px;padding:10px 14px;margin-top:1rem;background:#fff7ed;border:1px solid #fed7aa;border-left:4px solid #ea580c;border-radius:6px;font-size:13px;color:#9a3412;">'
+        + '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
+        + '<span><strong>Complemento obrigatório!</strong><br>Se não houver complemento, preencha com <strong style="background:#ffedd5;padding:1px 6px;border-radius:3px;">NC</strong>.</span>'
+        + '</div>';
+
+    function mostrarErro() {
+        var input = campoComplemento();
+        if ( !input.length ) return;
+        var wrapper = input.closest('.form-row, #billing_address_2_field, #billing-address-2-field, .wc-block-components-text-input, p, .components-text-control__input');
+        if ( !wrapper.length ) wrapper = input.parent();
+
+        if ( !$('#' + msgId).length ) {
+            wrapper.append(htmlErro);
+        }
+        $('#' + msgId).show();
+        input.css({ 'border-color':'#ea580c', 'box-shadow':'0 0 0 2px rgba(234,88,12,0.15)' });
+    }
+
+    function esconderErro() {
+        $('#' + msgId).remove();
+        campoComplemento().css({ 'border-color':'', 'box-shadow':'' });
+    }
+
+    // Mostra ao tirar o foco se estiver vazio
+    $(document.body).on('blur', '#billing_address_2, #billing-address-2, input[name="billing_address_2"]', function() {
+        if ( !$(this).val() || $(this).val().trim() === '' ) mostrarErro();
+    });
+
+    // Esconde imediatamente ao digitar/preencher
+    $(document.body).on('input change keyup', '#billing_address_2, #billing-address-2, input[name="billing_address_2"]', function() {
+        if ( $(this).val() && $(this).val().trim() !== '' ) esconderErro();
+    });
+
+    // Bloqueia o submit se complemento vazio (funciona em qualquer submit)
+    $(document.body).on('checkout_place_order', function() {
+        var val = campoComplemento().val();
+        if ( !val || val.trim() === '' ) {
+            mostrarErro();
+            campoComplemento().focus();
+            return false;
+        }
+        return true;
+    });
+    $(document.body).on('click', '#place_order, .wc-block-components-checkout-place-order-button, button[type*="submit"]', function() {
+        var val = campoComplemento().val();
+        if ( !val || val.trim() === '' ) {
+            mostrarErro();
+            campoComplemento().focus();
+            return false;
+        }
+    });
+
+    $(document.body).on('updated_checkout', function() {
+        apreasAplicarMascaraCEP();
+        apreasAplicarMascaraTelefone();
+    });
+
+    function apreasAplicarMascaraCEP() {
+        var input = $('#billing_postcode');
+        if ( ! input.length ) return;
+        if ( input.val() ) {
+            var vAtual = input.val().replace(/\D/g, '').slice(0, 8);
+            if ( vAtual.length > 5 ) {
+                input.val(vAtual.substring(0, 5) + '-' + vAtual.substring(5));
+            }
+        }
+        input.off('input.cepmask blur.cepmask');
+        input.on('input.cepmask', function() {
+            var v = $(this).val().replace(/\D/g, '').slice(0, 8);
+            if ( v.length > 5 ) v = v.substring(0, 5) + '-' + v.substring(5);
+            $(this).val(v);
+        });
+    }
+
+    function apreasFormatarTelefone(d) {
+        if ( d.length <= 2 ) return '(' + d;
+        if ( d.length <= 3 ) return '(' + d.substring(0, 2) + ') ';
+        if ( d.length <= 7 ) return '(' + d.substring(0, 2) + ') ' + d.substring(2);
+        return '(' + d.substring(0, 2) + ') ' + d.substring(2, 7) + '-' + d.substring(7);
+    }
+
+    function apreasAplicarMascaraTelefone() {
+        var input = $('#billing_phone');
+        if ( ! input.length ) return;
+        if ( input.val() ) {
+            var d = input.val().replace(/\D/g, '').slice(0, 11);
+            input.val( apreasFormatarTelefone(d) );
+        }
+        input.off('input.fonemask blur.fonemask');
+        input.on('input.fonemask', function() {
+            var v = $(this).val().replace(/\D/g, '').slice(0, 11);
+            $(this).val( apreasFormatarTelefone(v) );
+        });
+    }
+
+    apreasAplicarMascaraCEP();
+    apreasAplicarMascaraTelefone();
+});
+</script>
+APREAS_JS;
     }
 
     // ─────────────────────────────────────────────
@@ -374,6 +505,13 @@ class Checkout {
     // VALIDAÇÃO
     // ─────────────────────────────────────────────
     public function validar_campos_checkout() {
+
+        // Bairro — sempre obrigatório (validação server-side de backup)
+        if ( empty( $_POST['billing_neighborhood'] ) ) {
+            wc_add_notice( sprintf( __( 'O campo <strong>Bairro</strong> é obrigatório.', 'apreas' ), 'Bairro' ), 'error' );
+        }
+
+        // Campos do aluno — só quando há produto da categoria
         if ( ! $this->tem_produto_recordacao_escolar() ) {
             return;
         }
