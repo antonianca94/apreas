@@ -3,6 +3,13 @@
    Versão: 1.0.0
    ============================================================ */
 
+/* ── Oculto até login de shortcode ser efetuado ── */
+body.apreas-minicart-deslogado #apreas-minicart-trigger,
+body.apreas-minicart-deslogado #apreas-minicart-panel,
+body.apreas-minicart-deslogado #apreas-minicart-overlay {
+    display: none !important;
+}
+
 /* ── Botão gatilho (canto inferior direito) ── */
 #apreas-minicart-trigger {
     position: fixed;

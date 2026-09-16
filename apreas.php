@@ -753,6 +753,18 @@ class APREAS_Plugin
         $checkout_url = wc_get_checkout_url();
         ?>
         <!-- Apreas Mini Carrinho Flutuante -->
+        <script>
+        (function () {
+            try {
+                var s = JSON.parse(localStorage.getItem('apreas_login_sessao') || 'null');
+                if (!(s && s.expira && Date.now() < s.expira)) {
+                    document.body.classList.add('apreas-minicart-deslogado');
+                }
+            } catch (e) {
+                document.body.classList.add('apreas-minicart-deslogado');
+            }
+        })();
+        </script>
         <div id="apreas-minicart-overlay" aria-hidden="true"></div>
 
         <button id="apreas-minicart-trigger"
@@ -941,7 +953,7 @@ class APREAS_Plugin
                 "Apreas_Minicart_CSS",
                 plugins_url("/admin/css/minicart.css", __FILE__),
                 [],
-                "1.0.5"
+                "1.0.6"
             );
         }
         wp_enqueue_style(
@@ -1021,7 +1033,7 @@ class APREAS_Plugin
                 "Apreas_Minicart_JS",
                 plugins_url("/admin/js/minicart.js", __FILE__),
                 ["jquery"],
-                "1.0.0",
+                "1.0.1",
                 true
             );
             wp_localize_script(

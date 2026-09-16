@@ -6,6 +6,19 @@
     'use strict';
 
     /* ─────────────────────────────────────────────
+       Sessão (somente exibe após login de shortcode)
+    ───────────────────────────────────────────── */
+    var LOGIN_KEY = 'apreas_login_sessao';
+
+    function temSessaoAtiva() {
+        try {
+            var s = JSON.parse(localStorage.getItem(LOGIN_KEY) || 'null');
+            return !!(s && s.expira && Date.now() < s.expira);
+        } catch (e) {
+            return false;
+        }
+    }
+    /* ─────────────────────────────────────────────
        Referências DOM
     ───────────────────────────────────────────── */
     var $trigger, $panel, $overlay, $badge, $itemsList, $subtotalVal, $emptyMsg, $itemsWrap, $footerWrap;
@@ -218,11 +231,45 @@
     }
 
     /* ─────────────────────────────────────────────
-       Bootstrap
+       Bootstrap — somente inicializa/exibe se o
+       login de shortcode tiver sido efetuado.
     ───────────────────────────────────────────── */
+
+    function aplicarEstadoSessao() {
+        var logado = temSessaoAtiva();
+        if (logado) {
+            $('body').removeClass('apreas-minicart-deslogado');
+        } else {
+            $('body').addClass('apreas-minicart-deslogado');
+        }
+        return logado;
+    }
+
     $(document).ready(function () {
-        if ($('#apreas-minicart-trigger').length) {
+        if (!$('#apreas-minicart-trigger').length) return;
+        if (aplicarEstadoSessao()) {
             init();
+            window.__apreasMinicartInicializado = true;
+        }
+    });
+
+    // Login de shortcode efetuado com sucesso → exibe o minicart
+    $(document.body).on('apreas_login_success', function () {
+        if (!$('#apreas-minicart-trigger').length) return;
+        if (aplicarEstadoSessao()) {
+            if (!window.__apreasMinicartInicializado) {
+                init();
+                window.__apreasMinicartInicializado = true;
+            }
+            updateFromFragment();
+        }
+    });
+
+    // Logout (remove sessão) → recolhe o minicart
+    $(document).on('apreas_logout', function () {
+        $('body').addClass('apreas-minicart-deslogado');
+        if ($panel && $('#apreas-minicart-panel').hasClass('apreas-minicart--open')) {
+            closePanel();
         }
     });
 

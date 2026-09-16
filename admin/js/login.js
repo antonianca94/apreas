@@ -328,6 +328,8 @@ jQuery(document).ready(function ($) {
                     salvarSessao('escola', response.data);
                     aplicarSessaoEscola(response.data);
 
+                    $(document.body).trigger('apreas_login_success');
+
                     Swal.fire({
                         title: 'Acesso Liberado com Sucesso!',
                         text: '',
@@ -617,6 +619,8 @@ jQuery(document).ready(function ($) {
                     salvarSessao('eventos', response.data);
                     aplicarSessaoEventos(response.data);
 
+                    $(document.body).trigger('apreas_login_success');
+
                     window.scrollTo(0, 0);
                 } else {
                     Swal.fire({
@@ -737,6 +741,7 @@ jQuery(document).ready(function ($) {
     $(document).on('click', '#btnSairApreas', function (e) {
         e.preventDefault();
         localStorage.removeItem(SESSAO_KEY);
+        $(document).trigger('apreas_logout');
         location.reload();
     });
     // SAIR / LOGOUT
