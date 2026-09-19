@@ -330,16 +330,6 @@ jQuery(document).ready(function ($) {
 
                     $(document.body).trigger('apreas_login_success');
 
-                    Swal.fire({
-                        title: 'Acesso Liberado com Sucesso!',
-                        text: '',
-                        icon: 'success',
-                        confirmButtonText: 'OK',
-                        customClass: {
-                            confirmButton: 'custom-confirm-button'
-                        }
-                    });
-
                     // IMAGEM
                     if (response.data.imagem_upload_individual) {
                         $('.imagem_upload_individual img').attr('src', response.data.imagem_upload_individual);
@@ -601,12 +591,6 @@ jQuery(document).ready(function ($) {
                         if (l1_status_escola) l1_status_escola.textContent = response.data[0].escola.l1_status || 'FINALIZADO';
                         if (l2_status_escola) l2_status_escola.textContent = response.data[0].escola.l2_status || 'FINALIZADO';
                     }
-
-                    Swal.fire({
-                        title: 'Acesso Liberado com Sucesso!',
-                        icon: 'success',
-                        confirmButtonText: 'OK'
-                    });
 
                     var loginContainer = document.getElementById('loginContainer');
                     if (loginContainer) {

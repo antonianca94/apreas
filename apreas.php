@@ -946,7 +946,7 @@ class APREAS_Plugin
             "Participantes_CSS",
             plugins_url("/admin/css/participantes.css", __FILE__),
             [],
-            "1.0.33"
+            "1.0.35"
         );
         if (get_option('apreas_minicart_enabled', 1)) {
             wp_enqueue_style(
@@ -1010,7 +1010,7 @@ class APREAS_Plugin
             "Login_JS",
             plugins_url("/admin/js/login.js", __FILE__),
             [],
-            "1.0.79",
+            "1.0.80",
             true
         );
         wp_enqueue_script(
