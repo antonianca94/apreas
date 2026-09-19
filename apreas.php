@@ -1010,7 +1010,7 @@ class APREAS_Plugin
             "Login_JS",
             plugins_url("/admin/js/login.js", __FILE__),
             [],
-            "1.0.80",
+            "1.0.81",
             true
         );
         wp_enqueue_script(

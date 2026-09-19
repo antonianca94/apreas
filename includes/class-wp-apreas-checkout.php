@@ -357,8 +357,10 @@ APREAS_JS;
     // ─────────────────────────────────────────────
     private function tem_produto_recordacao_escolar() {
         if ( ! WC()->cart ) return false;
+        $categoria = get_option( 'apreas_checkout_category', 'recordacao-escolar' );
+        if ( empty( $categoria ) ) return false;
         foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
-            if ( has_term( 'recordacao-escolar', 'product_cat', $cart_item['product_id'] ) ) {
+            if ( has_term( $categoria, 'product_cat', $cart_item['product_id'] ) ) {
                 return true;
             }
         }

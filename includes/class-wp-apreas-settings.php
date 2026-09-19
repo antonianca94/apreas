@@ -42,6 +42,10 @@ class Settings
         register_setting('apreas_settings_group', 'apreas_taxa_fixa_enabled');
         register_setting('apreas_settings_group', 'apreas_taxa_fixa_valor');
         register_setting('apreas_settings_group', 'apreas_custom_coupon_enabled');
+        register_setting('apreas_settings_group', 'apreas_whatsapp_numero');
+        register_setting('apreas_settings_group', 'apreas_primary_color');
+        register_setting('apreas_settings_group', 'apreas_eventos_enabled');
+        register_setting('apreas_settings_group', 'apreas_checkout_category');
     }
 
     public function render_settings_page()
@@ -122,11 +126,85 @@ class Settings
                                 <input type="checkbox" name="apreas_custom_coupon_enabled" value="1" <?php checked(1, get_option('apreas_custom_coupon_enabled', 1)); ?>>
                                 <span class="apreas-slider round"></span>
                             </label>
-                        </div>
-                    </div>
-                </div>
+</div>
+            </div>
+        </div>
 
-                <div class="apreas-form-actions">
+        <div class="apreas-card">
+            <div class="apreas-card-header">
+                <span class="dashicons dashicons-phone"></span>
+                <h2>Identidade & Contato</h2>
+            </div>
+
+            <div class="apreas-setting-row">
+                <div class="apreas-setting-info">
+                    <strong>WhatsApp de Dúvidas</strong>
+                    <p>Número exibido nos formulários de login ("Dúvidas e Problemas?"). Informe apenas dígitos com DDI, ex.: 5511939490911.</p>
+                </div>
+                <div class="apreas-setting-control">
+                    <input type="text" name="apreas_whatsapp_numero" value="<?php echo esc_attr(get_option('apreas_whatsapp_numero', '5511939490911')); ?>" class="regular-text" style="max-width: 220px;" placeholder="5511939490911">
+                </div>
+            </div>
+
+            <div class="apreas-setting-row">
+                <div class="apreas-setting-info">
+                    <strong>Cor do Botão de Acesso</strong>
+                    <p>Cor principal usada nos botões e destaques dos formulários de login.</p>
+                </div>
+                <div class="apreas-setting-control">
+                    <input type="color" name="apreas_primary_color" value="<?php echo esc_attr(get_option('apreas_primary_color', '#d32f2f')); ?>" style="width: 48px; height: 32px; padding: 2px; border: 1px solid var(--apreas-border); border-radius: 4px; cursor: pointer;">
+                </div>
+            </div>
+
+            <div class="apreas-setting-row">
+                <div class="apreas-setting-info">
+                    <strong>Módulo de Login por Eventos</strong>
+                    <p>Exibe o shortcode [login_form_eventos] e libera o acesso por participantes de eventos. Desative se o site for apenas de recordação escolar.</p>
+                </div>
+                <div class="apreas-setting-control">
+                    <label class="apreas-switch">
+                        <input type="hidden" name="apreas_eventos_enabled" value="0">
+                        <input type="checkbox" name="apreas_eventos_enabled" value="1" <?php checked(1, get_option('apreas_eventos_enabled', 1)); ?>>
+                        <span class="apreas-slider round"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="apreas-card">
+            <div class="apreas-card-header">
+                <span class="dashicons dashicons-category"></span>
+                <h2>Checkout Apreas</h2>
+            </div>
+
+            <div class="apreas-setting-row">
+                <div class="apreas-setting-info">
+                    <strong>Categoria de Produtos do Checkout</strong>
+                    <p>Categoria usada para exibir os campos do aluno no checkout. Ao migrar para outro site, ajuste para a categoria criada lá.</p>
+                </div>
+                <div class="apreas-setting-control">
+                    <select name="apreas_checkout_category" style="max-width: 260px;">
+                        <?php
+                        $cats = get_terms(array('taxonomy' => 'product_cat', 'hide_empty' => false));
+                        $cats = (is_array($cats) && !is_wp_error($cats)) ? $cats : array();
+                        $slug_atual = get_option('apreas_checkout_category', 'recordacao-escolar');
+                        $existe = false;
+                        foreach ($cats as $cat) {
+                            if ($cat->slug === $slug_atual) { $existe = true; break; }
+                        }
+                        if (!empty($slug_atual) && !$existe) {
+                            echo '<option value="' . esc_attr($slug_atual) . '" selected>' . esc_html($slug_atual) . '</option>';
+                        }
+                        foreach ($cats as $cat) {
+                            echo '<option value="' . esc_attr($cat->slug) . '"' . selected($cat->slug, $slug_atual, false) . '>' . esc_html($cat->name) . ' (' . esc_html($cat->slug) . ')</option>';
+                        }
+                        ?>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="apreas-form-actions">
                     <?php submit_button('Salvar Alterações', 'primary large'); ?>
                 </div>
             </form>

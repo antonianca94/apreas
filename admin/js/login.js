@@ -279,7 +279,7 @@ jQuery(document).ready(function ($) {
         }
         $.ajax({
             type: 'POST',
-            url: `${'https://apreas.com.br'}/wp-admin/admin-ajax.php`,
+            url: location.origin + '/wp-admin/admin-ajax.php',
             data: {
                 action: 'process_login_form',
                 formData: formData
@@ -434,7 +434,7 @@ jQuery(document).ready(function ($) {
 
         $.ajax({
             type: 'POST',
-            url: `${'https://apreas.com.br'}/wp-admin/admin-ajax.php`,
+            url: location.origin + '/wp-admin/admin-ajax.php',
             data: {
                 action: 'process_login_form_eventos',
                 formData: formData
