@@ -27,6 +27,7 @@ class Login {
 
         add_shortcode( 'galeria', [$this,'shortcode_fotos_container'] );
         add_shortcode( 'fotos_selecionadas', [$this,'fotos_counter'] );
+        add_shortcode( 'link_album', [$this,'mostrar_link_album'] );
 
         // LOGOS
         add_shortcode('imagem_logo_evento', [$this,'mostrar_imagem_logo_evento']);
@@ -351,16 +352,20 @@ class Login {
         ob_start(); 
         ?>
         <div id="selected-count-container" class="text-center" style="font-size: 2rem; font-weight: 400;font-family: 'Roboto', Sans-serif !important;color: grey;">
-            <span id="selected-count">0</span>
+            <span class="apreas-selected-count">0</span>
         </div>
         <?php
         return ob_get_clean(); 
     }
 
+    function mostrar_link_album() {
+        return '<a href="#" class="apreas-link-album" target="_blank" rel="noopener" style="display:none;">Ver fotos do álbum</a>';
+    }
+
     function shortcode_fotos_container() {
         ob_start(); 
         ?>
-        <div id="fotos-container" class="container">
+        <div class="apreas-fotos-container container">
         </div>
         <?php
         return ob_get_clean(); 

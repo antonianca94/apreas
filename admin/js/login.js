@@ -40,6 +40,19 @@ jQuery(document).ready(function ($) {
     }
     // CONVERTE DD/MM/AAAA → YYYY-MM-DD
 
+    // HELPERS PARA SHORTCODES REPETÍVEIS (preenchem TODAS as instâncias da página)
+    function setAllText(sel, val) {
+        document.querySelectorAll(sel).forEach(function (el) {
+            el.textContent = val || '';
+        });
+    }
+    function setAllVal(sel, val) {
+        document.querySelectorAll(sel).forEach(function (el) {
+            el.value = val || '';
+        });
+    }
+    // HELPERS PARA SHORTCODES REPETÍVEIS
+
     // ============================================================
     // PERSÍSTÊNCIA DE SESSÃO (localStorage - expira em 10 minutos)
     // ============================================================
@@ -73,63 +86,44 @@ jQuery(document).ready(function ($) {
         if (!dados) return;
 
         var d = (tipo === 'eventos' && Array.isArray(dados) && dados.length > 0) ? dados[0] : dados;
-        var container = document.querySelector('.dados-aluno-container');
-        if (!container) return;
 
-        container.style.display = 'block';
-        var elNome = document.querySelector('.aluno-nome');
-        var elEscola = document.querySelector('.aluno-escola');
-        var elTurma = document.querySelector('.aluno-turma');
-        var elUnidade = document.querySelector('.aluno-unidade');
-        var elDataNasc = document.querySelector('.aluno-data-nascimento');
+        document.querySelectorAll('.dados-aluno-container').forEach(function (container) {
+            container.style.display = 'block';
+        });
+        setAllText('.aluno-nome', d.nome || '');
+        if (d.escola) setAllText('.aluno-escola', d.escola.nome || '');
+        if (d.turma) setAllText('.aluno-turma', d.turma.nome || '');
+        if (d.unidade) setAllText('.aluno-unidade', d.unidade.nome || '');
 
-        if (elNome) elNome.textContent = d.nome || '';
-        if (elEscola && d.escola) elEscola.textContent = d.escola.nome || '';
-        if (elTurma && d.turma) elTurma.textContent = d.turma.nome || '';
-        if (elUnidade && d.unidade) elUnidade.textContent = d.unidade.nome || '';
-
-        if (elDataNasc && d.data_nascimento) {
+        if (d.data_nascimento) {
             var dn = d.data_nascimento;
             if (dn.includes('-')) {
                 var p = dn.split('-');
                 if (p.length === 3) dn = p[2] + '/' + p[1] + '/' + p[0];
             }
-            elDataNasc.textContent = dn;
+            setAllText('.aluno-data-nascimento', dn);
         }
     }
 
     function aplicarSessaoEscola(data) {
         atualizarDadosAluno(data, 'escola');
-        var l1i = document.querySelector('.l1_escolha_data_inicio_escola');
-        var l1f = document.querySelector('.l1_escolha_data_fim_escola');
-        var l1e  = document.querySelector('.l1_entrega_data_escola');
-        var l1ei = document.querySelector('.l1_entrega_data_inicio_escola');
-        var l1ef = document.querySelector('.l1_entrega_data_fim_escola');
-        var l2i  = document.querySelector('.l2_escolha_data_inicio_escola');
-        var l2f  = document.querySelector('.l2_escolha_data_fim_escola');
-        var l2e  = document.querySelector('.l2_entrega_data_escola');
-        var l2ei = document.querySelector('.l2_entrega_data_inicio_escola');
-        var l2ef = document.querySelector('.l2_entrega_data_fim_escola');
-        var l1s  = document.querySelector('.l1_status_escola');
-        var l2s  = document.querySelector('.l2_status_escola');
         if (data.escola) {
             if (data.escola.imagem_logo_escola) {
                 $('.imagem_logo_escola').attr('src', data.escola.imagem_logo_escola).attr('srcset', data.escola.imagem_logo_escola);
             }
-            if (l1i) l1i.textContent = data.escola.l1_escolha_data_inicio || '';
-            if (l1f) l1f.textContent = data.escola.l1_escolha_data_fim || '';
-            if (l1e) l1e.textContent = data.escola.l1_entrega_data || '';
-            if (l1ei) l1ei.textContent = data.escola.l1_entrega_data_inicio || '';
-            if (l1ef) l1ef.textContent = data.escola.l1_entrega_data_fim || '';
-            if (l2i) l2i.textContent = data.escola.l2_escolha_data_inicio || '';
-            if (l2f) l2f.textContent = data.escola.l2_escolha_data_fim || '';
-            if (l2e) l2e.textContent = data.escola.l2_entrega_data || '';
-            if (l2ei) l2ei.textContent = data.escola.l2_entrega_data_inicio || '';
-            if (l2ef) l2ef.textContent = data.escola.l2_entrega_data_fim || '';
-            if (l1s) l1s.textContent = data.escola.l1_status || 'FINALIZADO';
-            if (l2s) l2s.textContent = data.escola.l2_status || 'FINALIZADO';
-            var dlf = document.querySelector('.data_limite_fotos_escola');
-            if (dlf) dlf.textContent = data.escola.data_limite_fotos || '';
+            setAllText('.l1_escolha_data_inicio_escola', data.escola.l1_escolha_data_inicio || '');
+            setAllText('.l1_escolha_data_fim_escola', data.escola.l1_escolha_data_fim || '');
+            setAllText('.l1_entrega_data_escola', data.escola.l1_entrega_data || '');
+            setAllText('.l1_entrega_data_inicio_escola', data.escola.l1_entrega_data_inicio || '');
+            setAllText('.l1_entrega_data_fim_escola', data.escola.l1_entrega_data_fim || '');
+            setAllText('.l2_escolha_data_inicio_escola', data.escola.l2_escolha_data_inicio || '');
+            setAllText('.l2_escolha_data_fim_escola', data.escola.l2_escolha_data_fim || '');
+            setAllText('.l2_entrega_data_escola', data.escola.l2_entrega_data || '');
+            setAllText('.l2_entrega_data_inicio_escola', data.escola.l2_entrega_data_inicio || '');
+            setAllText('.l2_entrega_data_fim_escola', data.escola.l2_entrega_data_fim || '');
+            setAllText('.l1_status_escola', data.escola.l1_status || 'FINALIZADO');
+            setAllText('.l2_status_escola', data.escola.l2_status || 'FINALIZADO');
+            setAllText('.data_limite_fotos_escola', data.escola.data_limite_fotos || '');
         }
         if (data.imagem_upload_individual) {
             $('.imagem_upload_individual img').attr('src', data.imagem_upload_individual).attr('srcset', data.imagem_upload_individual);
@@ -140,14 +134,10 @@ jQuery(document).ready(function ($) {
         if (data.imagem_upload_turma) {
             $('.imagem_upload_turma img').attr('src', data.imagem_upload_turma).attr('srcset', data.imagem_upload_turma);
         }
-        var nomeInput = document.querySelector('.nome input');
-        var escolaInput = document.querySelector('.escola input');
-        var unidadeInput = document.querySelector('.unidade input');
-        var turmaInput = document.querySelector('.turma input');
-        if (nomeInput && data.nome) nomeInput.value = data.nome;
-        if (escolaInput && data.escola) escolaInput.value = data.escola.nome || '';
-        if (unidadeInput && data.unidade) unidadeInput.value = data.unidade.nome || '';
-        if (turmaInput && data.turma) turmaInput.value = data.turma.nome || '';
+        if (data.nome) setAllVal('.nome input', data.nome);
+        if (data.escola) setAllVal('.escola input', data.escola.nome || '');
+        if (data.unidade) setAllVal('.unidade input', data.unidade.nome || '');
+        if (data.turma) setAllVal('.turma input', data.turma.nome || '');
         var lc = document.getElementById('loginContainer');
         if (lc) lc.classList.add('d-none');
     }
@@ -166,7 +156,7 @@ jQuery(document).ready(function ($) {
             $('.imagem_upload_turma').find('img').attr('src', d.imagem_upload_turma).attr('srcset', d.imagem_upload_turma);
         }
         if (d.link_album) {
-            $('#link_album_shortcode').attr('href', d.link_album);
+            $('.apreas-link-album').attr('href', d.link_album).show();
         }
         if (dataArray.length > 0 && d.fotos_participante && d.fotos_participante.length > 0) {
             var fotosHtml = '<div class="row">';
@@ -174,81 +164,50 @@ jQuery(document).ready(function ($) {
                 fotosHtml += '<div class="col-6 col-md-3 col-lg-2 mb-4"><div class="mb-3 fotos-para-selecionar" style="position: relative; text-align: center;"><img src="' + foto.caminho + '" alt="' + foto.nome + '" class="img-fluid mb-4"><button type="button" class="btn btn-primary select-photo text-white" data-codigo="' + foto.codigo + '">Selecionar</button></div></div>';
             });
             fotosHtml += '</div>';
-            $('#fotos-container').html(fotosHtml);
+            document.querySelectorAll('.apreas-fotos-container').forEach(function (container) {
+                container.innerHTML = fotosHtml;
+            });
             updateCheckboxListener();
         }
-        var nomeInput = document.querySelector('.nomeoculto input');
-        var escolaeventoInput = document.querySelector('.escolaevento input');
-        var eventoInput = document.querySelector('.evento input');
-        var escolaInput = document.querySelector('.escola input');
-        var unidadeInput = document.querySelector('.unidade input');
-        var turmaInput = document.querySelector('.turma input');
-        if (nomeInput && d.nome) nomeInput.value = d.nome;
-        if (escolaeventoInput && d.escola && d.evento) escolaeventoInput.value = (d.escola.nome || '') + ' / ' + (d.evento.nome || '');
-        if (eventoInput && d.evento) eventoInput.value = d.evento.nome || '';
-        if (escolaInput && d.escola) escolaInput.value = d.escola.nome || '';
-        if (unidadeInput && d.unidade) unidadeInput.value = d.unidade.nome || '';
-        if (turmaInput && d.turma) turmaInput.value = d.turma.nome || '';
-        var l1ie = document.querySelector('.l1_escolha_data_inicio_evento');
-        var l1fe = document.querySelector('.l1_escolha_data_fim_evento');
-        var l1ee = document.querySelector('.l1_entrega_data_evento');
-        var l1eei = document.querySelector('.l1_entrega_data_inicio_evento');
-        var l1eef = document.querySelector('.l1_entrega_data_fim_evento');
-
-        var l2ie = document.querySelector('.l2_escolha_data_inicio_evento');
-        var l2fe = document.querySelector('.l2_escolha_data_fim_evento');
-        var l2ee = document.querySelector('.l2_entrega_data_evento');
-        var l2eei = document.querySelector('.l2_entrega_data_inicio_evento');
-        var l2eef = document.querySelector('.l2_entrega_data_fim_evento');
-
-        var l1is = document.querySelector('.l1_escolha_data_inicio_escola');
-        var l1fs = document.querySelector('.l1_escolha_data_fim_escola');
-        var l1es = document.querySelector('.l1_entrega_data_escola');
-        var l1esi = document.querySelector('.l1_entrega_data_inicio_escola');
-        var l1esf = document.querySelector('.l1_entrega_data_fim_escola');
-
-        var l2is = document.querySelector('.l2_escolha_data_inicio_escola');
-        var l2fs = document.querySelector('.l2_escolha_data_fim_escola');
-        var l2es = document.querySelector('.l2_entrega_data_escola');
-        var l2esi = document.querySelector('.l2_entrega_data_inicio_escola');
-        var l2esf = document.querySelector('.l2_entrega_data_fim_escola');
-        var l1ss = document.querySelector('.l1_status_escola');
-        var l2ss = document.querySelector('.l2_status_escola');
-        var l1se = document.querySelector('.l1_status_evento');
-        var l2se = document.querySelector('.l2_status_evento');
+        if (d.nome) setAllVal('.nomeoculto input', d.nome);
+        if (d.escola && d.evento) setAllVal('.escolaevento input', (d.escola.nome || '') + ' / ' + (d.evento.nome || ''));
+        if (d.evento) setAllVal('.evento input', d.evento.nome || '');
+        if (d.escola) setAllVal('.escola input', d.escola.nome || '');
+        if (d.unidade) setAllVal('.unidade input', d.unidade.nome || '');
+        if (d.turma) setAllVal('.turma input', d.turma.nome || '');
         if (d.evento) {
             if (d.evento.imagem_logo_evento) {
                 $('.imagem_logo_evento').attr('src', d.evento.imagem_logo_evento).attr('srcset', d.evento.imagem_logo_evento);
             }
-            if (l1ie) l1ie.textContent = d.evento.l1_escolha_data_inicio || '';
-            if (l1fe) l1fe.textContent = d.evento.l1_escolha_data_fim || '';
-            if (l1ee) l1ee.textContent = d.evento.l1_entrega_data || '';
-            if (l1eei) l1eei.textContent = d.evento.l1_entrega_data_inicio || '';
-            if (l1eef) l1eef.textContent = d.evento.l1_entrega_data_fim || '';
-            if (l2ie) l2ie.textContent = d.evento.l2_escolha_data_inicio || '';
-            if (l2fe) l2fe.textContent = d.evento.l2_escolha_data_fim || '';
-            if (l2ee) l2ee.textContent = d.evento.l2_entrega_data || '';
-            if (l2eei) l2eei.textContent = d.evento.l2_entrega_data_inicio || '';
-            if (l2eef) l2eef.textContent = d.evento.l2_entrega_data_fim || '';
-            if (l1se) l1se.textContent = d.evento.l1_status || 'FINALIZADO';
-            if (l2se) l2se.textContent = d.evento.l2_status || 'FINALIZADO';
+            setAllText('.l1_escolha_data_inicio_evento', d.evento.l1_escolha_data_inicio || '');
+            setAllText('.l1_escolha_data_fim_evento', d.evento.l1_escolha_data_fim || '');
+            setAllText('.l1_entrega_data_evento', d.evento.l1_entrega_data || '');
+            setAllText('.l1_entrega_data_inicio_evento', d.evento.l1_entrega_data_inicio || '');
+            setAllText('.l1_entrega_data_fim_evento', d.evento.l1_entrega_data_fim || '');
+            setAllText('.l2_escolha_data_inicio_evento', d.evento.l2_escolha_data_inicio || '');
+            setAllText('.l2_escolha_data_fim_evento', d.evento.l2_escolha_data_fim || '');
+            setAllText('.l2_entrega_data_evento', d.evento.l2_entrega_data || '');
+            setAllText('.l2_entrega_data_inicio_evento', d.evento.l2_entrega_data_inicio || '');
+            setAllText('.l2_entrega_data_fim_evento', d.evento.l2_entrega_data_fim || '');
+            setAllText('.l1_status_evento', d.evento.l1_status || 'FINALIZADO');
+            setAllText('.l2_status_evento', d.evento.l2_status || 'FINALIZADO');
         }
         if (d.escola) {
             if (d.escola.imagem_logo_escola) {
                 $('.imagem_logo_escola').attr('src', d.escola.imagem_logo_escola).attr('srcset', d.escola.imagem_logo_escola);
             }
-            if (l1is) l1is.textContent = d.escola.l1_escolha_data_inicio || '';
-            if (l1fs) l1fs.textContent = d.escola.l1_escolha_data_fim || '';
-            if (l1es) l1es.textContent = d.escola.l1_entrega_data || '';
-            if (l1esi) l1esi.textContent = d.escola.l1_entrega_data_inicio || '';
-            if (l1esf) l1esf.textContent = d.escola.l1_entrega_data_fim || '';
-            if (l2is) l2is.textContent = d.escola.l2_escolha_data_inicio || '';
-            if (l2fs) l2fs.textContent = d.escola.l2_escolha_data_fim || '';
-            if (l2es) l2es.textContent = d.escola.l2_entrega_data || '';
-            if (l2esi) l2esi.textContent = d.escola.l2_entrega_data_inicio || '';
-            if (l2esf) l2esf.textContent = d.escola.l2_entrega_data_fim || '';
-            if (l1ss) l1ss.textContent = d.escola.l1_status || 'FINALIZADO';
-            if (l2ss) l2ss.textContent = d.escola.l2_status || 'FINALIZADO';
+            setAllText('.l1_escolha_data_inicio_escola', d.escola.l1_escolha_data_inicio || '');
+            setAllText('.l1_escolha_data_fim_escola', d.escola.l1_escolha_data_fim || '');
+            setAllText('.l1_entrega_data_escola', d.escola.l1_entrega_data || '');
+            setAllText('.l1_entrega_data_inicio_escola', d.escola.l1_entrega_data_inicio || '');
+            setAllText('.l1_entrega_data_fim_escola', d.escola.l1_entrega_data_fim || '');
+            setAllText('.l2_escolha_data_inicio_escola', d.escola.l2_escolha_data_inicio || '');
+            setAllText('.l2_escolha_data_fim_escola', d.escola.l2_escolha_data_fim || '');
+            setAllText('.l2_entrega_data_escola', d.escola.l2_entrega_data || '');
+            setAllText('.l2_entrega_data_inicio_escola', d.escola.l2_entrega_data_inicio || '');
+            setAllText('.l2_entrega_data_fim_escola', d.escola.l2_entrega_data_fim || '');
+            setAllText('.l1_status_escola', d.escola.l1_status || 'FINALIZADO');
+            setAllText('.l2_status_escola', d.escola.l2_status || 'FINALIZADO');
         }
         var lc = document.getElementById('loginContainer');
         if (lc) lc.classList.add('d-none');
@@ -289,18 +248,6 @@ jQuery(document).ready(function ($) {
                 if (response.success == true) {
 
                     // CAMPOS EXTRAS | ESCOLAS
-                    let l1_escolha_data_inicio_escola = document.querySelector('.l1_escolha_data_inicio_escola');
-                    let l1_escolha_data_fim_escola = document.querySelector('.l1_escolha_data_fim_escola');
-                    let l1_entrega_data_escola = document.querySelector('.l1_entrega_data_escola');
-                    let l1_entrega_data_inicio_escola = document.querySelector('.l1_entrega_data_inicio_escola');
-                    let l1_entrega_data_fim_escola = document.querySelector('.l1_entrega_data_fim_escola');
-                    let l2_escolha_data_inicio_escola = document.querySelector('.l2_escolha_data_inicio_escola');
-                    let l2_escolha_data_fim_escola = document.querySelector('.l2_escolha_data_fim_escola');
-                    let l2_entrega_data_escola = document.querySelector('.l2_entrega_data_escola');
-                    let l2_entrega_data_inicio_escola = document.querySelector('.l2_entrega_data_inicio_escola');
-                    let l2_entrega_data_fim_escola = document.querySelector('.l2_entrega_data_fim_escola');
-                    let l1_status_escola = document.querySelector('.l1_status_escola');
-                    let l2_status_escola = document.querySelector('.l2_status_escola');
                     //  CAMPOS EXTRAS | ESCOLAS
 
                     if (response.data.escola) {
@@ -308,20 +255,19 @@ jQuery(document).ready(function ($) {
                             $('.imagem_logo_escola').attr('src', response.data.escola.imagem_logo_escola);
                             $('.imagem_logo_escola').attr('srcset', response.data.escola.imagem_logo_escola);
                         }
-                        if (l1_escolha_data_inicio_escola) l1_escolha_data_inicio_escola.textContent = response.data.escola.l1_escolha_data_inicio || '';
-                        if (l1_escolha_data_fim_escola) l1_escolha_data_fim_escola.textContent = response.data.escola.l1_escolha_data_fim || '';
-                        if (l1_entrega_data_escola) l1_entrega_data_escola.textContent = response.data.escola.l1_entrega_data || '';
-                        if (l1_entrega_data_inicio_escola) l1_entrega_data_inicio_escola.textContent = response.data.escola.l1_entrega_data_inicio || '';
-                        if (l1_entrega_data_fim_escola) l1_entrega_data_fim_escola.textContent = response.data.escola.l1_entrega_data_fim || '';
-                        if (l2_escolha_data_inicio_escola) l2_escolha_data_inicio_escola.textContent = response.data.escola.l2_escolha_data_inicio || '';
-                        if (l2_escolha_data_fim_escola) l2_escolha_data_fim_escola.textContent = response.data.escola.l2_escolha_data_fim || '';
-                        if (l2_entrega_data_escola) l2_entrega_data_escola.textContent = response.data.escola.l2_entrega_data || '';
-                        if (l2_entrega_data_inicio_escola) l2_entrega_data_inicio_escola.textContent = response.data.escola.l2_entrega_data_inicio || '';
-                        if (l2_entrega_data_fim_escola) l2_entrega_data_fim_escola.textContent = response.data.escola.l2_entrega_data_fim || '';
-                        if (l1_status_escola) l1_status_escola.textContent = response.data.escola.l1_status || 'FINALIZADO';
-                        if (l2_status_escola) l2_status_escola.textContent = response.data.escola.l2_status || 'FINALIZADO';
-                        var dlf = document.querySelector('.data_limite_fotos_escola');
-                        if (dlf) dlf.textContent = response.data.escola.data_limite_fotos || '';
+                        setAllText('.l1_escolha_data_inicio_escola', response.data.escola.l1_escolha_data_inicio || '');
+                        setAllText('.l1_escolha_data_fim_escola', response.data.escola.l1_escolha_data_fim || '');
+                        setAllText('.l1_entrega_data_escola', response.data.escola.l1_entrega_data || '');
+                        setAllText('.l1_entrega_data_inicio_escola', response.data.escola.l1_entrega_data_inicio || '');
+                        setAllText('.l1_entrega_data_fim_escola', response.data.escola.l1_entrega_data_fim || '');
+                        setAllText('.l2_escolha_data_inicio_escola', response.data.escola.l2_escolha_data_inicio || '');
+                        setAllText('.l2_escolha_data_fim_escola', response.data.escola.l2_escolha_data_fim || '');
+                        setAllText('.l2_entrega_data_escola', response.data.escola.l2_entrega_data || '');
+                        setAllText('.l2_entrega_data_inicio_escola', response.data.escola.l2_entrega_data_inicio || '');
+                        setAllText('.l2_entrega_data_fim_escola', response.data.escola.l2_entrega_data_fim || '');
+                        setAllText('.l1_status_escola', response.data.escola.l1_status || 'FINALIZADO');
+                        setAllText('.l2_status_escola', response.data.escola.l2_status || 'FINALIZADO');
+                        setAllText('.data_limite_fotos_escola', response.data.escola.data_limite_fotos || '');
                     }
 
                     //console.log(response.data);
@@ -378,33 +324,11 @@ jQuery(document).ready(function ($) {
 
                 // ENVIAR VALORES PARA O FORMULÁRIO
 
-                const nomeInput = document.querySelector('.nome input');
-                const eventoInput = document.querySelector('.evento input');
-                const escolaInput = document.querySelector('.escola input');
-                const unidadeInput = document.querySelector('.unidade input');
-                const turmaInput = document.querySelector('.turma input');
-
-                if (nomeInput && response.data.nome) {
-                    nomeInput.value = response.data.nome || '';
-                    //console.log(nomeInput.value);
-                }
-
-                if (eventoInput && response.data.evento) {
-                    eventoInput.value = response.data.evento.nome || '';
-                    //console.log(eventoInput.value);
-                }
-                if (escolaInput && response.data.escola) {
-                    escolaInput.value = response.data.escola.nome || '';
-                    //console.log(escolaInput.value);
-                }
-                if (unidadeInput && response.data.unidade) {
-                    unidadeInput.value = response.data.unidade.nome || '';
-                    //console.log(unidadeInput.value);
-                }
-                if (turmaInput && response.data.turma) {
-                    turmaInput.value = response.data.turma.nome || '';
-                    //console.log(turmaInput.value);
-                }
+                if (response.data.nome) setAllVal('.nome input', response.data.nome);
+                if (response.data.evento) setAllVal('.evento input', response.data.evento.nome || '');
+                if (response.data.escola) setAllVal('.escola input', response.data.escola.nome || '');
+                if (response.data.unidade) setAllVal('.unidade input', response.data.unidade.nome || '');
+                if (response.data.turma) setAllVal('.turma input', response.data.turma.nome || '');
                 // ENVIAR VALORES PARA O FORMULÁRIO
 
             },
@@ -460,8 +384,7 @@ jQuery(document).ready(function ($) {
 
                     // LINK ALBUM
                     if (response.data[0].link_album) {
-                        //console.log("Link do Álbum: " + response.data[0].link_album);
-                        $('#link_album_shortcode').attr('href', response.data[0].link_album);
+                        $('.apreas-link-album').attr('href', response.data[0].link_album).show();
                     }
                     // LINK ALBUM
 
@@ -482,95 +405,48 @@ jQuery(document).ready(function ($) {
                             `;
                         });
                         fotosHtml += '</div>';
-                        $('#fotos-container').html(fotosHtml);
+                        document.querySelectorAll('.apreas-fotos-container').forEach(function (container) {
+                            container.innerHTML = fotosHtml;
+                        });
                         updateCheckboxListener();
 
                         // ENVIAR VALORES PARA O FORMULÁRIO
-                        const nomeInput = document.querySelector('.nomeoculto input');
-                        const escolaeventoInput = document.querySelector('.escolaevento input');
-                        const eventoInput = document.querySelector('.evento input');
-                        const escolaInput = document.querySelector('.escola input');
-                        const unidadeInput = document.querySelector('.unidade input');
-                        const turmaInput = document.querySelector('.turma input');
-
-                        if (nomeInput && response.data[0].nome) {
-                            nomeInput.value = response.data[0].nome || '';
+                        if (response.data[0].nome) setAllVal('.nomeoculto input', response.data[0].nome);
+                        if (response.data[0].escola && response.data[0].evento) {
+                            setAllVal('.escolaevento input', `${response.data[0].escola.nome || ''} / ${response.data[0].evento.nome || ''}`);
                         }
-
-                        if (escolaeventoInput && response.data[0].escola && response.data[0].evento) {
-                            escolaeventoInput.value = `${response.data[0].escola.nome || ''} / ${response.data[0].evento.nome || ''}`;
-                        }
-
-                        if (eventoInput && response.data[0].evento) {
-                            eventoInput.value = response.data[0].evento.nome || '';
-                            //console.log(eventoInput.value);
-                        }
-                        if (escolaInput && response.data[0].escola) {
-                            escolaInput.value = response.data[0].escola.nome || '';
-                            //console.log(escolaInput.value);
-                        }
-                        if (unidadeInput && response.data[0].unidade) {
-                            unidadeInput.value = response.data[0].unidade.nome || '';
-                            //console.log(unidadeInput.value);
-                        }
-                        if (turmaInput && response.data[0].turma) {
-                            turmaInput.value = response.data[0].turma.nome || '';
-                            //console.log(turmaInput.value);
-                        }
+                        if (response.data[0].evento) setAllVal('.evento input', response.data[0].evento.nome || '');
+                        if (response.data[0].escola) setAllVal('.escola input', response.data[0].escola.nome || '');
+                        if (response.data[0].unidade) setAllVal('.unidade input', response.data[0].unidade.nome || '');
+                        if (response.data[0].turma) setAllVal('.turma input', response.data[0].turma.nome || '');
                         // ENVIAR VALORES PARA O FORMULÁRIO
 
                     }
                     // FOTOS PARTICIPANTE
 
                     // CAMPOS EXTRAS | EVENTOS
-                    let l1_escolha_data_inicio_evento = document.querySelector('.l1_escolha_data_inicio_evento');
-                    let l1_escolha_data_fim_evento = document.querySelector('.l1_escolha_data_fim_evento');
-                    let l1_entrega_data_evento = document.querySelector('.l1_entrega_data_evento');
-                    let l1_entrega_data_inicio_evento = document.querySelector('.l1_entrega_data_inicio_evento');
-                    let l1_entrega_data_fim_evento = document.querySelector('.l1_entrega_data_fim_evento');
-                    let l2_escolha_data_inicio_evento = document.querySelector('.l2_escolha_data_inicio_evento');
-                    let l2_escolha_data_fim_evento = document.querySelector('.l2_escolha_data_fim_evento');
-                    let l2_entrega_data_evento = document.querySelector('.l2_entrega_data_evento');
-                    let l2_entrega_data_inicio_evento = document.querySelector('.l2_entrega_data_inicio_evento');
-                    let l2_entrega_data_fim_evento = document.querySelector('.l2_entrega_data_fim_evento');
-                    let l1_status_evento = document.querySelector('.l1_status_evento');
-                    let l2_status_evento = document.querySelector('.l2_status_evento');
                     //  CAMPOS EXTRAS | EVENTOS
 
                     // CAMPOS EXTRAS | ESCOLAS
-                    let l1_escolha_data_inicio_escola = document.querySelector('.l1_escolha_data_inicio_escola');
-                    let l1_escolha_data_fim_escola = document.querySelector('.l1_escolha_data_fim_escola');
-                    let l1_entrega_data_escola = document.querySelector('.l1_entrega_data_escola');
-                    let l1_entrega_data_inicio_escola = document.querySelector('.l1_entrega_data_inicio_escola');
-                    let l1_entrega_data_fim_escola = document.querySelector('.l1_entrega_data_fim_escola');
-                    let l2_escolha_data_inicio_escola = document.querySelector('.l2_escolha_data_inicio_escola');
-                    let l2_escolha_data_fim_escola = document.querySelector('.l2_escolha_data_fim_escola');
-                    let l2_entrega_data_escola = document.querySelector('.l2_entrega_data_escola');
-                    let l2_entrega_data_inicio_escola = document.querySelector('.l2_entrega_data_inicio_escola');
-                    let l2_entrega_data_fim_escola = document.querySelector('.l2_entrega_data_fim_escola');
-                    let l1_status_escola = document.querySelector('.l1_status_escola');
-                    let l2_status_escola = document.querySelector('.l2_status_escola');
                     //  CAMPOS EXTRAS | ESCOLAS
 
                     if (response.data[0].evento) {
-                        //console.log(response.data[0].evento);
                         if (response.data[0].evento.imagem_logo_evento) {
-                            //console.log(response.data[0].evento.imagem_logo_evento);
                             $('.imagem_logo_evento').attr('src', response.data[0].evento.imagem_logo_evento);
                             $('.imagem_logo_evento').attr('srcset', response.data[0].evento.imagem_logo_evento);
                         }
-                        if (l1_escolha_data_inicio_evento) l1_escolha_data_inicio_evento.textContent = response.data[0].evento.l1_escolha_data_inicio || '';
-                        if (l1_escolha_data_fim_evento) l1_escolha_data_fim_evento.textContent = response.data[0].evento.l1_escolha_data_fim || '';
-                        if (l1_entrega_data_evento) l1_entrega_data_evento.textContent = response.data[0].evento.l1_entrega_data || '';
-                        if (l1_entrega_data_inicio_evento) l1_entrega_data_inicio_evento.textContent = response.data[0].evento.l1_entrega_data_inicio || '';
-                        if (l1_entrega_data_fim_evento) l1_entrega_data_fim_evento.textContent = response.data[0].evento.l1_entrega_data_fim || '';
-                        if (l2_escolha_data_inicio_evento) l2_escolha_data_inicio_evento.textContent = response.data[0].evento.l2_escolha_data_inicio || '';
-                        if (l2_escolha_data_fim_evento) l2_escolha_data_fim_evento.textContent = response.data[0].evento.l2_escolha_data_fim || '';
-                        if (l2_entrega_data_evento) l2_entrega_data_evento.textContent = response.data[0].evento.l2_entrega_data || '';
-                        if (l2_entrega_data_inicio_evento) l2_entrega_data_inicio_evento.textContent = response.data[0].evento.l2_entrega_data_inicio || '';
-                        if (l2_entrega_data_fim_evento) l2_entrega_data_fim_evento.textContent = response.data[0].evento.l2_entrega_data_fim || '';
-                        if (l1_status_evento) l1_status_evento.textContent = response.data[0].evento.l1_status || 'FINALIZADO';
-                        if (l2_status_evento) l2_status_evento.textContent = response.data[0].evento.l2_status || 'FINALIZADO';
+                        setAllText('.l1_escolha_data_inicio_evento', response.data[0].evento.l1_escolha_data_inicio || '');
+                        setAllText('.l1_escolha_data_fim_evento', response.data[0].evento.l1_escolha_data_fim || '');
+                        setAllText('.l1_entrega_data_evento', response.data[0].evento.l1_entrega_data || '');
+                        setAllText('.l1_entrega_data_inicio_evento', response.data[0].evento.l1_entrega_data_inicio || '');
+                        setAllText('.l1_entrega_data_fim_evento', response.data[0].evento.l1_entrega_data_fim || '');
+                        setAllText('.l2_escolha_data_inicio_evento', response.data[0].evento.l2_escolha_data_inicio || '');
+                        setAllText('.l2_escolha_data_fim_evento', response.data[0].evento.l2_escolha_data_fim || '');
+                        setAllText('.l2_entrega_data_evento', response.data[0].evento.l2_entrega_data || '');
+                        setAllText('.l2_entrega_data_inicio_evento', response.data[0].evento.l2_entrega_data_inicio || '');
+                        setAllText('.l2_entrega_data_fim_evento', response.data[0].evento.l2_entrega_data_fim || '');
+                        setAllText('.l1_status_evento', response.data[0].evento.l1_status || 'FINALIZADO');
+                        setAllText('.l2_status_evento', response.data[0].evento.l2_status || 'FINALIZADO');
                     }
 
                     if (response.data[0].escola) {
@@ -578,18 +454,18 @@ jQuery(document).ready(function ($) {
                             $('.imagem_logo_escola').attr('src', response.data[0].escola.imagem_logo_escola);
                             $('.imagem_logo_escola').attr('srcset', response.data[0].escola.imagem_logo_escola);
                         }
-                        if (l1_escolha_data_inicio_escola) l1_escolha_data_inicio_escola.textContent = response.data[0].escola.l1_escolha_data_inicio || '';
-                        if (l1_escolha_data_fim_escola) l1_escolha_data_fim_escola.textContent = response.data[0].escola.l1_escolha_data_fim || '';
-                        if (l1_entrega_data_escola) l1_entrega_data_escola.textContent = response.data[0].escola.l1_entrega_data || '';
-                        if (l1_entrega_data_inicio_escola) l1_entrega_data_inicio_escola.textContent = response.data[0].escola.l1_entrega_data_inicio || '';
-                        if (l1_entrega_data_fim_escola) l1_entrega_data_fim_escola.textContent = response.data[0].escola.l1_entrega_data_fim || '';
-                        if (l2_escolha_data_inicio_escola) l2_escolha_data_inicio_escola.textContent = response.data[0].escola.l2_escolha_data_inicio || '';
-                        if (l2_escolha_data_fim_escola) l2_escolha_data_fim_escola.textContent = response.data[0].escola.l2_escolha_data_fim || '';
-                        if (l2_entrega_data_escola) l2_entrega_data_escola.textContent = response.data[0].escola.l2_entrega_data || '';
-                        if (l2_entrega_data_inicio_escola) l2_entrega_data_inicio_escola.textContent = response.data[0].escola.l2_entrega_data_inicio || '';
-                        if (l2_entrega_data_fim_escola) l2_entrega_data_fim_escola.textContent = response.data[0].escola.l2_entrega_data_fim || '';
-                        if (l1_status_escola) l1_status_escola.textContent = response.data[0].escola.l1_status || 'FINALIZADO';
-                        if (l2_status_escola) l2_status_escola.textContent = response.data[0].escola.l2_status || 'FINALIZADO';
+                        setAllText('.l1_escolha_data_inicio_escola', response.data[0].escola.l1_escolha_data_inicio || '');
+                        setAllText('.l1_escolha_data_fim_escola', response.data[0].escola.l1_escolha_data_fim || '');
+                        setAllText('.l1_entrega_data_escola', response.data[0].escola.l1_entrega_data || '');
+                        setAllText('.l1_entrega_data_inicio_escola', response.data[0].escola.l1_entrega_data_inicio || '');
+                        setAllText('.l1_entrega_data_fim_escola', response.data[0].escola.l1_entrega_data_fim || '');
+                        setAllText('.l2_escolha_data_inicio_escola', response.data[0].escola.l2_escolha_data_inicio || '');
+                        setAllText('.l2_escolha_data_fim_escola', response.data[0].escola.l2_escolha_data_fim || '');
+                        setAllText('.l2_entrega_data_escola', response.data[0].escola.l2_entrega_data || '');
+                        setAllText('.l2_entrega_data_inicio_escola', response.data[0].escola.l2_entrega_data_inicio || '');
+                        setAllText('.l2_entrega_data_fim_escola', response.data[0].escola.l2_entrega_data_fim || '');
+                        setAllText('.l1_status_escola', response.data[0].escola.l1_status || 'FINALIZADO');
+                        setAllText('.l2_status_escola', response.data[0].escola.l2_status || 'FINALIZADO');
                     }
 
                     var loginContainer = document.getElementById('loginContainer');
@@ -640,21 +516,15 @@ jQuery(document).ready(function ($) {
         function updateSelectedCount() {
             const selectedInputs = document.querySelectorAll('input[name="selected_photos[]"]');
             const count = selectedInputs.length; // Conta os inputs de fotos selecionadas
-            const countElement = document.getElementById('selected-count');
-            if (countElement) {
-                countElement.textContent = count; // Atualiza o texto do contador
-            }
+            document.querySelectorAll('.apreas-selected-count').forEach(function (el) {
+                el.textContent = count; // Atualiza o texto do contador
+            });
         }
 
         // Atualiza o input com os valores selecionados
         function updateInputEscolha() {
             const selected = getSelectedValues();
-            const inputEscolha = document.querySelector('.escolha input');
-            if (inputEscolha) {
-                inputEscolha.value = selected;
-            } else {
-                console.log('Nenhum input foi encontrado dentro do div .escolha.');
-            }
+            setAllVal('.escolha input', selected);
             updateSelectedCount(); // Atualiza o contador sempre que o input for alterado
         }
 
@@ -675,7 +545,8 @@ jQuery(document).ready(function ($) {
                     input.type = 'hidden';
                     input.name = 'selected_photos[]';
                     input.value = codigo;
-                    document.getElementById('fotos-container').appendChild(input);
+                    const container = this.closest('.apreas-fotos-container');
+                    if (container) container.appendChild(input);
                     this.textContent = 'Remover';
                     this.classList.remove('btn-primary');
                     this.classList.add('btn-danger');
