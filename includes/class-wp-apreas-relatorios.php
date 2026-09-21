@@ -28,6 +28,7 @@ class Relatorios {
 
     private function __construct() {
         add_action( 'admin_menu', [ $this, 'adicionar_pagina' ] );
+        add_action( 'admin_init', [ $this, 'processar_export_csv' ] );
         add_action( 'wp_ajax_apreas_toggle_pedido', [ $this, 'ajax_toggle_pedido' ] );
         add_action( 'wp_ajax_apreas_filtrar_pedidos', [ $this, 'ajax_filtrar_pedidos' ] );
         add_action( 'admin_head', [ $this, 'ocultar_notices' ] );
@@ -736,6 +737,26 @@ class Relatorios {
     // ─────────────────────────────────────────────
     // CSRF + CSV
     // ─────────────────────────────────────────────
+
+    /**
+     * Intercepta o download do CSV no admin_init, ANTES de o WordPress
+     * imprimir o HTML do admin. Assim o arquivo baixa apenas os dados,
+     * sem código HTML da página.
+     */
+    public function processar_export_csv() {
+        if ( ! current_user_can( self::CAPABILIDADE ) ) {
+            return;
+        }
+        if ( ! isset( $_GET['page'] ) || $_GET['page'] !== self::SLUG ) {
+            return;
+        }
+        if ( ! isset( $_GET['export'] ) || $_GET['export'] !== 'csv' ) {
+            return;
+        }
+
+        $this->exportar_csv( $this->consultar_pedidos( -1 ) );
+    }
+
     private function exportar_csv( $query ) {
         header( 'Content-Type: text/csv; charset=utf-8' );
         header( 'Content-Disposition: attachment; filename=relatorio-apreas-' . gmdate( 'Y-m-d-His' ) . '.csv' );
@@ -769,15 +790,15 @@ class Relatorios {
             fputcsv( $saida, [
                 ( get_post_meta( $order->get_id(), '_apreas_pedido_feito', true ) === '1' ) ? 'Sim' : 'Não',
                 ( get_post_meta( $order->get_id(), '_apreas_pedido_entregue', true ) === '1' ) ? 'Sim' : 'Não',
-                $this->nome_responsavel( $order ),
-                $order->get_billing_phone(),
-                $this->endereco_completo( $order ),
-                get_post_meta( $order->get_id(), '_apreas_aluno', true ),
-                get_post_meta( $order->get_id(), '_apreas_escola', true ),
-                $serie,
-                $turma,
-                $this->lista_pedidos( $order ),
-                $this->data_pedido( $order ),
+                wp_strip_all_tags( $this->nome_responsavel( $order ) ),
+                wp_strip_all_tags( $order->get_billing_phone() ),
+                wp_strip_all_tags( $this->endereco_completo( $order ) ),
+                wp_strip_all_tags( get_post_meta( $order->get_id(), '_apreas_aluno', true ) ),
+                wp_strip_all_tags( get_post_meta( $order->get_id(), '_apreas_escola', true ) ),
+                wp_strip_all_tags( $serie ),
+                wp_strip_all_tags( $turma ),
+                wp_strip_all_tags( $this->lista_pedidos( $order ) ),
+                wp_strip_all_tags( $this->data_pedido( $order ) ),
             ], ';' );
         }
 
@@ -794,11 +815,6 @@ class Relatorios {
         }
 
         nocache_headers();
-
-        // Export CSV
-        if ( isset( $_GET['export'] ) && $_GET['export'] === 'csv' ) {
-            $this->exportar_csv( $this->consultar_pedidos( -1 ) );
-        }
 
         $nome_filtro   = $this->get_filtro_nome_aluno();
         $escola_filtro = $this->get_filtro_escola();
