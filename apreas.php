@@ -84,6 +84,8 @@ class APREAS_Plugin
             $Unidades = \Apreas\Unidades::getInstance();
             $Turmas = \Apreas\Turmas::getInstance();
 
+            $Relatorios = \Apreas\Relatorios::getInstance();
+
             $Participantes = \Apreas\Participantes::getInstance();
             $Eventos = \Apreas\Eventos::getInstance();
             // INSTANCIAS
