@@ -70,18 +70,31 @@ class Checkout {
                 'label'       => __( 'Bairro', 'apreas' ),
                 'required'    => true,
                 'class'       => [ 'form-row-wide' ],
-                'priority'    => 75,   // entre CEP (70) e Cidade (80)
+                'priority'    => 65,   // CEP(50) Endereço(55) Complemento(60) Bairro(65) Cidade(70) Estado(75)
                 'clear'       => true,
             ]
         );
         // Força type=text independente do que outro plugin definiu
         $billing['billing_neighborhood']['type'] = 'text';
+        $billing['billing_neighborhood']['priority'] = 65;
+
+        // CEP — primeiro da sequência de endereço
+        if ( isset( $billing['billing_postcode'] ) ) {
+            $billing['billing_postcode']['priority'] = 50;
+        }
+
+        // ENDEREÇO (com número) — logo após o CEP
+        if ( isset( $billing['billing_address_1'] ) ) {
+            $billing['billing_address_1']['priority'] = 55;
+            $billing['billing_address_1']['placeholder'] = __( 'Rua e número', 'apreas' );
+            $billing['billing_address_1']['label'] = __( 'Endereço com Número', 'apreas' );
+        }
 
         // CIDADE — deve ser campo de texto aberto
         if ( isset( $billing['billing_city'] ) ) {
             $billing['billing_city']['type']     = 'text';
             $billing['billing_city']['label']    = __( 'Cidade', 'apreas' );
-            $billing['billing_city']['priority'] = 80;
+            $billing['billing_city']['priority'] = 70;
             $billing['billing_city']['class']    = [ 'form-row-wide' ];
         }
 
@@ -89,7 +102,7 @@ class Checkout {
         if ( isset( $billing['billing_state'] ) ) {
             $billing['billing_state']['type']     = 'state';
             $billing['billing_state']['label']    = __( 'Estado', 'apreas' );
-            $billing['billing_state']['priority'] = 85;
+            $billing['billing_state']['priority'] = 75;
             $billing['billing_state']['class']    = [ 'form-row-wide' ];
         }
 
@@ -98,7 +111,7 @@ class Checkout {
             $billing['billing_address_2']['required']    = false; // nativo OFF p/ não gerar aviso padrão
             $billing['billing_address_2']['label']       = __( 'Complemento', 'apreas' ) . ' <abbr class="required" title="obrigatório" style="color:#e00000;">*</abbr>';
             $billing['billing_address_2']['placeholder'] = __( 'Ex.: Apto 101, Bloco B', 'apreas' );
-            $billing['billing_address_2']['priority']    = 65;
+            $billing['billing_address_2']['priority']    = 60;
             $billing['billing_address_2']['class']       = [ 'form-row-wide' ];
         }
 
@@ -305,6 +318,7 @@ jQuery(document).ready(function($) {
     $(document.body).on('updated_checkout', function() {
         apreasAplicarMascaraCEP();
         apreasAplicarMascaraTelefone();
+        apreasAplicarMascaraData();
     });
 
     function apreasAplicarMascaraCEP() {
@@ -326,9 +340,54 @@ jQuery(document).ready(function($) {
 
     function apreasFormatarTelefone(d) {
         if ( d.length <= 2 ) return '(' + d;
-        if ( d.length <= 3 ) return '(' + d.substring(0, 2) + ') ';
         if ( d.length <= 7 ) return '(' + d.substring(0, 2) + ') ' + d.substring(2);
         return '(' + d.substring(0, 2) + ') ' + d.substring(2, 7) + '-' + d.substring(7);
+    }
+
+    function apreasPosicaoCursor(formatado, digitos) {
+        var count = 0;
+        for ( var i = 0; i < formatado.length; i++ ) {
+            if ( /\d/.test(formatado[i]) ) count++;
+            if ( count >= digitos ) return i + 1;
+        }
+        return formatado.length;
+    }
+
+    function apreasFormatarData(d) {
+        if ( d.length <= 2 ) return d;
+        if ( d.length <= 4 ) return d.substring(0, 2) + '/' + d.substring(2);
+        return d.substring(0, 2) + '/' + d.substring(2, 4) + '/' + d.substring(4, 8);
+    }
+
+    function apreasAplicarMascaraData() {
+        var input = $('#apreas_nascimento');
+        if ( ! input.length ) return;
+        if ( input.val() ) {
+            var d = input.val().replace(/\D/g, '').slice(0, 8);
+            input.val( apreasFormatarData(d) );
+        }
+        // Mesma técnica do telefone: reformata logo após a tecla entrar,
+        // sem travar a digitação.
+        input.off('.datemask');
+        input.on('input.datemask', function() {
+            var el = this;
+            if ( el._datemaskTimer ) clearTimeout(el._datemaskTimer );
+            el._datemaskTimer = setTimeout(function() {
+                var pos = el.selectionStart || el.value.length;
+                var digitosAntes = el.value.slice(0, pos).replace(/\D/g, '').length;
+                var d = el.value.replace(/\D/g, '').slice(0, 8);
+                var formatado = apreasFormatarData(d);
+                if ( el.value !== formatado ) {
+                    el.value = formatado;
+                    var novoPos = apreasPosicaoCursor(formatado, digitosAntes);
+                    try { el.setSelectionRange(novoPos, novoPos); } catch(e) {}
+                }
+            }, 0);
+        });
+        input.on('blur.datemask', function() {
+            var d = $(this).val().replace(/\D/g, '').slice(0, 8);
+            $(this).val( d ? apreasFormatarData(d) : '' );
+        });
     }
 
     function apreasAplicarMascaraTelefone() {
@@ -338,15 +397,34 @@ jQuery(document).ready(function($) {
             var d = input.val().replace(/\D/g, '').slice(0, 11);
             input.val( apreasFormatarTelefone(d) );
         }
-        input.off('input.fonemask blur.fonemask');
+        // Máscara aplicada enquanto digita SEM travar: a reformatação roda
+        // logo após o navegador inserir a tecla (setTimeout), então a
+        // digitação nunca é bloqueada e o cursor volta para a posição certa.
+        input.off('.fonemask');
         input.on('input.fonemask', function() {
-            var v = $(this).val().replace(/\D/g, '').slice(0, 11);
-            $(this).val( apreasFormatarTelefone(v) );
+            var el = this;
+            if ( el._fonemaskTimer ) clearTimeout(el._fonemaskTimer );
+            el._fonemaskTimer = setTimeout(function() {
+                var pos = el.selectionStart || el.value.length;
+                var digitosAntes = el.value.slice(0, pos).replace(/\D/g, '').length;
+                var d = el.value.replace(/\D/g, '').slice(0, 11);
+                var formatado = apreasFormatarTelefone(d);
+                if ( el.value !== formatado ) {
+                    el.value = formatado;
+                    var novoPos = apreasPosicaoCursor(formatado, digitosAntes);
+                    try { el.setSelectionRange(novoPos, novoPos); } catch(e) {}
+                }
+            }, 0);
+        });
+        input.on('blur.fonemask', function() {
+            var d = $(this).val().replace(/\D/g, '').slice(0, 11);
+            $(this).val( d ? apreasFormatarTelefone(d) : '' );
         });
     }
 
     apreasAplicarMascaraCEP();
     apreasAplicarMascaraTelefone();
+    apreasAplicarMascaraData();
 });
 </script>
 APREAS_JS;
@@ -402,6 +480,19 @@ APREAS_JS;
         // Adiciona um espaçador/quebra de linha para limpar o float do first/last
         echo '<div style="clear:both;"></div>';
 
+        woocommerce_form_field( 'apreas_nascimento', [
+            'type'               => 'text',
+            'label'              => __( 'Data de Nascimento', 'apreas' ),
+            'required'           => true,
+            'class'              => [ 'form-row-wide' ],
+            'placeholder'        => 'DD/MM/AAAA',
+            'custom_attributes'  => [
+                'maxlength'   => 10,
+                'inputmode'   => 'numeric',
+                'autocomplete' => 'off',
+            ],
+        ], $checkout->get_value( 'apreas_nascimento' ) );
+
         // ─────────────────────────────────────────────
         // Design Customizado - Cupom de Desconto
         // ─────────────────────────────────────────────
@@ -448,11 +539,20 @@ APREAS_JS;
                         var fieldAluno = $('#apreas_aluno');
                         var fieldEscola = $('#apreas_escola');
                         var fieldTurma = $('#apreas_turma');
+                        var fieldNasc = $('#apreas_nascimento');
 
                         // Só preenche se o campo estiver vazio
                         if (fieldAluno.length && !fieldAluno.val()) fieldAluno.val(d.nome || '');
                         if (fieldEscola.length && !fieldEscola.val()) fieldEscola.val(d.escola ? d.escola.nome : '');
                         if (fieldTurma.length && !fieldTurma.val()) fieldTurma.val(d.turma ? d.turma.nome : '');
+                        if (fieldNasc.length && !fieldNasc.val() && d.data_nascimento) {
+                            var nd = String(d.data_nascimento);
+                            if (nd.indexOf('-') !== -1) {
+                                var p = nd.split('-');
+                                if (p.length === 3) nd = p[2] + '/' + p[1] + '/' + p[0];
+                            }
+                            fieldNasc.val(nd);
+                        }
                     }
                 } catch(e) { console.warn('Erro ao restaurar sessão no checkout:', e); }
             }
@@ -519,14 +619,20 @@ APREAS_JS;
         }
 
         $campos = [
-            'apreas_aluno'  => 'Nome Completo do(a) Aluno(a)',
-            'apreas_escola' => 'Escola',
-            'apreas_turma'  => 'Turma',
+            'apreas_aluno'      => 'Nome Completo do(a) Aluno(a)',
+            'apreas_escola'     => 'Escola',
+            'apreas_turma'      => 'Turma',
+            'apreas_nascimento' => 'Data de Nascimento',
         ];
         foreach ( $campos as $key => $label ) {
             if ( empty( $_POST[ $key ] ) ) {
                 wc_add_notice( sprintf( __( 'O campo <strong>%s</strong> é obrigatório.', 'apreas' ), $label ), 'error' );
             }
+        }
+
+        // Formato da data de nascimento
+        if ( ! empty( $_POST['apreas_nascimento'] ) && ! preg_match( '/^\d{2}\/\d{2}\/\d{4}$/', $_POST['apreas_nascimento'] ) ) {
+            wc_add_notice( __( 'Informe a <strong>Data de Nascimento</strong> no formato DD/MM/AAAA.', 'apreas' ), 'error' );
         }
     }
 
@@ -539,14 +645,20 @@ APREAS_JS;
         }
 
         $campos = [
-            'apreas_aluno'         => '_apreas_aluno',
-            'apreas_escola'        => '_apreas_escola',
-            'apreas_turma'         => '_apreas_turma',
-            'billing_neighborhood' => '_billing_neighborhood',
+            'apreas_aluno'          => '_apreas_aluno',
+            'apreas_escola'         => '_apreas_escola',
+            'apreas_turma'          => '_apreas_turma',
+            'apreas_nascimento'     => '_apreas_nascimento',
+            'billing_neighborhood'  => '_billing_neighborhood',
         ];
         foreach ( $campos as $post_key => $meta_key ) {
             if ( ! empty( $_POST[ $post_key ] ) ) {
-                update_post_meta( $order_id, $meta_key, sanitize_text_field( $_POST[ $post_key ] ) );
+                $valor = sanitize_text_field( $_POST[ $post_key ] );
+                // Normaliza data de nascimento para YYYY-MM-DD (padrão usado no plugin)
+                if ( $post_key === 'apreas_nascimento' && preg_match( '/^(\d{2})\/(\d{2})\/(\d{4})$/', $valor, $m ) ) {
+                    $valor = $m[3] . '-' . $m[2] . '-' . $m[1];
+                }
+                update_post_meta( $order_id, $meta_key, $valor );
             }
         }
     }
@@ -559,14 +671,19 @@ APREAS_JS;
         $escola = get_post_meta( $order->get_id(), '_apreas_escola', true );
         $turma  = get_post_meta( $order->get_id(), '_apreas_turma',  true );
         $bairro = get_post_meta( $order->get_id(), '_billing_neighborhood', true );
+        $nasc   = get_post_meta( $order->get_id(), '_apreas_nascimento',  true );
+        if ( $nasc && preg_match( '/^\d{4}-\d{2}-\d{2}$/', $nasc ) ) {
+            $nasc = date( 'd/m/Y', strtotime( $nasc ) );
+        }
 
-        if ( ! $aluno && ! $escola && ! $turma && ! $bairro ) return;
+        if ( ! $aluno && ! $escola && ! $turma && ! $bairro && ! $nasc ) return;
 
         // SVGs — mesma cor neutra para todos
         $svg_pessoa = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="#6b7280"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8V21h19.2v-1.8c0-3.2-6.4-4.8-9.6-4.8z"/></svg>';
         $svg_escola = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="#6b7280"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zm0 12.27L4.56 11 12 6.73 19.44 11 12 15.27zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>';
         $svg_turma  = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="#6b7280"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>';
         $svg_bairro = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="#6b7280" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>';
+        $svg_nasc  = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
         $svg_header = '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="rgba(255,255,255,0.85)"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8V21h19.2v-1.8c0-3.2-6.4-4.8-9.6-4.8z"/></svg>';
 
         // Estilos reutilizáveis
@@ -613,6 +730,7 @@ APREAS_JS;
                     <?php
                     if ( $escola ) echo $row( $svg_escola, 'Escola', $escola );
                     if ( $turma  ) echo $row( $svg_turma,  'Turma',  $turma  );
+                    if ( $nasc   ) echo $row( $svg_nasc,   'Data de Nascimento', $nasc );
                     ?>
                 </div>
 
@@ -626,10 +744,15 @@ APREAS_JS;
     // ─────────────────────────────────────────────
     public function campos_no_email( $fields, $sent_to_admin, $order ) {
         $id = $order->get_id();
+        $nasc = get_post_meta( $id, '_apreas_nascimento', true );
+        if ( $nasc && preg_match( '/^\d{4}-\d{2}-\d{2}$/', $nasc ) ) {
+            $nasc = date( 'd/m/Y', strtotime( $nasc ) );
+        }
         $mapa = [
-            'aluno'  => [ 'label' => 'Nome do Aluno', 'value' => get_post_meta( $id, '_apreas_aluno',  true ) ],
-            'escola' => [ 'label' => 'Escola',         'value' => get_post_meta( $id, '_apreas_escola', true ) ],
-            'turma'  => [ 'label' => 'Turma',          'value' => get_post_meta( $id, '_apreas_turma',  true ) ],
+            'aluno'      => [ 'label' => 'Nome do Aluno', 'value' => get_post_meta( $id, '_apreas_aluno',  true ) ],
+            'escola'     => [ 'label' => 'Escola',         'value' => get_post_meta( $id, '_apreas_escola', true ) ],
+            'turma'      => [ 'label' => 'Turma',          'value' => get_post_meta( $id, '_apreas_turma',  true ) ],
+            'nascimento' => [ 'label' => 'Data de Nascimento', 'value' => $nasc ],
         ];
         foreach ( $mapa as $key => $data ) {
             if ( ! empty( $data['value'] ) ) $fields[ $key ] = $data;
