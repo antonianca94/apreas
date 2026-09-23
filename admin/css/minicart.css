@@ -6,8 +6,55 @@
 /* ── Oculto até login de shortcode ser efetuado ── */
 body.apreas-minicart-deslogado #apreas-minicart-trigger,
 body.apreas-minicart-deslogado #apreas-minicart-panel,
-body.apreas-minicart-deslogado #apreas-minicart-overlay {
+body.apreas-minicart-deslogado #apreas-minicart-overlay,
+body.apreas-minicart-deslogado #apreas-logout-button {
     display: none !important;
+}
+
+/* ── Botão sair (acima do mini carrinho) ── */
+#apreas-logout-button {
+    position: fixed;
+    bottom: 175px;
+    right: 20px;
+    z-index: 9999997;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #ffffff;
+    color: #d32f2f;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.25s cubic-bezier(.34, 1.56, .64, 1), box-shadow 0.25s ease, background 0.2s ease, color 0.2s ease;
+}
+
+#apreas-logout-button:hover {
+    background: #d32f2f;
+    color: #ffffff;
+    box-shadow: 0 12px 36px rgba(211, 47, 47, 0.35);
+}
+
+#apreas-logout-button:active {
+    transform: scale(0.94);
+}
+
+#apreas-logout-button svg {
+    display: block;
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    fill: none !important;
+    stroke: #d32f2f !important;
+    stroke-width: 2 !important;
+    stroke-linecap: round !important;
+    stroke-linejoin: round !important;
+}
+
+#apreas-logout-button:hover svg {
+    stroke: #ffffff !important;
 }
 
 /* ── Botão gatilho (canto inferior direito) ── */
@@ -482,5 +529,17 @@ body.apreas-minicart-deslogado #apreas-minicart-overlay {
         right: 20px;
         width: 56px;
         height: 56px;
+    }
+
+    #apreas-logout-button {
+        bottom: 161px;
+        right: 20px;
+        width: 56px;
+        height: 56px;
+    }
+
+    #apreas-logout-button svg {
+        width: 22px;
+        height: 22px;
     }
 }

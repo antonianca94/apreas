@@ -57,7 +57,7 @@ jQuery(document).ready(function ($) {
     // PERSÍSTÊNCIA DE SESSÃO (localStorage - expira em 10 minutos)
     // ============================================================
     var SESSAO_KEY = 'apreas_login_sessao';
-    var SESSAO_TTL = 10 * 60 * 1000; // 10 minutos em ms
+    var SESSAO_TTL = 365 * 24 * 60 * 60 * 1000; // 1 ano em ms (não expira até deslogar)
 
     function salvarSessao(tipo, dados) {
         try {
@@ -589,16 +589,33 @@ jQuery(document).ready(function ($) {
         } else if (sessaoAtiva.tipo === 'eventos') {
             aplicarSessaoEventos(sessaoAtiva.dados);
         }
+        programarOcultacaoLogoutContainer();
     }
     // RESTAURAR SESSÃO AO CARREGAR A PÁGINA
 
     // SAIR / LOGOUT
-    $(document).on('click', '#btnSairApreas', function (e) {
-        e.preventDefault();
+    function efetuarLogout() {
         localStorage.removeItem(SESSAO_KEY);
         $(document).trigger('apreas_logout');
-        location.reload();
+        window.location.href = location.origin + '/';
+    }
+    $(document).on('click', '#btnSairApreas, .apreas-logout-button', function (e) {
+        e.preventDefault();
+        efetuarLogout();
     });
     // SAIR / LOGOUT
+
+    // OCULTAR A BARRA "VOCÊ ESTÁ LOGADO" APÓS 15 SEGUNDOS
+    function programarOcultacaoLogoutContainer() {
+        var el = document.getElementById('logoutContainer');
+        if (!el) return;
+        if (el._apreasLogoutTimer) clearTimeout(el._apreasLogoutTimer);
+        el._apreasLogoutTimer = setTimeout(function () {
+            el.style.setProperty('display', 'none', 'important');
+        }, 15000);
+    }
+    // OCULTAR A BARRA "VOCÊ ESTÁ LOGADO" APÓS 15 SEGUNDOS
+
+    $(document.body).on('apreas_login_success', programarOcultacaoLogoutContainer);
 
 });

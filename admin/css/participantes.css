@@ -238,12 +238,12 @@ button.swal2-confirm.swal2-styled:hover {
     z-index: 9999999;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
+    gap: 20px;
     background: linear-gradient(135deg, #ffffff 0%, #f6faf6 100%);
     border: 1px solid rgba(46, 160, 67, 0.25);
     border-radius: 50px;
     box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
-    padding: 8px 8px 8px 18px;
+    padding: 16px 24px 16px 28px;
     font-family: "Roboto", Sans-serif;
     box-sizing: border-box;
 }
@@ -251,9 +251,9 @@ button.swal2-confirm.swal2-styled:hover {
 #logoutContainer span {
     display: inline-flex;
     align-items: center;
-    gap: 9px;
+    gap: 12px;
     font-weight: 600;
-    font-size: 0.95rem;
+    font-size: 1rem;
     color: #1f2d1f;
     white-space: nowrap;
 }
@@ -269,6 +269,17 @@ button.swal2-confirm.swal2-styled:hover {
     background-position: center;
     background-repeat: no-repeat;
     background-size: 11px;
+}
+
+/* Barra abaixo da barra de admin do WordPress quando logado no painel */
+body.admin-bar #logoutContainer {
+    top: 46px;
+}
+
+@media (max-width: 782px) {
+    body.admin-bar #logoutContainer {
+        top: 60px;
+    }
 }
 
 #btnSairApreas {
@@ -300,14 +311,14 @@ button.swal2-confirm.swal2-styled:hover {
     #logoutContainer {
         top: 8px;
         max-width: calc(100% - 16px);
-        gap: 10px;
-        padding: 6px 6px 6px 13px;
+        gap: 14px;
+        padding: 12px 18px 12px 20px;
         box-shadow: 0 4px 16px rgba(0, 0, 0, 0.14);
     }
 
     #logoutContainer span {
-        font-size: 0.82rem;
-        gap: 6px;
+        font-size: 0.9rem;
+        gap: 8px;
     }
 
     #logoutContainer span::before {

@@ -782,6 +782,15 @@ class APREAS_Plugin
             <span id="apreas-minicart-badge" aria-live="polite">0</span>
         </button>
 
+        <button type="button" id="apreas-logout-button" class="apreas-logout-button"
+                title="Sair da conta" aria-label="Sair da conta">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+        </button>
+
         <aside id="apreas-minicart-panel"
                role="dialog"
                aria-label="Mini Carrinho"
@@ -948,14 +957,14 @@ class APREAS_Plugin
             "Participantes_CSS",
             plugins_url("/admin/css/participantes.css", __FILE__),
             [],
-            "1.0.35"
+            "1.0.37"
         );
         if (get_option('apreas_minicart_enabled', 1)) {
             wp_enqueue_style(
                 "Apreas_Minicart_CSS",
                 plugins_url("/admin/css/minicart.css", __FILE__),
                 [],
-                "1.0.6"
+                "1.0.12"
             );
         }
         wp_enqueue_style(
@@ -1012,7 +1021,7 @@ class APREAS_Plugin
             "Login_JS",
             plugins_url("/admin/js/login.js", __FILE__),
             [],
-            "1.0.82",
+            "1.0.84",
             true
         );
         wp_enqueue_script(

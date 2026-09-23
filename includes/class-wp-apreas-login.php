@@ -395,9 +395,6 @@ class Login {
         </script>
         <div id="logoutContainer">
             <span>Você está logado.</span>
-            <a href="#" id="btnSairApreas" title="Sair da Conta">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-            </a>
         </div>
         <div id="loginContainer">
             <div id="loginOverlay"></div>
@@ -772,9 +769,7 @@ class Login {
         })();
         </script>
         <div id="logoutContainer">
-            <a href="#" id="btnSairApreas" title="Sair da Conta">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-            </a>
+            <span>Você está logado.</span>
         </div>
         <div id="loginContainer">
             <div id="loginOverlay"></div>
