@@ -27,12 +27,12 @@ class Relatorios {
     }
 
     private function __construct() {
-        add_action( 'admin_menu', [ $this, 'adicionar_pagina' ] );
+        add_action( 'admin_menu', [ $this, 'adicionar_pagina' ], 9 );
         add_action( 'admin_init', [ $this, 'processar_export_csv' ] );
         add_action( 'wp_ajax_apreas_toggle_pedido', [ $this, 'ajax_toggle_pedido' ] );
         add_action( 'wp_ajax_apreas_filtrar_pedidos', [ $this, 'ajax_filtrar_pedidos' ] );
         add_action( 'admin_head', [ $this, 'ocultar_notices' ] );
-        add_action( 'admin_print_styles-woocommerce_page_' . self::SLUG, [ $this, 'carregar_fonte' ] );
+        add_action( 'admin_print_styles-toplevel_page_' . self::SLUG, [ $this, 'carregar_fonte' ] );
     }
 
     // ─────────────────────────────────────────────
@@ -55,7 +55,7 @@ class Relatorios {
             return;
         }
         $tela = get_current_screen();
-        if ( ! $tela || $tela->id !== 'woocommerce_page_' . self::SLUG ) {
+        if ( ! $tela || ( $tela->id !== 'woocommerce_page_' . self::SLUG && $tela->id !== 'toplevel_page_' . self::SLUG ) ) {
             return;
         }
         echo '<style id="apreas-oculta-notices">
@@ -73,13 +73,23 @@ class Relatorios {
     }
 
     // ─────────────────────────────────────────────
-    // SUBMENU — WooCommerce > Relatório Avançado
+    // MENU RAIZ "Apreas" — Relatório (primeiro submenu)
     // ─────────────────────────────────────────────
     public function adicionar_pagina() {
+        add_menu_page(
+            'Apreas',
+            'Apreas',
+            'manage_woocommerce',
+            self::SLUG,
+            [ $this, 'render_pagina' ],
+            'dashicons-awards',
+            30
+        );
+
         add_submenu_page(
-            'woocommerce',
-            'Relatório Avançado',
-            'Relatório Avançado',
+            self::SLUG,
+            'Relatório',
+            'Relatório',
             self::CAPABILIDADE,
             self::SLUG,
             [ $this, 'render_pagina' ]
@@ -107,6 +117,47 @@ class Relatorios {
         return $this->obter_parametro( 'filtro_escola' );
     }
 
+    private function get_filtro_nome_pai() {
+        return $this->obter_parametro( 'filtro_nome_pai' );
+    }
+
+    private function get_filtro_data_inicio() {
+        return $this->obter_parametro( 'filtro_data_inicio' );
+    }
+
+    private function get_filtro_data_fim() {
+        return $this->obter_parametro( 'filtro_data_fim' );
+    }
+
+    private function get_filtro_ano() {
+        return $this->obter_parametro( 'filtro_ano' );
+    }
+
+    private function get_filtro_categoria() {
+        return $this->obter_parametro( 'filtro_categoria' );
+    }
+
+    /**
+     * Quantidade de registros por página: 10, 25, 50 ou 100 (padrão 25).
+     */
+    private function get_por_pagina() {
+        $valor = absint( $this->obter_parametro( 'por_pagina' ) );
+        return in_array( $valor, [ 10, 25, 50, 100 ], true ) ? $valor : 25;
+    }
+
+    /**
+     * Categorias de produto (product_cat) disponíveis como filtro.
+     */
+    private function listar_categorias() {
+        $cats = get_terms( [
+            'taxonomy'   => 'product_cat',
+            'hide_empty' => false,
+            'orderby'    => 'name',
+            'order'      => 'ASC',
+        ] );
+        return ( is_array( $cats ) && ! is_wp_error( $cats ) ) ? $cats : [];
+    }
+
     /**
      * Lista as escolas distintas realmente gravadas nos pedidos
      * (_apreas_escola é texto livre no checkout).
@@ -127,40 +178,89 @@ class Relatorios {
     // PEDIDOS FILTRADOS (IDs)
     // ─────────────────────────────────────────────
     /**
-     * IDs dos pedidos com dados de aluno, aplicando os filtros ativos.
-     * Filtragem direta via SQL (determinística, sem depender do WP_Meta_Query).
+     * IDs dos pedidos aplicando os filtros ativos.
+     * Lista qualquer pedido do WooCommerce (não exige dados de aluno),
+     * com filtros combináveis: aluno, escola, nome do pai, range de datas,
+     * ano e categoria de produto. Filtragem direta via SQL.
      */
     private function ids_pedidos_filtrados() {
         global $wpdb;
 
-        $nome   = $this->get_filtro_nome_aluno();
-        $escola = $this->get_filtro_escola();
+        $join   = '';
+        $where  = [];
 
-        $sql = "SELECT DISTINCT pm.post_id
-                FROM {$wpdb->postmeta} pm
-                INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
-                WHERE p.post_type = 'shop_order'
-                  AND pm.meta_key = '_apreas_aluno'
-                  AND pm.meta_value != ''";
-
+        // Nome do aluno
+        $nome = $this->get_filtro_nome_aluno();
         if ( $nome !== '' ) {
-            $padrao = '%' . $wpdb->esc_like( $nome ) . '%';
-            $sql .= $wpdb->prepare(
-                " AND post_id IN (
+            $where[] = $wpdb->prepare(
+                "p.ID IN (
                     SELECT post_id FROM {$wpdb->postmeta}
                     WHERE meta_key = '_apreas_aluno' AND meta_value LIKE %s )",
-                $padrao
+                '%' . $wpdb->esc_like( $nome ) . '%'
             );
         }
 
+        // Escola
+        $escola = $this->get_filtro_escola();
         if ( $escola !== '' ) {
-            $padrao = '%' . $wpdb->esc_like( $escola ) . '%';
-            $sql .= $wpdb->prepare(
-                " AND post_id IN (
+            $where[] = $wpdb->prepare(
+                "p.ID IN (
                     SELECT post_id FROM {$wpdb->postmeta}
                     WHERE meta_key = '_apreas_escola' AND meta_value LIKE %s )",
-                $padrao
+                '%' . $wpdb->esc_like( $escola ) . '%'
             );
+        }
+
+        // Nome do pai (nome de faturamento)
+        $pai = $this->get_filtro_nome_pai();
+        if ( $pai !== '' ) {
+            $where[] = $wpdb->prepare(
+                "p.ID IN (
+                    SELECT post_id FROM {$wpdb->postmeta}
+                    WHERE meta_key IN ( '_billing_first_name', '_billing_last_name' )
+                      AND meta_value LIKE %s )",
+                '%' . $wpdb->esc_like( $pai ) . '%'
+            );
+        }
+
+        // Range de datas do pedido (post_date)
+        $data_inicio = $this->get_filtro_data_inicio();
+        if ( $data_inicio !== '' && preg_match( '/^\d{4}-\d{2}-\d{2}$/', $data_inicio ) ) {
+            $where[] = $wpdb->prepare( 'p.post_date >= %s', $data_inicio . ' 00:00:00' );
+        }
+        $data_fim = $this->get_filtro_data_fim();
+        if ( $data_fim !== '' && preg_match( '/^\d{4}-\d{2}-\d{2}$/', $data_fim ) ) {
+            $where[] = $wpdb->prepare( 'p.post_date <= %s', $data_fim . ' 23:59:59' );
+        }
+
+        // Ano (ex.: 2027) — combinável com os demais filtros
+        $ano = $this->get_filtro_ano();
+        if ( $ano !== '' && preg_match( '/^\d{4}$/', $ano ) ) {
+            $where[] = $wpdb->prepare( 'YEAR( p.post_date ) = %d', (int) $ano );
+        }
+
+        // Categoria de produto (pedido contém produto da categoria)
+        $categoria = $this->get_filtro_categoria();
+        if ( $categoria !== '' ) {
+            $join .= " INNER JOIN {$wpdb->prefix}woocommerce_order_items oi
+                          ON oi.order_id = p.ID AND oi.order_item_type = 'line_item'";
+            $join .= " INNER JOIN {$wpdb->prefix}woocommerce_order_itemmeta oim
+                          ON oim.order_item_id = oi.order_item_id AND oim.meta_key = '_product_id'";
+            $join .= " INNER JOIN {$wpdb->prefix}term_relationships tr
+                          ON tr.object_id = oim.meta_value";
+            $join .= " INNER JOIN {$wpdb->prefix}term_taxonomy tt
+                          ON tt.term_taxonomy_id = tr.term_taxonomy_id AND tt.taxonomy = 'product_cat'";
+            $join .= $wpdb->prepare(
+                " INNER JOIN {$wpdb->prefix}terms t
+                      ON t.term_id = tt.term_id AND t.slug = %s",
+                sanitize_title( $categoria )
+            );
+        }
+
+        $sql = "SELECT DISTINCT p.ID FROM {$wpdb->posts} p" . $join;
+        $sql .= " WHERE p.post_type = 'shop_order'";
+        if ( $where ) {
+            $sql .= ' AND ' . implode( ' AND ', $where );
         }
 
         $ids = $wpdb->get_col( $sql );
@@ -227,6 +327,9 @@ class Relatorios {
         return implode( ', ', $partes );
     }
 
+    /**
+     * Versão texto (CSV): "Nome (x2), Outro (x3)".
+     */
     private function lista_pedidos( $order ) {
         $itens = [];
         foreach ( $order->get_items() as $item ) {
@@ -235,6 +338,31 @@ class Relatorios {
             $itens[] = ( $qtd > 1 ) ? $nome . ' (x' . $qtd . ')' : $nome;
         }
         return implode( ', ', $itens );
+    }
+
+    /**
+     * Versão HTML (tabela): cada item do pedido em linha própria com badge de quantidade.
+     */
+    private function lista_pedidos_html( $order ) {
+        $itens = [];
+        foreach ( $order->get_items() as $item ) {
+            $nome = esc_html( $item->get_name() );
+            $qtd  = absint( $item->get_quantity() );
+            if ( $qtd > 1 ) {
+                $itens[] = '<span class="ap-item-linha">' . $nome . ' <span class="ap-qtd-badge">x' . $qtd . '</span></span>';
+            } else {
+                $itens[] = '<span class="ap-item-linha">' . $nome . '</span>';
+            }
+        }
+        return implode( '', $itens );
+    }
+
+    /**
+     * Valor total do pedido formatado em reais.
+     */
+    private function total_pedido( $order ) {
+        $total = (float) $order->get_total();
+        return wc_price( $total, [ 'currency' => $order->get_currency() ? $order->get_currency() : get_woocommerce_currency() ] );
     }
 
     private function data_pedido( $order ) {
@@ -247,9 +375,9 @@ class Relatorios {
     }
 
     /**
-     * Paginação simples (mantém os filtros ativos).
+     * Paginação simples (mantém os filtros ativos e o por_pagina).
      */
-    private function paginacao( $total_paginas, $pagina_atual, $nome, $escola ) {
+    private function paginacao( $total_paginas, $pagina_atual, $filtros ) {
         $total_paginas = (int) $total_paginas;
         if ( $total_paginas <= 1 ) {
             return '';
@@ -257,14 +385,8 @@ class Relatorios {
 
         $base = admin_url( 'admin.php?page=' . self::SLUG );
 
-        $url_pagina = function ( $pagina ) use ( $base, $nome, $escola ) {
-            $args = [ 'paged' => $pagina ];
-            if ( $nome !== '' ) {
-                $args['filtro_nome_aluno'] = $nome;
-            }
-            if ( $escola !== '' ) {
-                $args['filtro_escola'] = $escola;
-            }
+        $url_pagina = function ( $pagina ) use ( $base, $filtros ) {
+            $args = array_merge( $filtros, [ 'paged' => $pagina ] );
             return add_query_arg( $args, $base );
         };
 
@@ -345,17 +467,19 @@ class Relatorios {
     }
 
     // ─────────────────────────────────────────────
-    // ARGUMENTOS DOS FILTROS ATIVOS (para links/paginação)
+    // ARGUMENTOS DOS FILTROS ATIVOS (para links/paginação/CSV)
     // ─────────────────────────────────────────────
     private function argumentos_filtro() {
         $args = [];
-        $nome   = $this->get_filtro_nome_aluno();
-        $escola = $this->get_filtro_escola();
-        if ( $nome !== '' ) {
-            $args['filtro_nome_aluno'] = $nome;
+        foreach ( [ 'filtro_nome_aluno', 'filtro_escola', 'filtro_nome_pai', 'filtro_data_inicio', 'filtro_data_fim', 'filtro_ano', 'filtro_categoria' ] as $campo ) {
+            $valor = $this->obter_parametro( $campo );
+            if ( $valor !== '' ) {
+                $args[ $campo ] = $valor;
+            }
         }
-        if ( $escola !== '' ) {
-            $args['filtro_escola'] = $escola;
+        $por_pagina = $this->get_por_pagina();
+        if ( $por_pagina !== 25 ) {
+            $args['por_pagina'] = $por_pagina;
         }
         return $args;
     }
@@ -577,6 +701,15 @@ class Relatorios {
             .apreas-negrito { font-weight: 600; }
             .apreas-aluno { font-weight: 600; color: #111827; }
             .apreas-itens { color: #374151; max-width: 300px; }
+            .ap-item-linha { display: block; padding: 2px 0; line-height: 1.5; }
+            .ap-item-linha + .ap-item-linha { border-top: 1px dashed #eef0f6; }
+            .ap-qtd-badge {
+                display: inline-block; margin-left: 4px; padding: 0 7px;
+                font-size: 10.5px; font-weight: 700;
+                background: #fef2f2; color: var(--ap-primary);
+                border-radius: 999px;
+            }
+            .apreas-total { white-space: nowrap; font-weight: 700; color: #111827; }
             .apreas-data { white-space: nowrap; }
 
             .apreas-badge {
@@ -656,10 +789,22 @@ class Relatorios {
             // Navega pelo mesmo caminho GET que o carregamento inicial (sempre funciona).
             function navegarPara() {
                 var args = {};
-                var n = $('#filtro_nome_aluno').val();
-                var e = $('#filtro_escola').val();
-                if (n) { args.filtro_nome_aluno = n; }
-                if (e) { args.filtro_escola = e; }
+                var n  = $('#filtro_nome_aluno').val();
+                var p  = $('#filtro_nome_pai').val();
+                var e  = $('#filtro_escola').val();
+                var di = $('#filtro_data_inicio').val();
+                var df = $('#filtro_data_fim').val();
+                var a  = $('#filtro_ano').val();
+                var c  = $('#filtro_categoria').val();
+                var pp = $('#por_pagina').val();
+                if (n)  { args.filtro_nome_aluno = n; }
+                if (p)  { args.filtro_nome_pai = p; }
+                if (e)  { args.filtro_escola = e; }
+                if (di) { args.filtro_data_inicio = di; }
+                if (df) { args.filtro_data_fim = df; }
+                if (a)  { args.filtro_ano = a; }
+                if (c)  { args.filtro_categoria = c; }
+                if (pp && pp !== '25') { args.por_pagina = pp; }
                 var q = $.param(args);
                 location.href = q ? (baseUrl + '&' + q) : baseUrl;
             }
@@ -670,8 +815,20 @@ class Relatorios {
                 timer = setTimeout(navegarPara, 600);
             });
 
-            // Escola: filtra imediatamente (vazio = volta a listar todas).
-            $('#filtro_escola').on('change', navegarPara);
+            // Nome do pai: mesmo comportamento de busca com pausa.
+            $('#filtro_nome_pai').on('keyup input', function () {
+                clearTimeout(timer);
+                timer = setTimeout(navegarPara, 600);
+            });
+
+            // Escola / datas / ano / categoria / por página: filtram imediatamente (vazio = volta a listar todas).
+            $('#filtro_escola, #filtro_data_inicio, #filtro_data_fim, #filtro_ano, #filtro_categoria, #por_pagina').on('change', navegarPara);
+
+            // Ano: pesquisa com pausa curta também.
+            $('#filtro_ano').on('keyup input', function () {
+                clearTimeout(timer);
+                timer = setTimeout(navegarPara, 600);
+            });
 
             // Botão Limpar: recarrega sem filtros.
             $('#apreas-filtros').on('click', '.apreas-btn-clear', function (e) {
@@ -776,6 +933,7 @@ class Relatorios {
             'Turma',
             'Pedidos Listados',
             'Data do Pedido',
+            'Valor Total',
         ], ';' );
 
         while ( $query->have_posts() ) {
@@ -799,6 +957,7 @@ class Relatorios {
                 wp_strip_all_tags( $turma ),
                 wp_strip_all_tags( $this->lista_pedidos( $order ) ),
                 wp_strip_all_tags( $this->data_pedido( $order ) ),
+                number_format( (float) $order->get_total(), 2, ',', '.' ),
             ], ';' );
         }
 
@@ -816,15 +975,23 @@ class Relatorios {
 
         nocache_headers();
 
-        $nome_filtro   = $this->get_filtro_nome_aluno();
-        $escola_filtro = $this->get_filtro_escola();
-        $escolas       = $this->listar_escolas_pedidos();
-        $paged         = isset( $_GET['paged'] ) ? max( 1, absint( $_GET['paged'] ) ) : 1;
-        $query         = $this->consultar_pedidos( 25, $paged );
-        $stats         = $this->estatisticas();
+        $nome_filtro      = $this->get_filtro_nome_aluno();
+        $escola_filtro    = $this->get_filtro_escola();
+        $pai_filtro       = $this->get_filtro_nome_pai();
+        $data_inicio      = $this->get_filtro_data_inicio();
+        $data_fim         = $this->get_filtro_data_fim();
+        $ano_filtro       = $this->get_filtro_ano();
+        $categoria_filtro = $this->get_filtro_categoria();
+        $por_pagina       = $this->get_por_pagina();
+        $escolas          = $this->listar_escolas_pedidos();
+        $categorias       = $this->listar_categorias();
+        $paged            = isset( $_GET['paged'] ) ? max( 1, absint( $_GET['paged'] ) ) : 1;
+        $query            = $this->consultar_pedidos( $por_pagina, $paged );
+        $stats            = $this->estatisticas();
+        $filtros          = $this->argumentos_filtro();
 
         $url_base = admin_url( 'admin.php?page=' . self::SLUG );
-        $url_csv  = add_query_arg( array_merge( [ 'export' => 'csv' ], $this->argumentos_filtro() ), $url_base );
+        $url_csv  = add_query_arg( array_merge( [ 'export' => 'csv' ], $filtros ), $url_base );
 
         $this->estilos_script();
         ?>
@@ -855,6 +1022,12 @@ class Relatorios {
                 <input type="hidden" name="page" value="<?php echo esc_attr( self::SLUG ); ?>">
 
                 <div class="apreas-filtro-campo">
+                    <label for="filtro_nome_pai">Nome do Pai</label>
+                    <input type="text" class="ctl" id="filtro_nome_pai" name="filtro_nome_pai"
+                           value="<?php echo esc_attr( $pai_filtro ); ?>" placeholder="Pesquisar pelo pai...">
+                </div>
+
+                <div class="apreas-filtro-campo">
                     <label for="filtro_nome_aluno">Nome do Aluno</label>
                     <input type="text" class="ctl" id="filtro_nome_aluno" name="filtro_nome_aluno"
                            value="<?php echo esc_attr( $nome_filtro ); ?>" placeholder="Pesquisar aluno...">
@@ -872,6 +1045,47 @@ class Relatorios {
                     </select>
                 </div>
 
+                <div class="apreas-filtro-campo">
+                    <label for="filtro_data_inicio">Data de Início</label>
+                    <input type="date" class="ctl" id="filtro_data_inicio" name="filtro_data_inicio"
+                           value="<?php echo esc_attr( $data_inicio ); ?>">
+                </div>
+
+                <div class="apreas-filtro-campo">
+                    <label for="filtro_data_fim">Data de Fim</label>
+                    <input type="date" class="ctl" id="filtro_data_fim" name="filtro_data_fim"
+                           value="<?php echo esc_attr( $data_fim ); ?>">
+                </div>
+
+                <div class="apreas-filtro-campo">
+                    <label for="filtro_ano">Ano</label>
+                    <input type="text" class="ctl" id="filtro_ano" name="filtro_ano" maxlength="4" inputmode="numeric"
+                           value="<?php echo esc_attr( $ano_filtro ); ?>" placeholder="Ex.: 2027" title="Informe apenas o ano">
+                </div>
+
+                <div class="apreas-filtro-campo">
+                    <label for="filtro_categoria">Categoria de Produto</label>
+                    <select id="filtro_categoria" class="ctl" name="filtro_categoria">
+                        <option value="">Todas as Categorias</option>
+                        <?php foreach ( $categorias as $cat ) : ?>
+                            <option value="<?php echo esc_attr( $cat->slug ); ?>" <?php selected( $categoria_filtro, $cat->slug ); ?>>
+                                <?php echo esc_html( $cat->name ); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <div class="apreas-filtro-campo">
+                    <label for="por_pagina">Itens por Página</label>
+                    <select id="por_pagina" class="ctl" name="por_pagina">
+                        <?php foreach ( [ 10, 25, 50, 100 ] as $valor_pag ) : ?>
+                            <option value="<?php echo esc_attr( $valor_pag ); ?>" <?php selected( $por_pagina, $valor_pag ); ?>>
+                                <?php echo esc_html( $valor_pag ); ?> registros
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
                 <div class="apreas-filtro-acoes">
                     <button type="submit" class="apreas-btn apreas-btn-primary">Filtrar</button>
                     <a href="<?php echo esc_url( $url_base ); ?>" class="apreas-btn apreas-btn-clear">Limpar</a>
@@ -879,7 +1093,7 @@ class Relatorios {
             </form>
 
             <!-- RESULTADO -->
-            <?php echo $this->html_conteudo( $query, $stats, $paged, $nome_filtro, $escola_filtro ); ?>
+            <?php echo $this->html_conteudo( $query, $stats, $paged, $filtros ); ?>
 
             <?php wp_reset_postdata(); ?>
         </div>
@@ -929,7 +1143,7 @@ class Relatorios {
     /**
      * Área de resultado (tabela ou estado vazio) — reutilizada na página e no AJAX.
      */
-    private function html_conteudo( $query, $stats, $paged, $nome, $escola ) {
+    private function html_conteudo( $query, $stats, $paged, $filtros ) {
         ob_start();
 
         if ( ! $query->have_posts() ) : ?>
@@ -944,7 +1158,7 @@ class Relatorios {
             <div class="apreas-tabela-card" id="apreas-conteudo">
                 <div class="apreas-tabela-top">
                     <span class="apreas-resultado"><strong><?php echo number_format( $stats['total'], 0, ',', '.' ); ?></strong> pedido(s) encontrado(s)</span>
-                    <?php echo $this->paginacao( $query->max_num_pages, $paged, $nome, $escola ); ?>
+                    <?php echo $this->paginacao( $query->max_num_pages, $paged, $filtros ); ?>
                 </div>
 
                 <div class="apreas-tabela-scroll">
@@ -961,6 +1175,7 @@ class Relatorios {
                                 <th>Série</th>
                                 <th>Turma</th>
                                 <th>Pedidos</th>
+                                <th>Total</th>
                                 <th>Data do Pedido</th>
                             </tr>
                         </thead>
@@ -1012,7 +1227,8 @@ class Relatorios {
                                     <td><?php echo esc_html( $escola_pedido ); ?></td>
                                     <td><?php echo esc_html( $serie ); ?></td>
                                     <td><?php echo esc_html( $turma ); ?></td>
-                                    <td class="apreas-itens"><?php echo esc_html( $this->lista_pedidos( $order ) ); ?></td>
+                                    <td class="apreas-itens"><?php echo $this->lista_pedidos_html( $order ); ?></td>
+                                    <td class="apreas-total"><?php echo wp_kses_post( $this->total_pedido( $order ) ); ?></td>
                                     <td class="apreas-data">
                                         <a class="link-pedido" href="<?php echo esc_url( $link_pedido ); ?>" title="Ver pedido nº <?php echo esc_attr( $order_id ); ?>">
                                             <span class="apreas-num-pedido">#<?php echo esc_html( $order_id ); ?></span>
@@ -1027,7 +1243,7 @@ class Relatorios {
 
                 <div class="apreas-tabela-bottom">
                     <span class="apreas-resultado">Página <?php echo (int) $paged; ?> de <?php echo (int) $query->max_num_pages; ?></span>
-                    <?php echo $this->paginacao( $query->max_num_pages, $paged, $nome, $escola ); ?>
+                    <?php echo $this->paginacao( $query->max_num_pages, $paged, $filtros ); ?>
                 </div>
             </div>
 
@@ -1046,14 +1262,13 @@ class Relatorios {
             wp_send_json_error( 'Sem permissão' );
         }
 
-        $nome   = $this->get_filtro_nome_aluno();
-        $escola = $this->get_filtro_escola();
         $paged  = isset( $_POST['paged'] ) ? max( 1, absint( $_POST['paged'] ) ) : 1;
+        $filtros = $this->argumentos_filtro();
 
         $ids      = $this->ids_pedidos_filtrados();
-        $query    = $this->consultar_pedidos( 25, $paged );
+        $query    = $this->consultar_pedidos( $this->get_por_pagina(), $paged );
         $stats    = $this->estatisticas();
-        $conteudo = $this->html_conteudo( $query, $stats, $paged, $nome, $escola );
+        $conteudo = $this->html_conteudo( $query, $stats, $paged, $filtros );
 
         wp_send_json_success( [
             'metricas'      => $this->html_metricas( $stats ),

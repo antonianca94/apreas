@@ -25,14 +25,13 @@ class Settings
 
     public function add_settings_page()
     {
-        add_menu_page(
+        add_submenu_page(
+            'apreas-relatorio',
             'Configurações Apreas',
             'Configurações Apreas',
             'manage_options',
             'apreas-settings',
-            [$this, 'render_settings_page'],
-            'dashicons-admin-generic',
-            30
+            [$this, 'render_settings_page']
         );
     }
 
