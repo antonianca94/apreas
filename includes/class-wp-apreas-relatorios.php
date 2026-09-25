@@ -925,9 +925,9 @@ class Relatorios {
             'Feito',
             'Entregue',
             'Nome do Pai',
+            'Nome do Aluno',
             'WhatsApp',
             'Endereço Completo',
-            'Nome do Aluno',
             'Escola',
             'Série',
             'Turma',
@@ -949,9 +949,9 @@ class Relatorios {
                 ( get_post_meta( $order->get_id(), '_apreas_pedido_feito', true ) === '1' ) ? 'Sim' : 'Não',
                 ( get_post_meta( $order->get_id(), '_apreas_pedido_entregue', true ) === '1' ) ? 'Sim' : 'Não',
                 wp_strip_all_tags( $this->nome_responsavel( $order ) ),
+                wp_strip_all_tags( get_post_meta( $order->get_id(), '_apreas_aluno', true ) ),
                 wp_strip_all_tags( $order->get_billing_phone() ),
                 wp_strip_all_tags( $this->endereco_completo( $order ) ),
-                wp_strip_all_tags( get_post_meta( $order->get_id(), '_apreas_aluno', true ) ),
                 wp_strip_all_tags( get_post_meta( $order->get_id(), '_apreas_escola', true ) ),
                 wp_strip_all_tags( $serie ),
                 wp_strip_all_tags( $turma ),
@@ -1168,9 +1168,9 @@ class Relatorios {
                                 <th class="apreas-check">Feito</th>
                                 <th class="apreas-check">Entregue</th>
                                 <th>Nome do Pai</th>
+                                <th>Nome do Aluno</th>
                                 <th>Whatsapp</th>
                                 <th>Endereço Completo</th>
-                                <th>Nome do Aluno</th>
                                 <th>Escola</th>
                                 <th>Série</th>
                                 <th>Turma</th>
@@ -1214,6 +1214,7 @@ class Relatorios {
                                         </span>
                                     </td>
                                     <td class="apreas-negrito"><?php echo esc_html( $this->nome_responsavel( $order ) ); ?></td>
+                                    <td class="apreas-aluno"><?php echo esc_html( $aluno ); ?></td>
                                     <td>
                                         <?php if ( $telefone ) : ?>
                                             <a class="link-whatsapp" href="https://wa.me/<?php echo esc_attr( preg_replace( '/\D/', '', $telefone ) ); ?>" target="_blank" rel="noopener">
@@ -1223,7 +1224,6 @@ class Relatorios {
                                         <?php else : ?>—<?php endif; ?>
                                     </td>
                                     <td><?php echo esc_html( $this->endereco_completo( $order ) ); ?></td>
-                                    <td class="apreas-aluno"><?php echo esc_html( $aluno ); ?></td>
                                     <td><?php echo esc_html( $escola_pedido ); ?></td>
                                     <td><?php echo esc_html( $serie ); ?></td>
                                     <td><?php echo esc_html( $turma ); ?></td>
