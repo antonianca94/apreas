@@ -1002,6 +1002,9 @@ class APREAS_Plugin
                 width: 100% !important;
                 margin-top: 4rem !important;
             }
+            body.woocommerce-checkout .woocommerce-notices-wrapper {
+                margin: 0 !important;
+            }
         ";
         wp_add_inline_style("Participantes_CSS", $checkout_css);
     }
