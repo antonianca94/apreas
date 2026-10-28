@@ -358,6 +358,44 @@ class Relatorios {
     }
 
     /**
+     * Indica se o pedido já foi pago (status de pagamento do WooCommerce).
+     */
+    private function pedido_pago( $order ) {
+        return (bool) $order->is_paid();
+    }
+
+    /**
+     * Badge com o status atual do pedido (WooCommerce).
+     */
+    private function status_pedido_html( $order ) {
+        $status = (string) $order->get_status();
+
+        if ( function_exists( 'wc_get_order_status_name' ) ) {
+            $rotulo = wc_get_order_status_name( $status );
+        } else {
+            $rotulo = $status;
+        }
+        if ( ! $rotulo ) {
+            $rotulo = $status;
+        }
+
+        $cores = [
+            'completed'         => 'st-completed',
+            'processing'        => 'st-processing',
+            'on-hold'           => 'st-on-hold',
+            'pending'           => 'st-pending',
+            'cancelled'         => 'st-cancelled',
+            'refunded'          => 'st-refunded',
+            'failed'            => 'st-failed',
+            'checkout-draft'    => 'st-draft',
+        ];
+
+        $classe = isset( $cores[ $status ] ) ? $cores[ $status ] : 'st-default';
+
+        return '<span class="apreas-badge badge-status ' . esc_attr( $classe ) . '">' . esc_html( $rotulo ) . '</span>';
+    }
+
+    /**
      * Valor total do pedido formatado em reais.
      */
     private function total_pedido( $order ) {
@@ -698,6 +736,11 @@ class Relatorios {
                 accent-color: var(--ap-primary);
                 cursor: pointer; margin: 0;
             }
+            input[type="checkbox"].apreas-pedido-check:disabled {
+                cursor: not-allowed;
+                opacity: .4;
+                filter: grayscale(1);
+            }
             .apreas-negrito { font-weight: 600; }
             .apreas-aluno { font-weight: 600; color: #111827; }
             .apreas-itens { color: #374151; max-width: 300px; }
@@ -722,6 +765,35 @@ class Relatorios {
             .apreas-badge.badge-sim::before { background: #22c55e; }
             .apreas-badge.badge-nao { background: #f1f1f4; color: #8a8f98; }
             .apreas-badge.badge-nao::before { background: #c3c8d1; }
+            .apreas-badge.badge-naopago { background: #fef2f2; color: #b91c1c; }
+            .apreas-badge.badge-naopago::before { background: #ef4444; }
+            td.apreas-check .apreas-badge:only-child { margin-left: 0; }
+
+            /* ── STATUS DO PEDIDO ── */
+            .apreas-badge.badge-status {
+                margin-left: 0;
+                text-transform: none;
+                letter-spacing: .2px;
+                font-size: 11px;
+            }
+            .apreas-badge.st-completed { background: #ecfdf3; color: #15803d; }
+            .apreas-badge.st-completed::before { background: #22c55e; }
+            .apreas-badge.st-processing { background: #eff6ff; color: #1d4ed8; }
+            .apreas-badge.st-processing::before { background: #3b82f6; }
+            .apreas-badge.st-on-hold { background: #fffbeb; color: #b45309; }
+            .apreas-badge.st-on-hold::before { background: #f59e0b; }
+            .apreas-badge.st-pending { background: #fdf4ff; color: #a21caf; }
+            .apreas-badge.st-pending::before { background: #d946ef; }
+            .apreas-badge.st-cancelled { background: #fef2f2; color: #b91c1c; }
+            .apreas-badge.st-cancelled::before { background: #ef4444; }
+            .apreas-badge.st-refunded { background: #fff7ed; color: #c2410c; }
+            .apreas-badge.st-refunded::before { background: #fb923c; }
+            .apreas-badge.st-failed { background: #fef2f2; color: #b91c1c; }
+            .apreas-badge.st-failed::before { background: #ef4444; }
+            .apreas-badge.st-draft { background: #f1f1f4; color: #6b7280; }
+            .apreas-badge.st-draft::before { background: #9ca3af; }
+            .apreas-badge.st-default { background: #f1f1f4; color: #6b7280; }
+            .apreas-badge.st-default::before { background: #9ca3af; }
 
             .link-whatsapp {
                 display: inline-flex; align-items: center; gap: 6px;
@@ -736,6 +808,7 @@ class Relatorios {
                 display: block; font-size: 11px; font-weight: 500;
                 color: var(--ap-muted); text-transform: uppercase; letter-spacing: .4px;
             }
+            .apreas-data .apreas-status-pedido { margin-top: 7px; }
 
             /* ── PAGINAÇÃO ── */
             .apreas-paginacao { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
@@ -784,6 +857,28 @@ class Relatorios {
                     location.replace(rec);
                     return;
                 }
+            }
+
+            // Rotulos e cores do status do pedido (badge na coluna Data do Pedido).
+            var statusPedido = {
+                'completed':      { rotulo: 'Concluído', classe: 'st-completed' },
+                'processing':     { rotulo: 'Processando', classe: 'st-processing' },
+                'on-hold':        { rotulo: 'Aguardando', classe: 'st-on-hold' },
+                'pending':        { rotulo: 'Aguardando pagamento', classe: 'st-pending' },
+                'cancelled':      { rotulo: 'Cancelado', classe: 'st-cancelled' },
+                'refunded':       { rotulo: 'Reembolsado', classe: 'st-refunded' },
+                'failed':         { rotulo: 'Falhou', classe: 'st-failed' },
+                'checkout-draft': { rotulo: 'Rascunho', classe: 'st-draft' }
+            };
+
+            function atualizarBadgeStatus($tr, status) {
+                if (!status || !statusPedido[status]) { return; }
+                var $badge = $tr.find('.apreas-status-pedido .badge-status');
+                if (!$badge.length) { return; }
+                $badge
+                    .removeClass('st-completed st-processing st-on-hold st-pending st-cancelled st-refunded st-failed st-draft st-default')
+                    .addClass(statusPedido[status].classe)
+                    .text(statusPedido[status].rotulo);
             }
 
             // Navega pelo mesmo caminho GET que o carregamento inicial (sempre funciona).
@@ -881,6 +976,17 @@ class Relatorios {
                             .toggleClass('badge-nao', valor !== '1')
                             .text(valor === '1' ? textoOn : textoOff);
                     }
+
+                    // Entregue marcado => pedido vai para "Concluído" no WooCommerce.
+                    // Entregue desmarcado => pedido volta para "Processando".
+                    if (campo === 'entregue') {
+                        atualizarBadgeStatus($el.closest('tr'), res.data && res.data.status);
+                        if (valor === '1') {
+                            mostrarStatus('Pedido #' + order + ' marcado como Concluído.');
+                        } else {
+                            mostrarStatus('Pedido #' + order + ' devolvido para Processando.');
+                        }
+                    }
                 }).fail(function () {
                     $el.prop('checked', valor !== '1');
                     mostrarStatus('Erro de conexão ao salvar.', true);
@@ -922,6 +1028,7 @@ class Relatorios {
         fwrite( $saida, "\xEF\xBB\xBF" ); // BOM p/ Excel
 
         fputcsv( $saida, [
+            'Pago',
             'Feito',
             'Entregue',
             'Nome do Pai',
@@ -946,6 +1053,7 @@ class Relatorios {
             [ $serie, $turma ] = $this->quebrar_serie_turma( get_post_meta( $order->get_id(), '_apreas_turma', true ) );
 
             fputcsv( $saida, [
+                $this->pedido_pago( $order ) ? 'Sim' : 'Não',
                 ( get_post_meta( $order->get_id(), '_apreas_pedido_feito', true ) === '1' ) ? 'Sim' : 'Não',
                 ( get_post_meta( $order->get_id(), '_apreas_pedido_entregue', true ) === '1' ) ? 'Sim' : 'Não',
                 wp_strip_all_tags( $this->nome_responsavel( $order ) ),
@@ -1165,6 +1273,7 @@ class Relatorios {
                     <table class="apreas-tabela">
                         <thead>
                             <tr>
+                                <th class="apreas-check">Pago</th>
                                 <th class="apreas-check">Feito</th>
                                 <th class="apreas-check">Entregue</th>
                                 <th>Nome do Pai</th>
@@ -1190,6 +1299,7 @@ class Relatorios {
 
                                 $feito    = get_post_meta( $order_id, '_apreas_pedido_feito', true ) === '1';
                                 $entregue = get_post_meta( $order_id, '_apreas_pedido_entregue', true ) === '1';
+                                $pago     = $this->pedido_pago( $order );
                                 $aluno    = get_post_meta( $order_id, '_apreas_aluno', true );
                                 $escola_pedido = get_post_meta( $order_id, '_apreas_escola', true );
                                 [ $serie, $turma ] = $this->quebrar_serie_turma( get_post_meta( $order_id, '_apreas_turma', true ) );
@@ -1198,9 +1308,15 @@ class Relatorios {
                                 ?>
                                 <tr>
                                     <td class="apreas-check">
+                                        <span class="apreas-badge <?php echo $pago ? 'badge-sim' : 'badge-naopago'; ?>">
+                                            <?php echo $pago ? 'Pago' : 'Não pago'; ?>
+                                        </span>
+                                    </td>
+                                    <td class="apreas-check">
                                         <input type="checkbox" class="apreas-pedido-check"
                                                data-order="<?php echo esc_attr( $order_id ); ?>" data-campo="feito"
-                                               <?php checked( $feito ); ?> title="Marcar como feito">
+                                               <?php checked( $feito ); ?> <?php disabled( ! $pago ); ?>
+                                               title="<?php echo $pago ? 'Marcar como feito' : 'Disponível apenas para pedidos pagos'; ?>">
                                         <span class="apreas-badge <?php echo $feito ? 'badge-sim' : 'badge-nao'; ?>">
                                             <?php echo $feito ? 'Feito' : 'Não feito'; ?>
                                         </span>
@@ -1208,7 +1324,8 @@ class Relatorios {
                                     <td class="apreas-check">
                                         <input type="checkbox" class="apreas-pedido-check"
                                                data-order="<?php echo esc_attr( $order_id ); ?>" data-campo="entregue"
-                                               <?php checked( $entregue ); ?> title="Marcar como entregue">
+                                               <?php checked( $entregue ); ?> <?php disabled( ! $pago ); ?>
+                                               title="<?php echo $pago ? 'Marcar como entregue' : 'Disponível apenas para pedidos pagos'; ?>">
                                         <span class="apreas-badge <?php echo $entregue ? 'badge-sim' : 'badge-nao'; ?>">
                                             <?php echo $entregue ? 'Entregue' : 'Pendente'; ?>
                                         </span>
@@ -1234,6 +1351,9 @@ class Relatorios {
                                             <span class="apreas-num-pedido">#<?php echo esc_html( $order_id ); ?></span>
                                             <?php echo esc_html( $this->data_pedido( $order ) ); ?>
                                         </a>
+                                        <div class="apreas-status-pedido">
+                                            <?php echo $this->status_pedido_html( $order ); ?>
+                                        </div>
                                     </td>
                                 </tr>
                             <?php endwhile; ?>
@@ -1303,12 +1423,48 @@ class Relatorios {
             wp_send_json_error( 'Parâmetros inválidos' );
         }
 
-        if ( get_post_type( $order_id ) !== 'shop_order' ) {
+        // Compatível com HPOS (tabelas customizadas) e com o storage legado.
+        $order = wc_get_order( $order_id );
+        if ( ! $order ) {
             wp_send_json_error( 'Pedido inválido' );
         }
 
+        if ( ! $this->pedido_pago( $order ) ) {
+            wp_send_json_error( 'Pedido não pago. Marque Feito/Entregue apenas após o pagamento.' );
+        }
+
         update_post_meta( $order_id, '_apreas_pedido_' . $campo, $valor );
-        wp_send_json_success( [ 'valor' => $valor ] );
+
+        $status = $order->get_status();
+
+        $usuario = wp_get_current_user();
+        $autor   = ( $usuario && $usuario->exists() ) ? $usuario->display_name : 'usuário do admin';
+
+        if ( $campo === 'entregue' && ! in_array( $status, [ 'cancelled', 'refunded' ], true ) ) {
+            try {
+                if ( $valor === '1' && $status !== 'completed' ) {
+                    // Marcar como entregue move o pedido para "Concluído".
+                    $order->update_status(
+                        'completed',
+                        sprintf( 'Pedido marcado como entregue no Relatório Apreas (por %s).', $autor )
+                    );
+                } elseif ( $valor === '0' && $status === 'completed' ) {
+                    // Desmarcar devolve o pedido para "Processando".
+                    $order->update_status(
+                        'processing',
+                        sprintf( 'Pedido desmarcado como entregue no Relatório Apreas (por %s).', $autor )
+                    );
+                }
+                $status = $order->get_status();
+            } catch ( \Throwable $e ) {
+                $status = $order->get_status();
+            }
+        }
+
+        wp_send_json_success( [
+            'valor'  => $valor,
+            'status' => $status,
+        ] );
     }
 }
 
