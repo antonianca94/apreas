@@ -173,3 +173,74 @@ input#imagem_logo_evento {
     margin: 10px 0px 10px 0px; 
 }
 /*** PREVIEW LOGO - EVENTO ***/
+
+/*** STATUS DAS FOTOS NA LISTAGEM DE ALUNOS ***/
+.apreas-img-status {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    cursor: help;
+}
+
+/* Mesma estrutura para "Sim" (link) e "Não" (span) — garante alinhamento idêntico */
+.apreas-img-status__body {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    line-height: 1;
+    color: inherit;
+    text-decoration: none;
+}
+
+.apreas-img-status__dot,
+.apreas-img-status__label {
+    display: block;
+    line-height: 1;
+}
+
+/* Círculo desenhado em CSS (não é caractere) — centraliza perfeito com o texto */
+.apreas-img-status__dot {
+    flex: 0 0 auto;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background-color: currentColor;
+}
+
+.apreas-img-status--ok .apreas-img-status__dot {
+    background-color: #46b450;
+}
+
+.apreas-img-status--empty .apreas-img-status__dot {
+    background-color: #dc3232;
+}
+
+.apreas-img-status--broken .apreas-img-status__dot {
+    background-color: #f0b849;
+}
+
+.apreas-img-status__tip {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    z-index: 1000;
+    display: none;
+    width: max-content;
+    max-width: 280px;
+    padding: 6px 9px;
+    border-radius: 4px;
+    background: #1d2327;
+    color: #fff;
+    font-size: 12px;
+    line-height: 1.4;
+    white-space: normal;
+    text-align: left;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    pointer-events: none;
+}
+
+.apreas-img-status:hover .apreas-img-status__tip,
+.apreas-img-status:focus-within .apreas-img-status__tip {
+    display: block;
+}
+/*** STATUS DAS FOTOS NA LISTAGEM DE ALUNOS ***/

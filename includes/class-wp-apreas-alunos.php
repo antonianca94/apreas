@@ -348,14 +348,20 @@ class Alunos {
         if (isset($_POST['turma'])) {
             update_post_meta($post_id, 'turma', $_POST['turma'] );
         }
-        if (isset($_POST['imagem_upload_individual'])) {
-            update_post_meta($post_id, 'imagem_upload_individual', $_POST['imagem_upload_individual'] );
-        }
-        if (isset($_POST['imagem_upload_individual2'])) {
-            update_post_meta($post_id, 'imagem_upload_individual2', $_POST['imagem_upload_individual2'] );
-        }
-        if (isset($_POST['imagem_upload_turma'])) {
-            update_post_meta($post_id, 'imagem_upload_turma', $_POST['imagem_upload_turma'] );
+        $campos_imagem = [
+            'imagem_upload_individual',
+            'imagem_upload_individual2',
+            'imagem_upload_turma',
+        ];
+        foreach ($campos_imagem as $campo_imagem) {
+            if (isset($_POST[$campo_imagem])) {
+                if (function_exists('apreas_imagem_limpar_cache')) {
+                    // Limpa o "Sim/Não" em cache da URL antiga e da nova.
+                    apreas_imagem_limpar_cache(get_post_meta($post_id, $campo_imagem, true));
+                    apreas_imagem_limpar_cache($_POST[$campo_imagem]);
+                }
+                update_post_meta($post_id, $campo_imagem, $_POST[$campo_imagem]);
+            }
         }
         
         $faltou = isset($_POST['faltou']) ? '1' : '0';

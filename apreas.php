@@ -724,14 +724,37 @@ class APREAS_Plugin
                 }
             }
 
-            // Função auxiliar para exibir o ícone de status
+            // Função auxiliar para exibir o ícone de status.
+            // Só responde "Sim" depois de testar se o link da imagem realmente abre.
             function exibir_status_imagem($valor)
             {
-                if ($valor) {
-                    echo '<span style="color: #46b450; font-size: 20px;" title="Preenchido">●</span> Sim';
+                $valor = trim((string) $valor);
+
+                if ($valor === '') {
+                    $estado = ['empty', 'Não', 'Nenhuma imagem cadastrada'];
+                } elseif (apreas_imagem_url_valida($valor)) {
+                    $estado = ['ok', 'Sim', 'Imagem acessível — clique para abrir em nova aba'];
                 } else {
-                    echo '<span style="color: #dc3232; font-size: 20px;" title="Vazio">○</span> Não';
+                    $estado = ['broken', 'Não', 'Link preenchido, mas a imagem não responde (arquivo removido, link quebrado ou inacessível)'];
                 }
+
+                $dica = esc_attr($estado[2]);
+
+                echo '<span class="apreas-img-status apreas-img-status--' . $estado[0] . '" aria-label="' . $dica . '">';
+
+                if ($estado[0] === 'ok') {
+                    echo '<a class="apreas-img-status__body" href="' . esc_url($valor) . '" target="_blank" rel="noopener noreferrer">'
+                        . '<span class="apreas-img-status__dot" aria-hidden="true"></span><span class="apreas-img-status__label">' . $estado[1] . '</span>'
+                        . '</a>';
+                } else {
+                    echo '<span class="apreas-img-status__body">'
+                        . '<span class="apreas-img-status__dot" aria-hidden="true"></span><span class="apreas-img-status__label">' . $estado[1] . '</span>'
+                        . '</span>';
+                }
+
+                // Único tooltip (CSS): aparece ao passar o mouse ou focar.
+                echo '<span class="apreas-img-status__tip">' . esc_html($estado[2]) . '</span>';
+                echo '</span>';
             }
         }
     }
@@ -1125,8 +1148,199 @@ class APREAS_Plugin
             "Style_CSS",
             plugins_url("/admin/css/style.css", __FILE__),
             [],
-            "1.0.12"
+            "1.0.16"
         );
+    }
+}
+
+/* -------------------------------------------------------------------------
+ * VALIDAÇÃO DE IMAGENS (Fotos dos Alunos)
+ *
+ * As colunas "Individual / Divertida / Turma" só devem responder "Sim" se o
+ * link salvo no post meta realmente abrir uma imagem. A checagem:
+ *   1. valida o formato da URL;
+ *   2. se o arquivo estiver no próprio servidor, confere no disco (rápido);
+ *   3. caso contrário, faz uma requisição HTTP (HEAD, com fallback p/ GET);
+ *   4. guarda o resultado em cache para não repetir a requisição.
+ * ------------------------------------------------------------------------- */
+
+if (!function_exists('apreas_imagem_url_valida')) {
+    /**
+     * Verifica se a URL de uma imagem aponta para um arquivo acessível.
+     *
+     * @param string $url URL salva no post meta.
+     * @return bool
+     */
+    function apreas_imagem_url_valida($url)
+    {
+        static $memoria = [];
+
+        $url = trim((string) $url);
+
+        if ($url === '') {
+            return false;
+        }
+
+        // Aceita URLs protocol-relative (ex.: //site.com/foto.jpg).
+        if (strpos($url, '//') === 0) {
+            $url = (is_ssl() ? 'https:' : 'http:') . $url;
+        }
+
+        // Aceita caminhos relativos (ex.: /wp-content/uploads/2026/01/foto.jpg).
+        if (isset($url[0]) && $url[0] === '/' && substr($url, 0, 2) !== '//') {
+            $url = home_url($url);
+        }
+
+        $url = esc_url_raw($url);
+
+        if (!$url || !wp_http_validate_url($url)) {
+            return false;
+        }
+
+        if (isset($memoria[$url])) {
+            return $memoria[$url];
+        }
+
+        // Arquivo local: decide pelo disco, sem requisição HTTP.
+        $arquivo_local = apreas_imagem_arquivo_local($url);
+        if ($arquivo_local !== null) {
+            return $memoria[$url] = $arquivo_local;
+        }
+
+        // Resultado remoto: 12h quando válido, 10 min quando inválido.
+        $chave = 'apreas_img_ok_' . md5($url);
+        $cache = get_transient($chave);
+        if ($cache !== false) {
+            return $memoria[$url] = ($cache === '1');
+        }
+
+        $valida = apreas_imagem_responde_http($url);
+
+        set_transient($chave, $valida ? '1' : '0', $valida ? 12 * HOUR_IN_SECONDS : 10 * MINUTE_IN_SECONDS);
+
+        return $memoria[$url] = $valida;
+    }
+}
+
+if (!function_exists('apreas_imagem_arquivo_local')) {
+    /**
+     * Confere se a URL corresponde a um arquivo que existe no próprio servidor.
+     *
+     * @param string $url
+     * @return bool|null true = existe, false = não existe, null = não é possível decidir pelo disco.
+     */
+    function apreas_imagem_arquivo_local($url)
+    {
+        $url = strtok($url, '?#');
+
+        $host_url    = wp_parse_url($url, PHP_URL_HOST);
+        $caminho_url = wp_parse_url($url, PHP_URL_PATH);
+
+        if (!$host_url || !$caminho_url) {
+            return null;
+        }
+
+        // Compara ignorando o esquema (http/https), o que evita falso "Não"
+        // depois de uma migração de domínio/protocolo.
+        $uploads = wp_get_upload_dir();
+        if (!empty($uploads['baseurl'])) {
+            $host_uploads = wp_parse_url($uploads['baseurl'], PHP_URL_HOST);
+            $path_uploads = rtrim((string) wp_parse_url($uploads['baseurl'], PHP_URL_PATH), '/');
+
+            if ($host_url === $host_uploads && $path_uploads !== '' && strpos($caminho_url, $path_uploads . '/') === 0) {
+                $relativo = ltrim(substr($caminho_url, strlen($path_uploads)), '/');
+                $arquivo  = trailingslashit($uploads['basedir']) . urldecode($relativo);
+
+                // Se não existir no disco pode ser CDN/offload: confirma via HTTP.
+                return file_exists($arquivo) ? true : null;
+            }
+        }
+
+        $host_site = wp_parse_url(home_url(), PHP_URL_HOST);
+        if ($host_url === $host_site) {
+            $arquivo = ABSPATH . ltrim(urldecode($caminho_url), '/');
+
+            return file_exists($arquivo) ? true : null;
+        }
+
+        return null;
+    }
+}
+
+if (!function_exists('apreas_imagem_responde_http')) {
+    /**
+     * Faz uma requisição HTTP para confirmar que a imagem existe e é acessível.
+     *
+     * @param string $url
+     * @return bool
+     */
+    function apreas_imagem_responde_http($url)
+    {
+        $args = [
+            'timeout'     => 5,
+            'redirection' => 5,
+            'headers'     => [
+                'Accept' => 'image/*,*/*;q=0.8',
+            ],
+        ];
+
+        $resposta = wp_remote_head($url, $args);
+        $codigo   = is_wp_error($resposta) ? 0 : (int) wp_remote_retrieve_response_code($resposta);
+
+        // Alguns servidores recusam HEAD (403/405/501): tenta um GET parcial.
+        if ($codigo === 0 || in_array($codigo, [403, 405, 501], true)) {
+            $args['headers']['Range'] = 'bytes=0-2048';
+            $resposta                 = wp_remote_get($url, $args);
+        }
+
+        if (is_wp_error($resposta)) {
+            return false;
+        }
+
+        $codigo = (int) wp_remote_retrieve_response_code($resposta);
+
+        if ($codigo < 200 || $codigo >= 400) {
+            return false;
+        }
+
+        $tipo = wp_remote_retrieve_header($resposta, 'content-type');
+        if (is_array($tipo)) {
+            $tipo = reset($tipo);
+        }
+
+        // Página HTML no lugar da imagem = link quebrado.
+        if ($tipo && stripos($tipo, 'text/html') !== false) {
+            return false;
+        }
+
+        return true;
+    }
+}
+
+if (!function_exists('apreas_imagem_limpar_cache')) {
+    /**
+     * Limpa o cache de validação de uma imagem (usado ao salvar o aluno).
+     *
+     * @param string $url
+     * @return void
+     */
+    function apreas_imagem_limpar_cache($url)
+    {
+        $url = trim((string) $url);
+
+        if ($url === '') {
+            return;
+        }
+
+        if (strpos($url, '//') === 0) {
+            $url = (is_ssl() ? 'https:' : 'http:') . $url;
+        }
+
+        $url = esc_url_raw($url);
+
+        if ($url) {
+            delete_transient('apreas_img_ok_' . md5($url));
+        }
     }
 }
 
