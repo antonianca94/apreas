@@ -51,17 +51,43 @@ jQuery(document).ready(function ($) {
             el.value = val || '';
         });
     }
+    function textoSerieTurma(d) {
+        var serie = d.serie && d.serie.nome ? d.serie.nome : '';
+        var turma = d.turma && d.turma.turma_nome ? d.turma.turma_nome : '';
+        if (serie && turma) return serie + ' ' + turma;
+        if (serie) return serie;
+        return d.turma && d.turma.nome ? d.turma.nome : '';
+    }
+    function urlImagem(d, novo, antigo) {
+        return (d && (d[novo] || d[antigo])) || '';
+    }
+    function aplicarImagensAluno(d) {
+        if (!d) return;
+
+        var imagens = [
+            [urlImagem(d, 'img_individual', 'imagem_upload_individual'), '.imagem_upload_individual img, .img_individual img, img.img_individual'],
+            [urlImagem(d, 'img_divertida', 'imagem_upload_individual2'), '.imagem_upload_individual2 img, .img_divertida img, img.img_divertida'],
+            [urlImagem(d, 'img_coletivo', 'imagem_upload_turma'), '.imagem_upload_turma img, .img_coletivo img, img.img_coletivo']
+        ];
+
+        imagens.forEach(function (imagem) {
+            if (imagem[0]) {
+                $(imagem[1]).attr('src', imagem[0]).attr('srcset', imagem[0]);
+            }
+        });
+    }
     // HELPERS PARA SHORTCODES REPETÍVEIS
 
     // ============================================================
     // PERSÍSTÊNCIA DE SESSÃO (localStorage - expira em 10 minutos)
     // ============================================================
     var SESSAO_KEY = 'apreas_login_sessao';
-    var SESSAO_TTL = 365 * 24 * 60 * 60 * 1000; // 1 ano em ms (não expira até deslogar)
+    var SESSAO_TTL = 10 * 60 * 1000; // 10 minutos em ms
 
     function salvarSessao(tipo, dados) {
         try {
-            var sessao = { tipo: tipo, dados: dados, expira: Date.now() + SESSAO_TTL };
+            var agora = Date.now();
+            var sessao = { tipo: tipo, dados: dados, criada: agora, expira: agora + SESSAO_TTL };
             localStorage.setItem(SESSAO_KEY, JSON.stringify(sessao));
         } catch (e) { console.warn('Sessao nao salva:', e); }
     }
@@ -71,7 +97,7 @@ jQuery(document).ready(function ($) {
             var raw = localStorage.getItem(SESSAO_KEY);
             if (!raw) return null;
             var s = JSON.parse(raw);
-            if (Date.now() > s.expira) {
+            if (!s.criada || (Date.now() - s.criada) > SESSAO_TTL || Date.now() > s.expira) {
                 localStorage.removeItem(SESSAO_KEY);
                 return null;
             }
@@ -87,12 +113,12 @@ jQuery(document).ready(function ($) {
 
         var d = (tipo === 'eventos' && Array.isArray(dados) && dados.length > 0) ? dados[0] : dados;
 
-        document.querySelectorAll('.dados-aluno-container').forEach(function (container) {
-            container.style.display = 'block';
+        document.querySelectorAll('.dados-aluno-container, .apreas-nome-aluno-wrap').forEach(function (container) {
+            container.style.display = '';
         });
         setAllText('.aluno-nome', d.nome || '');
         if (d.escola) setAllText('.aluno-escola', d.escola.nome || '');
-        if (d.turma) setAllText('.aluno-turma', d.turma.nome || '');
+        if (d.turma || d.serie) setAllText('.aluno-turma', textoSerieTurma(d));
         if (d.unidade) setAllText('.aluno-unidade', d.unidade.nome || '');
 
         if (d.data_nascimento) {
@@ -125,19 +151,11 @@ jQuery(document).ready(function ($) {
             setAllText('.l2_status_escola', data.escola.l2_status || 'FINALIZADO');
             setAllText('.data_limite_fotos_escola', data.escola.data_limite_fotos || '');
         }
-        if (data.imagem_upload_individual) {
-            $('.imagem_upload_individual img').attr('src', data.imagem_upload_individual).attr('srcset', data.imagem_upload_individual);
-        }
-        if (data.imagem_upload_individual2) {
-            $('.imagem_upload_individual2 img').attr('src', data.imagem_upload_individual2).attr('srcset', data.imagem_upload_individual2);
-        }
-        if (data.imagem_upload_turma) {
-            $('.imagem_upload_turma img').attr('src', data.imagem_upload_turma).attr('srcset', data.imagem_upload_turma);
-        }
+        aplicarImagensAluno(data);
         if (data.nome) setAllVal('.nome input', data.nome);
         if (data.escola) setAllVal('.escola input', data.escola.nome || '');
         if (data.unidade) setAllVal('.unidade input', data.unidade.nome || '');
-        if (data.turma) setAllVal('.turma input', data.turma.nome || '');
+        if (data.turma || data.serie) setAllVal('.turma input', textoSerieTurma(data));
         var lc = document.getElementById('loginContainer');
         if (lc) lc.classList.add('d-none');
     }
@@ -146,15 +164,7 @@ jQuery(document).ready(function ($) {
         atualizarDadosAluno(dataArray, 'eventos');
         if (!dataArray || !dataArray.length) return;
         var d = dataArray[0];
-        if (d.imagem_upload_individual) {
-            $('.imagem_upload_individual').find('img').attr('src', d.imagem_upload_individual).attr('srcset', d.imagem_upload_individual);
-        }
-        if (d.imagem_upload_individual2) {
-            $('.imagem_upload_individual2').find('img').attr('src', d.imagem_upload_individual2).attr('srcset', d.imagem_upload_individual2);
-        }
-        if (d.imagem_upload_turma) {
-            $('.imagem_upload_turma').find('img').attr('src', d.imagem_upload_turma).attr('srcset', d.imagem_upload_turma);
-        }
+        aplicarImagensAluno(d);
         if (d.link_album) {
             $('.apreas-link-album').attr('href', d.link_album).show();
         }
@@ -174,7 +184,7 @@ jQuery(document).ready(function ($) {
         if (d.evento) setAllVal('.evento input', d.evento.nome || '');
         if (d.escola) setAllVal('.escola input', d.escola.nome || '');
         if (d.unidade) setAllVal('.unidade input', d.unidade.nome || '');
-        if (d.turma) setAllVal('.turma input', d.turma.nome || '');
+        if (d.turma || d.serie) setAllVal('.turma input', textoSerieTurma(d));
         if (d.evento) {
             if (d.evento.imagem_logo_evento) {
                 $('.imagem_logo_evento').attr('src', d.evento.imagem_logo_evento).attr('srcset', d.evento.imagem_logo_evento);
@@ -276,29 +286,6 @@ jQuery(document).ready(function ($) {
 
                     $(document.body).trigger('apreas_login_success');
 
-                    // IMAGEM
-                    if (response.data.imagem_upload_individual) {
-                        $('.imagem_upload_individual img').attr('src', response.data.imagem_upload_individual);
-                    }
-                    if (response.data.imagem_upload_individual) {
-                        $('.imagem_upload_individual img').attr('srcset', response.data.imagem_upload_individual);
-                    }
-
-                    if (response.data.imagem_upload_individual2) {
-                        $('.imagem_upload_individual2 img').attr('src', response.data.imagem_upload_individual2);
-                    }
-                    if (response.data.imagem_upload_individual2) {
-                        $('.imagem_upload_individual2 img').attr('srcset', response.data.imagem_upload_individual2);
-                    }
-
-                    if (response.data.imagem_upload_turma) {
-                        $('.imagem_upload_turma img').attr('src', response.data.imagem_upload_turma);
-                    }
-                    if (response.data.imagem_upload_turma) {
-                        $('.imagem_upload_turma img').attr('srcset', response.data.imagem_upload_turma);
-                    }
-                    // IMAGEM
-
                     var loginContainer = document.getElementById('loginContainer');
                     if (loginContainer) {
                         loginContainer.classList.add('d-none');
@@ -328,7 +315,7 @@ jQuery(document).ready(function ($) {
                 if (response.data.evento) setAllVal('.evento input', response.data.evento.nome || '');
                 if (response.data.escola) setAllVal('.escola input', response.data.escola.nome || '');
                 if (response.data.unidade) setAllVal('.unidade input', response.data.unidade.nome || '');
-                if (response.data.turma) setAllVal('.turma input', response.data.turma.nome || '');
+                if (response.data.turma || response.data.serie) setAllVal('.turma input', textoSerieTurma(response.data));
                 // ENVIAR VALORES PARA O FORMULÁRIO
 
             },
@@ -367,21 +354,6 @@ jQuery(document).ready(function ($) {
             success: function (response) {
                 //console.log(response)
                 if (response.success == true) {
-                    // IMAGEM
-                    if (response.data[0].imagem_upload_individual) {
-                        $('.imagem_upload_individual').find('img').attr('src', response.data[0].imagem_upload_individual);
-                        $('.imagem_upload_individual').find('img').attr('srcset', response.data[0].imagem_upload_individual);
-                    }
-                    if (response.data[0].imagem_upload_individual2) {
-                        $('.imagem_upload_individual2').find('img').attr('src', response.data[0].imagem_upload_individual2);
-                        $('.imagem_upload_individual2').find('img').attr('srcset', response.data[0].imagem_upload_individual2);
-                    }
-                    if (response.data[0].imagem_upload_turma) {
-                        $('.imagem_upload_turma').find('img').attr('src', response.data[0].imagem_upload_turma);
-                        $('.imagem_upload_turma').find('img').attr('srcset', response.data[0].imagem_upload_turma);
-                    }
-                    // IMAGEM
-
                     // LINK ALBUM
                     if (response.data[0].link_album) {
                         $('.apreas-link-album').attr('href', response.data[0].link_album).show();
@@ -418,7 +390,7 @@ jQuery(document).ready(function ($) {
                         if (response.data[0].evento) setAllVal('.evento input', response.data[0].evento.nome || '');
                         if (response.data[0].escola) setAllVal('.escola input', response.data[0].escola.nome || '');
                         if (response.data[0].unidade) setAllVal('.unidade input', response.data[0].unidade.nome || '');
-                        if (response.data[0].turma) setAllVal('.turma input', response.data[0].turma.nome || '');
+                        if (response.data[0].turma || response.data[0].serie) setAllVal('.turma input', textoSerieTurma(response.data[0]));
                         // ENVIAR VALORES PARA O FORMULÁRIO
 
                     }

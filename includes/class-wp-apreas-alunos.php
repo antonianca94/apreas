@@ -15,10 +15,41 @@ class Alunos {
 
     public function __construct() {
         add_action( 'init', [$this, 'alunos_posttype'], );
+        add_action( 'init', [$this, 'registrar_metas_alunos'], 20 );
         add_action( 'admin_init', [$this,'adicionar_capacidades_para_administrador']);
         add_action( 'add_meta_boxes', [$this,'adicionar_meta_box_alunos']);
         add_action( 'save_post', [$this,'salvar_meta_box_alunos']);
         add_action( 'pmxi_saved_post', [$this, 'importar_alunos_wp_all_import'], 10, 3 );
+    }
+
+    function registrar_metas_alunos() {
+        $auth_callback = function($allowed, $meta_key, $post_id) {
+            return current_user_can('edit_post', $post_id);
+        };
+
+        register_post_meta('alunos', 'serie', array(
+            'type'              => 'integer',
+            'single'            => true,
+            'show_in_rest'      => true,
+            'sanitize_callback' => 'absint',
+            'auth_callback'     => $auth_callback,
+        ));
+
+        register_post_meta('alunos', 'serie_nome', array(
+            'type'              => 'string',
+            'single'            => true,
+            'show_in_rest'      => true,
+            'sanitize_callback' => 'sanitize_text_field',
+            'auth_callback'     => $auth_callback,
+        ));
+
+        register_post_meta('alunos', 'turma', array(
+            'type'              => 'string',
+            'single'            => true,
+            'show_in_rest'      => true,
+            'sanitize_callback' => 'sanitize_text_field',
+            'auth_callback'     => $auth_callback,
+        ));
     }
 
     // Função para adicionar o meta box
@@ -31,6 +62,88 @@ class Alunos {
             'normal', 
             'high' 
         );
+        add_meta_box(
+            'meta-box-alunos-shortcodes',
+            'Shortcodes do Aluno',
+            [$this,'exibir_meta_box_shortcodes_aluno'],
+            'alunos',
+            'normal',
+            'low'
+        );
+    }
+
+    // Documentação dos shortcodes exibida dentro do post type ALUNOS
+    function exibir_meta_box_shortcodes_aluno() {
+        ?>
+        <div style="padding: 10px;">
+            <p style="margin-bottom:15px; font-size:13px; color:#444;">
+                Use os shortcodes abaixo em qualquer página para exibir dados do aluno logado.
+                A sessão do aluno expira em <strong>10 minutos</strong>.
+            </p>
+
+            <div style="margin-bottom: 20px; padding: 12px; background: #f9f9f9; border-left: 4px solid #d32f2f;">
+                <strong style="display:block; margin-bottom:5px;">Nome do Aluno</strong>
+                <code>[nome_aluno]</code>
+                <p style="font-size:13px; color:#666; margin-top:5px;">
+                    Exibe somente o nome do aluno logado. Sem sessão ativa, o valor fica vazio.
+                </p>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size:13px; color:#666; background: #fff; padding: 10px; border: 1px solid #eee;">
+                    <div>
+                        <strong>Conteúdo:</strong><br>
+                        - <code>tag="h2"</code> (span, p, div, strong, h1...h6)<br>
+                        - <code>label="Aluno:"</code><br>
+                        - <code>mostrar_label="false"</code><br>
+                        - <code>ocultar_sem_sessao="true"</code>
+                    </div>
+                    <div>
+                        <strong>Estilo do nome:</strong><br>
+                        - <code>cor="#333333"</code><br>
+                        - <code>tamanho="24px"</code><br>
+                        - <code>peso="bold"</code><br>
+                        - <code>fonte="Arial"</code>
+                    </div>
+                    <div>
+                        <strong>Estilo do rótulo:</strong><br>
+                        - <code>cor_label="#666666"</code><br>
+                        - <code>peso_label="bold"</code><br>
+                        - <code>tamanho_label="14px"</code>
+                    </div>
+                    <div>
+                        <strong>Container:</strong><br>
+                        - <code>alinhar="center"</code><br>
+                        - <code>fundo="#f5f5f5"</code><br>
+                        - <code>padding="12px"</code><br>
+                        - <code>borda_raio="8px"</code>
+                    </div>
+                </div>
+
+                <p style="font-size:12px; color:#888; margin-top:10px;">
+                    <strong>Exemplo simples:</strong><br>
+                    <code>[nome_aluno]</code>
+                </p>
+                <p style="font-size:12px; color:#888; margin-top:4px;">
+                    <strong>Exemplo formatado:</strong><br>
+                    <code>[nome_aluno tag="h2" tamanho="24px" peso="bold" cor="#333333" alinhar="center" fonte="Arial" fundo="#f5f5f5" padding="12px" borda_raio="8px"]</code>
+                </p>
+                <p style="font-size:12px; color:#888; margin-top:4px;">
+                    <strong>Exemplo com rótulo:</strong><br>
+                    <code>[nome_aluno label="Aluno:" tamanho="20px" peso="600" cor="#d32f2f" cor_label="#666666" peso_label="bold" tamanho_label="14px"]</code>
+                </p>
+            </div>
+
+            <div style="padding: 12px; background: #f9f9f9; border-left: 4px solid #999;">
+                <strong style="display:block; margin-bottom:5px;">Dados completos do aluno</strong>
+                <code>[dados_aluno]</code>
+                <p style="font-size:13px; color:#666; margin-top:5px;">
+                    Exibe nome, escola, série/turma, unidade e data de nascimento. Aceita atributos de visibilidade
+                    (<code>mostrar_nome</code>, <code>mostrar_escola</code>, <code>mostrar_turma</code>, <code>mostrar_unidade</code>, <code>mostrar_data</code>),
+                    rótulos (<code>label_nome</code>, <code>label_escola</code>, <code>label_turma</code>, <code>label_unidade</code>, <code>label_data</code>) e estilo
+                    (<code>cor</code>, <code>tamanho</code>, <code>peso</code>, <code>fonte</code>, <code>fundo</code>, <code>padding</code>, <code>borda_raio</code>, <code>alinhar</code>, <code>espacamento</code>).
+                </p>
+            </div>
+        </div>
+        <?php
     }
 
     // Callback para exibir o conteúdo do meta box
@@ -49,8 +162,22 @@ class Alunos {
         $unidade = get_post_meta($post->ID, 'unidade', true);
         $unidade = !empty($unidade) ? explode(',', $unidade) : [];
 
-        $turma = get_post_meta($post->ID, 'turma', true);
-        $turma = !empty($turma) ? explode(',', $turma) : [];
+        $serie = absint(get_post_meta($post->ID, 'serie', true));
+        $turma_meta = get_post_meta($post->ID, 'turma', true);
+        $turma = is_scalar($turma_meta) ? trim((string) $turma_meta) : '';
+
+        // Compatibilidade com alunos ainda não processados pela migração.
+        if (!$serie && $turma !== '' && ctype_digit($turma)) {
+            $turma_legada = get_post((int) $turma);
+            if ($turma_legada && $turma_legada->post_type === 'turmas') {
+                list($serie_nome_legada, $turma_legada_nome) = \Apreas\Series::quebrar_serie_turma($turma_legada->post_title);
+                $serie_encontrada = \Apreas\Series::encontrar_serie_por_titulo($serie_nome_legada);
+                if ($serie_encontrada) {
+                    $serie = $serie_encontrada;
+                    $turma = $turma_legada_nome;
+                }
+            }
+        }
         // var_dump('SENHA_NOME: '.$senha_nome);
         // var_dump('DATA_NASCIMENTO: '.$data_nascimento);
         // var_dump($escola);
@@ -80,15 +207,15 @@ class Alunos {
         $unidades_query = new \WP_Query($args_unidades);
         // UNIDADES
 
-        // TURMAS
-        $args_turmas = array(
-            'post_type' => 'turmas',
+        // SÉRIES
+        $args_series = array(
+            'post_type' => 'series',
             'posts_per_page' => -1,
             'orderby' => 'title',
             'order' => 'ASC'
         );
-        $turmas_query = new \WP_Query($args_turmas);
-        // TURMAS
+        $series_query = new \WP_Query($args_series);
+        // SÉRIES
         ?>
         <style>
             .post-type-alunos span.select2.select2-container {
@@ -170,6 +297,7 @@ class Alunos {
                 });
             });
         </script>
+        <?php wp_nonce_field('apreas_save_alunos', 'apreas_alunos_nonce'); ?>
         <div class="row mt-4 mb-4">
             <div class="col">
                 <div class="form-group">
@@ -232,23 +360,27 @@ class Alunos {
             </div>
         </div>
         <!-- UNIDADES -->
-        <!-- TURMAS -->
+        <!-- SÉRIE E TURMA -->
         <div class="row mt-3">
             <div class="col">
                 <div class="form-group">
-                    <label for="turma" class="mb-2 fw-bold">Turma</label>
-                    <select id="turma" name="turma" class="form-control">
-                        <option value=""></option>
-                        <?php while ($turmas_query->have_posts()) : $turmas_query->the_post(); ?>
-                            <?php
-                            $selected = is_array($turma) && in_array(get_the_ID(), $turma) ? 'selected' : '';
-                            ?>
-                            <option value="<?php echo esc_attr(get_the_ID()); ?>" <?php echo $selected; ?>><?php the_title(); ?></option>
+                    <label for="serie" class="mb-2 fw-bold">Série</label>
+                    <select id="serie" name="serie" class="form-control">
+                        <option value="">Selecione a série</option>
+                        <?php while ($series_query->have_posts()) : $series_query->the_post(); ?>
+                            <option value="<?php echo esc_attr(get_the_ID()); ?>" <?php selected($serie, get_the_ID()); ?>><?php echo esc_html(get_the_title()); ?></option>
                         <?php endwhile; ?>
                     </select>
                 </div>
             </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="turma" class="mb-2 fw-bold">Turma</label>
+                    <input type="text" id="turma" name="turma" class="form-control" value="<?php echo esc_attr($turma); ?>" />
+                </div>
+            </div>
         </div>
+        <!-- SÉRIE E TURMA -->
         <!-- Faltou -->
         <div class="row mt-4 mb-2">
             <div class="col">
@@ -269,7 +401,7 @@ class Alunos {
                 <div style="width:100%;">
                     <input type="text" id="imagem_upload_individual" name="imagem_upload_individual" class="imagem_upload_individual" value="<?php  echo $imagem_upload_individual; ?>" />
                 </div>
-                <p style="font-size:12px; color:#666; margin-top:6px;"><strong>Para exibir no site:</strong> Adicione um elemento de Imagem e defina sua <strong>Classe CSS</strong> como <code>imagem_upload_individual</code></p>
+                <p style="font-size:12px; color:#666; margin-top:6px;"><strong>Para exibir no site:</strong> Adicione um elemento de Imagem e defina sua <strong>Classe CSS</strong> como <code>img_individual</code></p>
                 <div class="preview-aluno">
                     <div class="preview-aluno-individual">
 
@@ -282,7 +414,7 @@ class Alunos {
                 <div style="width:100%;">
                     <input type="text" id="imagem_upload_individual2" name="imagem_upload_individual2" class="imagem_upload_individual2" value="<?php  echo $imagem_upload_individual2; ?>" />
                 </div>
-                <p style="font-size:12px; color:#666; margin-top:6px;"><strong>Para exibir no site:</strong> Adicione um elemento de Imagem e defina sua <strong>Classe CSS</strong> como <code>imagem_upload_individual2</code></p>
+                <p style="font-size:12px; color:#666; margin-top:6px;"><strong>Para exibir no site:</strong> Adicione um elemento de Imagem e defina sua <strong>Classe CSS</strong> como <code>img_divertida</code></p>
                 <div class="preview-aluno">
                     <div class="preview-aluno-individual2">
 
@@ -295,7 +427,7 @@ class Alunos {
                 <div style="width:100%;">
                     <input type="text" id="imagem_upload_turma" name="imagem_upload_turma" class="imagem_upload_turma" value="<?php echo $imagem_upload_turma; ?>" />
                 </div>
-                <p style="font-size:12px; color:#666; margin-top:6px;"><strong>Para exibir no site:</strong> Adicione um elemento de Imagem e defina sua <strong>Classe CSS</strong> como <code>imagem_upload_turma</code></p>
+                <p style="font-size:12px; color:#666; margin-top:6px;"><strong>Para exibir no site:</strong> Adicione um elemento de Imagem e defina sua <strong>Classe CSS</strong> como <code>img_coletivo</code></p>
                 <div class="preview-aluno">
                     <div class="preview-aluno-turma">
 
@@ -309,6 +441,11 @@ class Alunos {
 
     // Salvar os valores do meta box
     function salvar_meta_box_alunos($post_id) {
+        if (get_post_type($post_id) !== 'alunos') return;
+        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
+        if (!isset($_POST['apreas_alunos_nonce']) || !wp_verify_nonce($_POST['apreas_alunos_nonce'], 'apreas_save_alunos')) return;
+        if (!current_user_can('edit_post', $post_id)) return;
+
         if (isset($_POST['nome'])) {
             update_post_meta($post_id, 'nome', sanitize_text_field($_POST['nome']));
         }
@@ -345,8 +482,16 @@ class Alunos {
         if (isset($_POST['unidade'])) {
             update_post_meta($post_id, 'unidade', $_POST['unidade'] );
         }
-        if (isset($_POST['turma'])) {
-            update_post_meta($post_id, 'turma', $_POST['turma'] );
+        if (array_key_exists('serie', $_POST)) {
+            $serie_id = absint($_POST['serie']);
+            if ($serie_id && get_post_type($serie_id) !== 'series') {
+                $serie_id = 0;
+            }
+            update_post_meta($post_id, 'serie', $serie_id);
+            update_post_meta($post_id, 'serie_nome', $serie_id ? get_the_title($serie_id) : '');
+        }
+        if (array_key_exists('turma', $_POST)) {
+            update_post_meta($post_id, 'turma', sanitize_text_field($_POST['turma']));
         }
         $campos_imagem = [
             'imagem_upload_individual',
@@ -378,11 +523,17 @@ class Alunos {
         // Converte o objeto XML para array para facilitar o acesso
         $data = json_decode(json_encode($xml_node), true);
 
+        $tem_campo_serie = array_key_exists('serie', $data) || array_key_exists('série', $data);
+        $tem_campo_turma = array_key_exists('turma', $data);
+        $serie_importada = array_key_exists('serie', $data) ? $data['serie'] : (isset($data['série']) ? $data['série'] : '');
+        $turma_importada = $tem_campo_turma ? $data['turma'] : '';
+        if (!is_scalar($serie_importada)) $serie_importada = '';
+        if (!is_scalar($turma_importada)) $turma_importada = '';
+
         // Mapeamento de Tags do XML para Meta Keys do Banco
         $meta_to_import = [
             'data_nascimento' => isset($data['data_nascimento']) ? $data['data_nascimento'] : (isset($data['data nascimento']) ? $data['data nascimento'] : ''),
             'escola'          => isset($data['escola']) ? $data['escola'] : '',
-            'turma'           => isset($data['turma']) ? $data['turma'] : '',
             'unidade'         => isset($data['unidade']) ? $data['unidade'] : '',
             'nome'            => isset($data['nome']) ? $data['nome'] : '',
             'ultimo_nome'     => isset($data['ultimo_nome']) ? $data['ultimo_nome'] : (isset($data['ultimo nome']) ? $data['ultimo nome'] : ''),
@@ -425,6 +576,52 @@ class Alunos {
                 }
                 update_post_meta($post_id, $key, $value);
             }
+        }
+
+        // Série e turma são campos diferentes no cadastro de Alunos.
+        $serie_id = 0;
+        $serie_nome = '';
+        $turma_nome = trim((string) $turma_importada);
+        $turma_foi_separada = false;
+
+        if ($tem_campo_serie && trim((string) $serie_importada) !== '') {
+            $serie_id = absint($serie_importada);
+            if (!$serie_id || get_post_type($serie_id) !== 'series') {
+                // Valores numéricos também podem representar o nome da série.
+                $serie_id = \Apreas\Series::obter_serie_por_titulo(trim((string) $serie_importada));
+            }
+            if ($serie_id) {
+                $serie_nome = get_the_title($serie_id);
+            }
+        } elseif (!$tem_campo_serie && $tem_campo_turma && $turma_nome !== '') {
+            // Compatibilidade com importações antigas: ID do post ou "3º Ano A".
+            if (ctype_digit($turma_nome)) {
+                $turma_legada = get_post((int) $turma_nome);
+                if ($turma_legada && $turma_legada->post_type === 'turmas') {
+                    list($serie_nome, $turma_nome) = \Apreas\Series::quebrar_serie_turma($turma_legada->post_title);
+                    $turma_foi_separada = true;
+                }
+            } else {
+                list($serie_encontrada, $turma_encontrada) = \Apreas\Series::quebrar_serie_turma($turma_nome);
+                if ($turma_encontrada !== '') {
+                    $serie_nome = $serie_encontrada;
+                    $turma_nome = $turma_encontrada;
+                    $turma_foi_separada = true;
+                }
+            }
+
+            if ($serie_nome !== '') {
+                $serie_id = \Apreas\Series::obter_serie_por_titulo($serie_nome);
+            }
+        }
+
+        if ($serie_id) {
+            update_post_meta($post_id, 'serie', $serie_id);
+            update_post_meta($post_id, 'serie_nome', $serie_nome);
+        }
+
+        if ($tem_campo_turma && ($serie_id || $turma_foi_separada || !$tem_campo_serie)) {
+            update_post_meta($post_id, 'turma', $turma_nome);
         }
 
         // Gera a Senha Nome automaticamente caso não tenha sido importada

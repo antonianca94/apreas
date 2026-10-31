@@ -44,6 +44,7 @@ class Login {
 
         // DADOS DO ALUNO
         add_shortcode('dados_aluno', [$this,'mostrar_dados_aluno']);
+        add_shortcode('nome_aluno', [$this,'mostrar_nome_aluno']);
         // DADOS DO ALUNO
 
         // SHORTCODES INDIVIDUAIS DE DATAS
@@ -78,7 +79,7 @@ class Login {
             'tamanho_label' => '',
             'label_nome' => 'Nome:',
             'label_escola' => 'Escola:',
-            'label_turma' => 'Turma:',
+            'label_turma' => 'Série e Turma:',
             'label_unidade' => 'Unidade:',
             'label_data' => 'Data de Nascimento:',
             'mostrar_nome' => 'true',
@@ -128,6 +129,66 @@ class Login {
         </div>
 <?php
         return ob_get_clean();
+    }
+
+    // ============================================================
+    // [nome_aluno] — Exibe somente o nome do aluno/participante logado
+    // Preenchido via JS pela classe .aluno-nome (mesma usada em [dados_aluno])
+    // ============================================================
+    function mostrar_nome_aluno($atts) {
+        $a = shortcode_atts( array(
+            'label'              => '',
+            'mostrar_label'      => 'true',
+            'cor'                => '',
+            'tamanho'            => '',
+            'peso'               => '',
+            'alinhar'            => '',
+            'fonte'              => '',
+            'fundo'              => '',
+            'padding'            => '0',
+            'borda_raio'         => '0',
+            'cor_label'          => '',
+            'peso_label'         => 'bold',
+            'tamanho_label'      => '',
+            'tag'                => 'span',
+            'ocultar_sem_sessao' => 'false'
+        ), $atts );
+
+        $wrap_style = '';
+        if (!empty($a['alinhar']))    $wrap_style .= 'text-align:'    . esc_attr($a['alinhar'])    . ';';
+        if (!empty($a['fonte']))      $wrap_style .= 'font-family:'   . esc_attr($a['fonte'])      . ';';
+        if (!empty($a['fundo']))      $wrap_style .= 'background-color:' . esc_attr($a['fundo'])  . ';';
+        if (!empty($a['padding']))    $wrap_style .= 'padding:'       . esc_attr($a['padding'])    . ';';
+        if (!empty($a['borda_raio'])) $wrap_style .= 'border-radius:' . esc_attr($a['borda_raio']). ';';
+
+        // Oculta o bloco até que o JS restaure a sessão do aluno
+        if ($a['ocultar_sem_sessao'] !== 'false' && $a['ocultar_sem_sessao'] !== '0') {
+            $wrap_style = 'display:none;' . $wrap_style;
+        }
+
+        $val_style = '';
+        if (!empty($a['cor']))      $val_style .= 'color:'       . esc_attr($a['cor'])      . ';';
+        if (!empty($a['tamanho']))  $val_style .= 'font-size:'   . esc_attr($a['tamanho'])  . ';';
+        if (!empty($a['peso']))     $val_style .= 'font-weight:' . esc_attr($a['peso'])     . ';';
+
+        $label_style = '';
+        if (!empty($a['cor_label']))     $label_style .= 'color:'       . esc_attr($a['cor_label'])      . ';';
+        if (!empty($a['peso_label']))    $label_style .= 'font-weight:' . esc_attr($a['peso_label'])     . ';';
+        if (!empty($a['tamanho_label'])) $label_style .= 'font-size:'   . esc_attr($a['tamanho_label']) . ';';
+
+        $show_label = ($a['mostrar_label'] !== 'false' && $a['mostrar_label'] !== '0' && $a['label'] !== '');
+
+        $tags_permitidas = array( 'span', 'p', 'div', 'strong', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' );
+        $tag = in_array( $a['tag'], $tags_permitidas, true ) ? $a['tag'] : 'span';
+
+        $output  = '<' . $tag . ' class="apreas-nome-aluno-wrap" style="' . $wrap_style . '">';
+        if ($show_label) {
+            $output .= '<strong class="apreas-nome-aluno-label" style="' . $label_style . '">' . esc_html($a['label']) . ' </strong>';
+        }
+        $output .= '<span class="aluno-nome apreas-nome-aluno" style="' . $val_style . '"></span>';
+        $output .= '</' . $tag . '>';
+
+        return $output;
     }
 
     // ============================================================
@@ -387,7 +448,8 @@ class Login {
         (function(){
             try {
                 var s = JSON.parse(localStorage.getItem('apreas_login_sessao') || 'null');
-                if (s && s.expira && Date.now() < s.expira) {
+                var ativa = s && s.criada && (Date.now() - s.criada) <= (10 * 60 * 1000) && s.expira && Date.now() < s.expira;
+                if (ativa) {
                     document.write('<style>#loginContainer{display:none!important} #logoutContainer{display:flex!important; z-index: 99999;}</style>');
                 }
             } catch(e) {}
@@ -673,14 +735,34 @@ class Login {
             $imagem_upload_individual2 = get_post_meta($post_id, 'imagem_upload_individual2', true);
             $imagem_upload_turma = get_post_meta($post_id, 'imagem_upload_turma', true);
 
-            // [ESCOLA - UNIDADE - TURMA] 
-                $escola_id = get_post_meta($post_id, 'escola', true);    
+            // [ESCOLA - UNIDADE - SÉRIE - TURMA]
+                $escola_id = get_post_meta($post_id, 'escola', true);
                 $unidade_id = get_post_meta($post_id, 'unidade', true);
-                $turma_id = get_post_meta($post_id, 'turma', true);
+                $serie_id = absint(get_post_meta($post_id, 'serie', true));
+                $turma_meta = get_post_meta($post_id, 'turma', true);
+                $turma_nome = is_scalar($turma_meta) ? trim((string) $turma_meta) : '';
                 $escola_post = get_post($escola_id);
                 $unidade_post = get_post($unidade_id);
-                $turma_post = get_post($turma_id);
-            // [ESCOLA - UNIDADE - TURMA] 
+
+                // Compatibilidade com o formato anterior, em que turma guardava o ID da série.
+                $serie_nome = '';
+                if (!$serie_id && $turma_nome !== '' && ctype_digit($turma_nome)) {
+                    $turma_legada = get_post((int) $turma_nome);
+                    if ($turma_legada && $turma_legada->post_type === 'turmas') {
+                        list($serie_nome, $turma_nome) = \Apreas\Series::quebrar_serie_turma($turma_legada->post_title);
+                        $serie_id = \Apreas\Series::encontrar_serie_por_titulo($serie_nome);
+                    }
+                }
+
+                $serie_post = $serie_id ? get_post($serie_id) : null;
+                if ($serie_post && $serie_post->post_type === 'series') {
+                    $serie_nome = $serie_post->post_title;
+                } else {
+                    $serie_id = 0;
+                    $serie_post = null;
+                }
+                $rotulo_turma = trim($serie_nome . ' ' . $turma_nome);
+            // [ESCOLA - UNIDADE - SÉRIE - TURMA]
 
             // ESCOLA | CAMPOS EXTRAS
             $imagem_logo_escola = get_post_meta(intval($escola_id), 'imagem_logo_escola', true);
@@ -704,6 +786,9 @@ class Login {
                 'imagem_upload_individual' => $imagem_upload_individual,
                 'imagem_upload_individual2' => $imagem_upload_individual2,
                 'imagem_upload_turma' => $imagem_upload_turma,
+                'img_individual' => $imagem_upload_individual,
+                'img_divertida' => $imagem_upload_individual2,
+                'img_coletivo' => $imagem_upload_turma,
                 'escola' => [
                     'id' => intval($escola_id),
                     'nome' => $escola_post ? $escola_post->post_title : null,
@@ -726,9 +811,14 @@ class Login {
                     'id' => intval($unidade_id),
                     'nome' => $unidade_post ? $unidade_post->post_title : null
                 ],
+                'serie' => [
+                    'id' => intval($serie_id),
+                    'nome' => $serie_nome ?: null
+                ],
                 'turma' => [
-                    'id' => intval($turma_id),
-                    'nome' => $turma_post ? $turma_post->post_title : null
+                    'id' => 0,
+                    'nome' => $rotulo_turma ?: null,
+                    'turma_nome' => $turma_nome ?: null
                 ],
                 'data_nascimento' => get_post_meta($post_id, 'data_nascimento', true)
             ];
@@ -762,7 +852,8 @@ class Login {
         (function(){
             try {
                 var s = JSON.parse(localStorage.getItem('apreas_login_sessao') || 'null');
-                if (s && s.expira && Date.now() < s.expira) {
+                var ativa = s && s.criada && (Date.now() - s.criada) <= (10 * 60 * 1000) && s.expira && Date.now() < s.expira;
+                if (ativa) {
                     document.write('<style>#loginContainer{display:none!important} #logoutContainer{display:flex!important; z-index: 99999;}</style>');
                 }
             } catch(e) {}
@@ -1164,6 +1255,9 @@ class Login {
                     'imagem_upload_individual' => $imagem_upload_individual,
                     'imagem_upload_individual2' => $imagem_upload_individual2,
                     'imagem_upload_turma' => $imagem_upload_turma,
+                    'img_individual' => $imagem_upload_individual,
+                    'img_divertida' => $imagem_upload_individual2,
+                    'img_coletivo' => $imagem_upload_turma,
                     'link_album' => $link_album,
                     'evento' => [
                         'id' => intval($evento_id),

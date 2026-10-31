@@ -530,7 +530,7 @@ APREAS_JS;
                     var raw = localStorage.getItem('apreas_login_sessao');
                     if (!raw) return;
                     var s = JSON.parse(raw);
-                    if (Date.now() > s.expira) return;
+                    if (!s.criada || (Date.now() - s.criada) > (10 * 60 * 1000) || Date.now() > s.expira) return;
 
                     var dados = s.dados;
                     var d = (s.tipo === 'eventos' && Array.isArray(dados) && dados.length > 0) ? dados[0] : dados;

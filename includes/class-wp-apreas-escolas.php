@@ -253,6 +253,13 @@ class Escolas {
                     </div>
                 </div>
             </div>
+
+            <div style="margin-bottom: 10px; padding: 12px; background: #f9f9f9; border-left: 4px solid #d32f2f;">
+                <strong style="display:block; margin-bottom:5px;">Nome do Aluno</strong>
+                <code>[nome_aluno]</code>
+                <p style="font-size:13px; color:#666; margin-top:5px;">Exibe somente o nome do aluno logado. Aceita <code>label</code>, <code>mostrar_label</code>, <code>tag</code>, <code>cor</code>, <code>tamanho</code>, <code>peso</code>, <code>alinhar</code>, <code>fonte</code>, <code>fundo</code>, <code>padding</code>, <code>borda_raio</code>, <code>cor_label</code>, <code>peso_label</code>, <code>tamanho_label</code> e <code>ocultar_sem_sessao</code>.</p>
+                <p style="font-size:12px; color:#888; margin-top:4px;"><strong>Exemplo:</strong> <code>[nome_aluno tag="h2" tamanho="22px" peso="bold" alinhar="center"]</code></p>
+            </div>
         </div>
         <?php
     }

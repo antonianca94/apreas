@@ -9,11 +9,12 @@
        Sessão (somente exibe após login de shortcode)
     ───────────────────────────────────────────── */
     var LOGIN_KEY = 'apreas_login_sessao';
+    var SESSAO_TTL = 10 * 60 * 1000; // 10 minutos
 
     function temSessaoAtiva() {
         try {
             var s = JSON.parse(localStorage.getItem(LOGIN_KEY) || 'null');
-            return !!(s && s.expira && Date.now() < s.expira);
+            return !!(s && s.criada && (Date.now() - s.criada) <= SESSAO_TTL && s.expira && Date.now() < s.expira);
         } catch (e) {
             return false;
         }

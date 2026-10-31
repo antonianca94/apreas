@@ -67,6 +67,8 @@ class APREAS_Plugin
         // Campos extras do checkout WooCommerce (substitui plugin externo)
         $Checkout = \Apreas\Checkout::getInstance();
         $Settings = \Apreas\Settings::getInstance();
+        // Registra Séries também no frontend, pois os dados do Aluno são usados no login.
+        $Series = \Apreas\Series::getInstance();
 
         // ─────────────────────────────────────────────
         // AJAX — Mini Carrinho: dados do carrinho
@@ -96,6 +98,7 @@ class APREAS_Plugin
                     "cb" => $columns["cb"], // Checkbox de seleção
                     "title" => "Aluno", // Nome do Aluno
                     "escola" => "Escola",
+                    "serie" => "Série",
                     "turma" => "Turma",
                     "unidade" => "Unidade",
                     "data_nascimento" => "Data de Nascimento",
@@ -136,10 +139,19 @@ class APREAS_Plugin
                             }
                             break;
 
+                        case "serie":
+                            $serie_id = absint(get_post_meta($post_id, "serie", true));
+                            if ($serie_id) {
+                                echo esc_html(get_the_title($serie_id));
+                            } else {
+                                echo "—";
+                            }
+                            break;
+
                         case "turma":
-                            $turma_id = get_post_meta($post_id, "turma", true);
-                            if ($turma_id) {
-                                echo get_the_title($turma_id);
+                            $turma = get_post_meta($post_id, "turma", true);
+                            if (is_scalar($turma) && $turma !== '') {
+                                echo esc_html($turma);
                             } else {
                                 echo "—";
                             }
@@ -324,6 +336,7 @@ class APREAS_Plugin
                 $sortable_columns
             ) {
                 $sortable_columns["escola"] = "escola";
+                $sortable_columns["serie"] = "serie";
                 $sortable_columns["turma"] = "turma";
                 $sortable_columns["unidade"] = "unidade";
                 $sortable_columns["data_nascimento"] = "data_nascimento";
@@ -339,10 +352,16 @@ class APREAS_Plugin
 
                 switch ($orderby) {
                     case "escola":
-                    case "turma":
                     case "unidade":
                         $query->set("meta_key", $orderby); // Usa o slug da coluna como chave do meta_data
                         $query->set("orderby", "meta_value_num"); // Ordena como número (já que guarda o ID)
+
+                        break;
+
+                    case "serie":
+                    case "turma":
+                        $query->set("meta_key", $orderby === "serie" ? "serie_nome" : "turma");
+                        $query->set("orderby", "meta_value");
 
                         break;
 
@@ -384,29 +403,39 @@ class APREAS_Plugin
                 }
                 echo "</select>";
 
-                // --- FILTRO DE TURMA ---
-                $turmas = get_posts([
-                    "post_type" => "turmas", // Verifique se o slug do CPT de turmas é 'turma'
+                // --- FILTRO DE SÉRIE ---
+                $series = get_posts([
+                    "post_type" => "series",
                     "posts_per_page" => -1,
                     "orderby" => "title",
                     "order" => "ASC",
                 ]);
 
-                $turma_sel = isset($_GET["filtro_turma"])
-                    ? $_GET["filtro_turma"]
+                $serie_sel = isset($_GET["filtro_serie"])
+                    ? $_GET["filtro_serie"]
                     : "";
 
-                echo '<select name="filtro_turma">';
-                echo '<option value="">Todas as Turmas</option>';
-                foreach ($turmas as $tur) {
+                echo '<select name="filtro_serie">';
+                echo '<option value="">Todas as Séries</option>';
+                foreach ($series as $serie) {
                     printf(
                         '<option value="%s" %s>%s</option>',
-                        $tur->ID,
-                        selected($turma_sel, $tur->ID, false),
-                        $tur->post_title
+                        esc_attr($serie->ID),
+                        selected($serie_sel, $serie->ID, false),
+                        esc_html($serie->post_title)
                     );
                 }
                 echo "</select>";
+
+                // --- FILTRO DE TURMA ---
+                $turma_sel = isset($_GET["filtro_turma"])
+                    ? sanitize_text_field(wp_unslash($_GET["filtro_turma"]))
+                    : "";
+
+                printf(
+                    '<input type="text" name="filtro_turma" value="%s" placeholder="Filtrar por turma" />',
+                    esc_attr($turma_sel)
+                );
             });
 
             add_action("pre_get_posts", function ($query) {
@@ -432,12 +461,21 @@ class APREAS_Plugin
                     ];
                 }
 
+                // Se selecionou Série
+                if (!empty($_GET["filtro_serie"])) {
+                    $meta_query[] = [
+                        "key" => "serie",
+                        "value" => absint($_GET["filtro_serie"]),
+                        "compare" => "=",
+                    ];
+                }
+
                 // Se selecionou Turma
                 if (!empty($_GET["filtro_turma"])) {
                     $meta_query[] = [
-                        "key" => "turma", // Nome da meta_key que você usa para salvar o ID da turma
-                        "value" => $_GET["filtro_turma"],
-                        "compare" => "=",
+                        "key" => "turma",
+                        "value" => sanitize_text_field(wp_unslash($_GET["filtro_turma"])),
+                        "compare" => "LIKE",
                     ];
                 }
 
@@ -782,7 +820,8 @@ class APREAS_Plugin
         (function () {
             try {
                 var s = JSON.parse(localStorage.getItem('apreas_login_sessao') || 'null');
-                if (!(s && s.expira && Date.now() < s.expira)) {
+                var ativa = s && s.criada && (Date.now() - s.criada) <= (10 * 60 * 1000) && s.expira && Date.now() < s.expira;
+                if (!ativa) {
                     document.body.classList.add('apreas-minicart-deslogado');
                 }
             } catch (e) {
@@ -1047,7 +1086,7 @@ class APREAS_Plugin
             "Login_JS",
             plugins_url("/admin/js/login.js", __FILE__),
             [],
-            "1.0.84",
+            "1.0.85",
             true
         );
         wp_enqueue_script(
