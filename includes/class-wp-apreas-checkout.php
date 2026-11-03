@@ -454,44 +454,13 @@ APREAS_JS;
         }
 
         echo '<div class="apreas-campos-aluno" style="margin-bottom:0rem;">';
-        echo '<h3>' . esc_html__( 'Informações do Aluno', 'apreas' ) . '</h3>';
 
-        woocommerce_form_field( 'apreas_aluno', [
-            'type'     => 'text',
-            'label'    => __( 'Nome Completo do(a) Aluno(a)', 'apreas' ),
-            'required' => true,
-            'class'    => [ 'form-row-wide' ],
-        ], $checkout->get_value( 'apreas_aluno' ) );
-
-        woocommerce_form_field( 'apreas_escola', [
-            'type'     => 'text',
-            'label'    => __( 'Escola', 'apreas' ),
-            'required' => true,
-            'class'    => [ 'form-row-first' ],
-        ], $checkout->get_value( 'apreas_escola' ) );
-
-        woocommerce_form_field( 'apreas_turma', [
-            'type'     => 'text',
-            'label'    => __( 'Série e Turma', 'apreas' ),
-            'required' => true,
-            'class'    => [ 'form-row-last' ],
-        ], $checkout->get_value( 'apreas_turma' ) );
-
-        // Adiciona um espaçador/quebra de linha para limpar o float do first/last
-        echo '<div style="clear:both;"></div>';
-
-        woocommerce_form_field( 'apreas_nascimento', [
-            'type'               => 'text',
-            'label'              => __( 'Data de Nascimento', 'apreas' ),
-            'required'           => true,
-            'class'              => [ 'form-row-wide' ],
-            'placeholder'        => 'DD/MM/AAAA',
-            'custom_attributes'  => [
-                'maxlength'   => 10,
-                'inputmode'   => 'numeric',
-                'autocomplete' => 'off',
-            ],
-        ], $checkout->get_value( 'apreas_nascimento' ) );
+        // Os dados do aluno vêm da sessão de login e não devem ser editados
+        // pelo responsável durante a finalização da compra.
+        echo '<input type="hidden" id="apreas_aluno" name="apreas_aluno" value="' . esc_attr( $checkout->get_value( 'apreas_aluno' ) ) . '" autocomplete="off" />';
+        echo '<input type="hidden" id="apreas_escola" name="apreas_escola" value="' . esc_attr( $checkout->get_value( 'apreas_escola' ) ) . '" autocomplete="off" />';
+        echo '<input type="hidden" id="apreas_turma" name="apreas_turma" value="' . esc_attr( $checkout->get_value( 'apreas_turma' ) ) . '" autocomplete="off" />';
+        echo '<input type="hidden" id="apreas_nascimento" name="apreas_nascimento" value="' . esc_attr( $checkout->get_value( 'apreas_nascimento' ) ) . '" autocomplete="off" />';
 
         // ─────────────────────────────────────────────
         // Design Customizado - Cupom de Desconto
@@ -541,11 +510,12 @@ APREAS_JS;
                         var fieldTurma = $('#apreas_turma');
                         var fieldNasc = $('#apreas_nascimento');
 
-                        // Só preenche se o campo estiver vazio
-                        if (fieldAluno.length && !fieldAluno.val()) fieldAluno.val(d.nome || '');
-                        if (fieldEscola.length && !fieldEscola.val()) fieldEscola.val(d.escola ? d.escola.nome : '');
-                        if (fieldTurma.length && !fieldTurma.val()) fieldTurma.val(d.turma ? d.turma.nome : '');
-                        if (fieldNasc.length && !fieldNasc.val() && d.data_nascimento) {
+                        // Always restore the canonical session data so the
+                        // responsible cannot change the student's information.
+                        if (fieldAluno.length) fieldAluno.val(d.nome || '');
+                        if (fieldEscola.length) fieldEscola.val(d.escola ? d.escola.nome : '');
+                        if (fieldTurma.length) fieldTurma.val(d.turma ? d.turma.nome : '');
+                        if (fieldNasc.length && d.data_nascimento) {
                             var nd = String(d.data_nascimento);
                             if (nd.indexOf('-') !== -1) {
                                 var p = nd.split('-');

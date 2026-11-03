@@ -244,3 +244,54 @@ input#imagem_logo_evento {
     display: block;
 }
 /*** STATUS DAS FOTOS NA LISTAGEM DE ALUNOS ***/
+
+/*** COPIAR ID DAS UNIDADES ***/
+.apreas-copy-id {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin: 0;
+    padding: 2px 4px;
+    border: 0;
+    border-radius: 3px;
+    background: transparent;
+    color: #1d2327;
+    font-size: 13px;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.apreas-copy-id:hover,
+.apreas-copy-id:focus {
+    background: #f0f0f1;
+    color: #2271b1;
+}
+
+.apreas-copy-id:focus-visible {
+    outline: 2px solid #2271b1;
+    outline-offset: 1px;
+}
+
+.apreas-copy-id .dashicons {
+    width: 16px;
+    height: 16px;
+    font-size: 16px;
+    color: #8c8f94;
+}
+
+.apreas-copy-id.is-copied {
+    color: #00a32a;
+}
+
+.apreas-copy-id.is-copied .dashicons {
+    color: #00a32a;
+}
+
+.apreas-copy-id.has-error {
+    color: #d63638;
+}
+
+.apreas-copy-id.has-error .dashicons {
+    color: #d63638;
+}
+/*** COPIAR ID DAS UNIDADES ***/

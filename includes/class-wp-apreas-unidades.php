@@ -18,7 +18,64 @@ class Unidades {
         add_action( 'admin_init', [$this,'unidades_capacidades_administrador']);
         add_action( 'add_meta_boxes', [$this,'adicionar_meta_box_unidades']);
         add_action( 'save_post', [$this,'salvar_meta_box_unidades']);
+        add_filter( 'manage_unidades_posts_columns', [$this,'unidades_posts_columns']);
+        add_action( 'manage_unidades_posts_custom_column', [$this,'unidades_posts_custom_column'], 10, 2 );
+        add_action( 'admin_enqueue_scripts', [$this,'enqueue_copy_id_assets']);
 
+    }
+
+    /**
+     * Carrega os recursos necessários para copiar o ID das unidades.
+     */
+    public function enqueue_copy_id_assets($hook_suffix) {
+        $post_type = isset($_GET['post_type']) ? sanitize_key(wp_unslash($_GET['post_type'])) : '';
+
+        if ($hook_suffix !== 'edit.php' || $post_type !== 'unidades') {
+            return;
+        }
+
+        wp_enqueue_script(
+            'apreas-copy-id',
+            plugins_url('/admin/js/copy-id.js', dirname(__DIR__) . '/apreas.php'),
+            [],
+            '1.0.0',
+            true
+        );
+    }
+
+    /**
+     * Adiciona a coluna ID na listagem do post type Unidades.
+     */
+    public function unidades_posts_columns($columns) {
+        $new_columns = [];
+
+        if (isset($columns['cb'])) {
+            $new_columns['cb'] = $columns['cb'];
+        }
+
+        $new_columns['post_id'] = 'ID';
+
+        foreach ($columns as $key => $label) {
+            if ($key !== 'cb' && $key !== 'post_id') {
+                $new_columns[$key] = $label;
+            }
+        }
+
+        return $new_columns;
+    }
+
+    /**
+     * Exibe o ID da unidade na listagem do post type Unidades.
+     */
+    public function unidades_posts_custom_column($column, $post_id) {
+        if ($column === 'post_id') {
+            $post_id = absint($post_id);
+
+            printf(
+                '<button type="button" class="apreas-copy-id" data-apreas-copy-id="%1$d" title="Copiar ID" aria-label="Copiar ID %1$d"><strong>%1$d</strong><span class="dashicons dashicons-clipboard" aria-hidden="true"></span></button>',
+                $post_id
+            );
+        }
     }
 
     function unidades_posttype () {

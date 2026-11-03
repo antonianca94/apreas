@@ -57,6 +57,20 @@ class APREAS_Plugin
         add_action("admin_enqueue_scripts", [$this, "load_admin_assets"]);
         add_action("wp_enqueue_scripts", [$this, "load_frontend_assets"]);
         add_action("wp_footer", [$this, "render_minicart_html"]);
+        add_action("admin_init", [$this, "atualizar_regras_apos_remocao_cpts"]);
+    }
+
+    /**
+     * Atualiza as regras de URL após a remoção dos post types Participantes,
+     * Eventos e Turmas. Os registros existentes no banco não são apagados.
+     */
+    public function atualizar_regras_apos_remocao_cpts() {
+        if (get_option('apreas_cpts_removidos_rewrite_v1') === '1') {
+            return;
+        }
+
+        flush_rewrite_rules(false);
+        update_option('apreas_cpts_removidos_rewrite_v1', '1');
     }
 
     public function plugin_loaded()
@@ -84,12 +98,8 @@ class APREAS_Plugin
             // INSTANCIAS
             $Alunos = \Apreas\Alunos::getInstance();
             $Unidades = \Apreas\Unidades::getInstance();
-            $Turmas = \Apreas\Turmas::getInstance();
 
             $Relatorios = \Apreas\Relatorios::getInstance();
-
-            $Participantes = \Apreas\Participantes::getInstance();
-            $Eventos = \Apreas\Eventos::getInstance();
             // INSTANCIAS
 
             //COLUNA ALUNOS
@@ -648,68 +658,6 @@ class APREAS_Plugin
             }
             //FIM COLUNA ESCOLA
 
-            //INICIO COLUNA TURMA
-            // 1. Define as colunas e a ordem
-            add_filter("manage_turmas_posts_columns", "reorder_turmas_columns");
-            function reorder_turmas_columns($columns)
-            {
-                // Criamos um novo array com a ordem desejada
-                $new_columns = [];
-
-                // 1. Colocamos o Checkbox de seleção em primeiro (padrão do WP)
-                if (isset($columns["cb"])) {
-                    $new_columns["cb"] = $columns["cb"];
-                }
-
-                // 2. Inserimos o ID como a primeira coluna de dados
-                $new_columns["post_id"] = "ID";
-
-                // 3. Adicionamos o Título
-                if (isset($columns["title"])) {
-                    $new_columns["title"] = $columns["title"];
-                }
-
-                // 4. Adicionamos a Data
-                if (isset($columns["date"])) {
-                    $new_columns["date"] = $columns["date"];
-                }
-
-                // Caso existam outras colunas de plugins (como SEO, etc) e você queira mantê-las no final:
-                /*
-                foreach ($columns as $key => $value) {
-                if (!isset($new_columns[$key])) {
-                $new_columns[$key] = $value;
-                }
-                }
-                */
-
-                return $new_columns;
-            }
-
-            // 2. Preenche o valor da coluna ID
-            add_action(
-                "manage_turmas_posts_custom_column",
-                "display_turmas_id_value",
-                10,
-                2
-            );
-            function display_turmas_id_value($column, $post_id)
-            {
-                if ($column === "post_id") {
-                    echo "<strong>" . $post_id . "</strong>";
-                }
-            }
-
-            // 3. Ajusta a largura da coluna ID via CSS para ficar discreto
-            add_action("admin_head", "style_turmas_id_column");
-            function style_turmas_id_column()
-            {
-                echo '<style type="text/css">
-        .column-post_id { width: 90px !important; text-align: left; }
-    </style>';
-            }
-            //FIM COLUNA TURMA
-
             // 1. Criar os cabeçalhos das colunas
             add_filter(
                 "manage_alunos_posts_columns",
@@ -1187,7 +1135,7 @@ class APREAS_Plugin
             "Style_CSS",
             plugins_url("/admin/css/style.css", __FILE__),
             [],
-            "1.0.16"
+            "1.0.17"
         );
     }
 }

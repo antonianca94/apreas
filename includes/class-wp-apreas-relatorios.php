@@ -73,12 +73,12 @@ class Relatorios {
     }
 
     // ─────────────────────────────────────────────
-    // MENU RAIZ "Apreas" — Relatório (primeiro submenu)
+    // MENU RAIZ "Apreas Recordação" — Relatório (primeiro submenu)
     // ─────────────────────────────────────────────
     public function adicionar_pagina() {
         add_menu_page(
-            'Apreas',
-            'Apreas',
+            'Apreas Recordação',
+            'Apreas Recordação',
             'manage_woocommerce',
             self::SLUG,
             [ $this, 'render_pagina' ],

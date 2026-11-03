@@ -244,9 +244,9 @@ class Series {
     /**
      * Migra os registros antigos de Turmas para Séries e atualiza os Alunos.
      *
-     * O CPT legado "turmas" é mantido para não alterar as demais áreas do
-     * plugin. Cada aluno passa a guardar o ID da série em "serie" e o texto
-     * da turma em "turma".
+     * O CPT legado "turmas" foi removido da interface, mas seus registros
+     * existentes são preservados para esta migração. Cada aluno passa a
+     * guardar o ID da série em "serie" e o texto da turma em "turma".
      */
     public function migrar_turmas_para_series() {
         if (get_option(self::MIGRATION_OPTION) === '1') return;
