@@ -3,7 +3,7 @@
 Plugin Name: Apreas WP Plugin
 Plugin URI: https://apreas.com.br/
 Description: Recursos extras para os Alunos.
-Version: 2.2.2
+Version: 2.3.0
 Author: Apreas Development Team
 Author URI: https://apreas.com.br/
 Text Domain: apreas
@@ -100,6 +100,9 @@ class APREAS_Plugin
             $Unidades = \Apreas\Unidades::getInstance();
 
             $Relatorios = \Apreas\Relatorios::getInstance();
+            // Eventos (serviços) + Google Calendar: acesso pelas permissões do WordPress.
+            $Eventos = \Apreas\Eventos::getInstance();
+            $GoogleCalendar = \Apreas\GoogleCalendar::getInstance();
             // INSTANCIAS
 
             //COLUNA ALUNOS

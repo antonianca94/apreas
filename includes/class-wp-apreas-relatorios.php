@@ -408,7 +408,7 @@ class Relatorios {
         if ( ! $data ) {
             return '—';
         }
-        $dt = $data->setTimezone( new \DateTimeZone( wp_timezone_string() ) );
+        $dt = $data->setTimezone( Fuso::zona() );
         return $dt->format( 'd/m/Y H:i' );
     }
 
