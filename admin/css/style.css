@@ -245,7 +245,22 @@ input#imagem_logo_evento {
 }
 /*** STATUS DAS FOTOS NA LISTAGEM DE ALUNOS ***/
 
-/*** COPIAR ID DAS UNIDADES ***/
+/*** COPIAR ID NAS LISTAGENS (UNIDADES, ESCOLAS, SÉRIES, ALUNOS) ***/
+/* Layout auto + width:1% com nowrap: a coluna ID encolhe até o maior ID da
+   tela em vez de receber a sobra de espaço (no fixed, 1% colapsaria a coluna). */
+.post-type-unidades .wp-list-table,
+.post-type-escolas .wp-list-table,
+.post-type-series .wp-list-table,
+.post-type-alunos .wp-list-table {
+    table-layout: auto;
+}
+
+.column-post_id {
+    width: 1%;
+    white-space: nowrap;
+    text-align: left;
+}
+
 .apreas-copy-id {
     display: inline-flex;
     align-items: center;
@@ -259,6 +274,7 @@ input#imagem_logo_evento {
     font-size: 13px;
     cursor: pointer;
     line-height: 1;
+    white-space: nowrap;
 }
 
 .apreas-copy-id:hover,
@@ -294,4 +310,4 @@ input#imagem_logo_evento {
 .apreas-copy-id.has-error .dashicons {
     color: #d63638;
 }
-/*** COPIAR ID DAS UNIDADES ***/
+/*** COPIAR ID NAS LISTAGENS ***/

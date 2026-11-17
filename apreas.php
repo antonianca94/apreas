@@ -98,6 +98,8 @@ class APREAS_Plugin
             // INSTANCIAS
             $Alunos = \Apreas\Alunos::getInstance();
             $Unidades = \Apreas\Unidades::getInstance();
+            // Coluna ID com botão de copiar nas listagens (unidades, escolas, séries, alunos).
+            $ColunaId = \Apreas\ColunaId::getInstance();
 
             $Relatorios = \Apreas\Relatorios::getInstance();
             // Eventos (serviços) + Google Calendar: acesso pelas permissões do WordPress.
@@ -637,28 +639,6 @@ class APREAS_Plugin
                 return $new_columns;
             }
 
-            // 2. Preenche o valor da coluna ID
-            add_action(
-                "manage_escolas_posts_custom_column",
-                "display_escolas_id_value",
-                10,
-                2
-            );
-            function display_escolas_id_value($column, $post_id)
-            {
-                if ($column === "post_id") {
-                    echo "<strong>" . $post_id . "</strong>";
-                }
-            }
-
-            // 3. Ajusta a largura da coluna ID via CSS para ficar discreto
-            add_action("admin_head", "style_escolas_id_column");
-            function style_escolas_id_column()
-            {
-                echo '<style type="text/css">
-        .column-post_id { width: 90px !important; text-align: left; }
-    </style>';
-            }
             //FIM COLUNA ESCOLA
 
             // 1. Criar os cabeçalhos das colunas
@@ -1138,7 +1118,7 @@ class APREAS_Plugin
             "Style_CSS",
             plugins_url("/admin/css/style.css", __FILE__),
             [],
-            "1.0.17"
+            "1.0.18"
         );
     }
 }
