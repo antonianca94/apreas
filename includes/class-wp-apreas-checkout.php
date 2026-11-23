@@ -30,6 +30,10 @@ class Checkout {
         add_filter( 'woocommerce_order_get_formatted_billing_address',    [ $this, 'adicionar_bairro_string_admin' ], 10, 3 );
         // Corrige mapeamento dos campos de endereço (bairro / cidade / estado)
         add_filter( 'woocommerce_checkout_fields',                        [ $this, 'corrigir_campos_endereco' ], 99 );
+
+        // Garante o país de faturamento: o campo billing_country é ocultado por plugins de
+        // checkout BR e o WooCommerce recusa o pedido quando ele não chega no POST.
+        add_filter( 'woocommerce_checkout_posted_data',                   [ $this, 'garantir_pais_faturamento' ], 9999 );
         
         // Remove completamente o bloco de Informações Adicionais / Notas do Pedido
         add_filter( 'woocommerce_enable_order_notes_field', '__return_false', 9999 );
@@ -121,6 +125,35 @@ class Checkout {
         }
 
         return $fields;
+    }
+
+    /**
+     * Define o país de faturamento quando o checkout não envia billing_country.
+     *
+     * O WooCommerce recusa o pedido com "This store cannot accept your order without a
+     * billing country" quando o country não existe no POST — e ele só existe no POST se
+     * estiver no fieldset do checkout, que plugins de checkout BR costumam remover.
+     */
+    public function garantir_pais_faturamento( $data ) {
+        if ( ! empty( $data['billing_country'] ) ) {
+            return $data;
+        }
+
+        $pais = '';
+        if ( function_exists( 'WC' ) && WC()->countries ) {
+            $pais = WC()->countries->get_base_country();
+        }
+        if ( ! $pais ) {
+            $pais = 'BR';
+        }
+
+        $data['billing_country'] = $pais;
+
+        if ( empty( $data['shipping_country'] ) && WC()->cart && WC()->cart->needs_shipping() ) {
+            $data['shipping_country'] = $pais;
+        }
+
+        return $data;
     }
 
     // ─────────────────────────────────────────────
